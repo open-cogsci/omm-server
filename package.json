@@ -13,8 +13,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "nuxt": "^2.0.0",
-    "cross-env": "^5.2.0",
     "@adonisjs/ace": "^4.0.7",
     "@adonisjs/auth": "^2.0.10",
     "@adonisjs/bodyparser": "^1.0.8",
@@ -25,8 +23,14 @@
     "@adonisjs/lucid": "^4.0.22",
     "@adonisjs/session": "^1.0.19",
     "@adonisjs/shield": "^1.0.4",
+    "@nuxtjs/auth": "^4.8.5",
     "@nuxtjs/axios": "^5.3.6",
-    "@nuxtjs/dotenv": "^1.4.0"
+    "@nuxtjs/dotenv": "^1.4.0",
+    "cross-env": "^5.2.0",
+    "nuxt": "^2.0.0",
+    "sqlite3": "^4.1.1",
+    "vuex-pathify": "^1.4.1",
+    "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.9",

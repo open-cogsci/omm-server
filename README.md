@@ -6,7 +6,7 @@
 
 ``` bash
 # install dependencies
-$ npm run install
+$ npm ci (or `npm install` if that fails)
 
 # serve with hot reload at localhost:3000
 $ npm run dev

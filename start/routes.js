@@ -14,5 +14,19 @@
 */
 
 const Route = use('Route')
+const API_PREFIX = '/api/v1'
+
+Route.group(() => {
+  Route.resource('users', 'UserController').apiOnly()
+  Route.get('/auth/user', 'UserController.me').as('users.me')
+  Route.put('/auth/user', 'UserController.updateMe').as('users.update_me')
+  Route.put('/auth/user/change_password', 'UserController.changePassword').as('users.password')
+  Route.resource('jobs', 'JobController').apiOnly()
+  Route.resource('participants', 'ParticipantController').apiOnly()
+}).prefix(API_PREFIX).middleware(['auth:jwt'])
+
+Route.group(() => {
+  Route.post('/auth/login', 'UserController.login').as('login')
+}).prefix(API_PREFIX)
 
 Route.any('*', 'NuxtController.render')

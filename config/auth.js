@@ -1,5 +1,7 @@
 'use strict'
 
+const appKey = require('./app').appKey
+
 module.exports = {
   /*
   |--------------------------------------------------------------------------
@@ -13,7 +15,7 @@ module.exports = {
   | Available Serializers - lucid, database
   |
   */
-  authenticator: 'session',
+  authenticator: 'jwt',
 
   /*
   |--------------------------------------------------------------------------
@@ -69,7 +71,7 @@ module.exports = {
     uid: 'email',
     password: 'password',
     options: {
-      secret: 'self::app.appKey'
+      secret: appKey
     }
   }
 }
