@@ -1,4 +1,3 @@
-/* eslint-disable require-await */
 <template>
   <v-card>
     <v-card-title class="justify-center">
@@ -10,6 +9,7 @@
           <v-col cols="12">
             <v-text-field
               :rules="validation.email"
+              v-model="email"
               validate-on-blur
               label="Email address"
             />
@@ -17,6 +17,7 @@
           <v-col cols="12">
             <v-text-field
               :rules="validation.password"
+              v-model="password"
               label="password"
               type="password"
             />
@@ -51,6 +52,7 @@ import { validateEmail } from '~/assets/js/validationrules'
 
 export default {
   layout: 'guest',
+  middleware: ['auth'],
   auth: 'guest',
   data () {
     return {
@@ -87,12 +89,11 @@ export default {
       try {
         await this.$auth.loginWith('local', {
           data: {
-            username: this.email,
+            email: this.email,
             password: this.password
           }
         })
       } catch (e) {
-        console.error('Whoop', e)
         this.error = e + ''
       }
     }

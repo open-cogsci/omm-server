@@ -42,10 +42,12 @@ class UserController {
   async login ({ request, auth, response }) {
     try {
       // validate the user credentials and generate a JWT token
-      const token = await auth.attempt(
-        request.input('email'),
-        request.input('password')
-      )
+      const token = await auth
+        // .withRefreshToken()
+        .attempt(
+          request.input('email'),
+          request.input('password')
+        )
 
       return response.json({
         status: 'success',
@@ -55,6 +57,34 @@ class UserController {
       response.status(400).json({
         status: 'error',
         message: 'Invalid email/password'
+      })
+    }
+  }
+
+  /**
+   * Logout the current user
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Auth} ctx.auth
+   * @param {Response} ctx.response
+   */
+  async logout ({ auth, response }) {
+    try {
+      const user = await auth.getUser()
+      const token = auth.getAuthHeader()
+      await user
+        .tokens()
+        .where('token', token)
+        .update({ is_revoked: true })
+      response.json({
+        status: 'success',
+        message: 'User logged out.'
+      })
+    } catch (error) {
+      response.status(400).json({
+        status: 'error',
+        message: 'Unable to logout user'
       })
     }
   }
@@ -132,12 +162,13 @@ class UserController {
    */
   async me ({ auth, response }) {
     const user = await User.query()
+      .select('id', 'name', 'email', 'created_at', 'updated_at')
       .where('id', auth.current.user.id)
       .firstOrFail()
 
     return response.json({
       status: 'success',
-      data: user
+      data: { user }
     })
   }
 
