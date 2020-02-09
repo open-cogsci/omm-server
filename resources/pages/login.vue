@@ -1,9 +1,19 @@
 <template>
   <v-card>
-    <v-card-title class="justify-center">
-      Please Login
+    <v-card-title>
+      <v-img
+        :src="require('@/assets/img/cogsci.png')"
+        max-height="40"
+        max-width="40"
+        class="mx-2"
+        contain
+      />
+      <span class="display-1 font-weight-light">Open Monkey Mind</span>
     </v-card-title>
     <v-card-text>
+      <h1 class="text-center subtitle-1">
+        Please sign in
+      </h1>
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="12">

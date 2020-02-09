@@ -36,10 +36,21 @@
     <v-app-bar
       :clipped-left="clipped"
       fixed
+      color="primary"
+      dark
       app
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title v-text="title" />
+      <v-img
+        :src="require('@/assets/img/cogsci.png')"
+        max-height="40"
+        max-width="40"
+        class="mx-2"
+        contain
+      />
+      <v-toolbar-title>
+        {{ title }}
+      </v-toolbar-title>
       <v-spacer />
       <v-menu bottom offset-y left>
         <template v-slot:activator="{ on }">
@@ -101,7 +112,7 @@ export default {
         }
       ],
       miniVariant: false,
-      title: 'OpenMM'
+      title: 'OpenMonkeyMind'
     }
   },
   methods: {

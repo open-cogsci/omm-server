@@ -188,7 +188,6 @@ class UserController {
 
       // update with new data entered
       user.name = request.input('name')
-      user.username = request.input('username')
       user.email = request.input('email')
 
       await user.save()

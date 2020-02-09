@@ -67,16 +67,16 @@
                 <v-row>
                   <v-col cols="12">
                     <v-text-field
-                      v-model="password.old"
-                      :rules="validation.password_old"
+                      v-model="password.password"
+                      :rules="validation.password"
                       label="Old password"
                       type="password"
                     />
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
-                      v-model="password.new"
-                      :rules="validation.password_new"
+                      v-model="password.newPassword"
+                      :rules="validation.newPassword"
                       label="New password"
                       validate-on-blur
                       type="password"
@@ -84,8 +84,8 @@
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
-                      v-model="password.new2"
-                      :rules="validation.password_new2"
+                      v-model="password.newPassword2"
+                      :rules="validation.newPassword2"
                       label="Repeat new password"
                       type="password"
                       validate-on-blur
@@ -125,9 +125,9 @@ export default {
     return {
       user: { ...this.$auth.user },
       password: {
-        old: '',
-        new: '',
-        new2: ''
+        password: '',
+        newPassword: '',
+        newPassword2: ''
       },
       validation: {
         name: [v => !!v || 'Name cannot be empty'],
@@ -135,15 +135,15 @@ export default {
           v => !!v || 'Email cannot be empty',
           v => emailRule(v) || 'Invalid email address'
         ],
-        password_old: [
+        password: [
           v => !!v || 'Please provide your current password'
         ],
-        password_new: [
+        newPassword: [
           v => !!v || 'Please provide a new password'
         ],
-        password_new2: [
+        newPassword2: [
           v => !!v || 'Please repeat your new password',
-          v => v === this.password.new || 'Does not match with first new password'
+          v => v === this.password.newPassword || 'Does not match with first new password'
         ]
       },
       detailsFormValid: true,
@@ -154,12 +154,21 @@ export default {
     async saveDetails () {
       if (!this.$refs.detailsForm.validate()) { return }
       const data = { ...this.user }
-      await this.$emit('details', data)
+      try {
+        await this.$axios.$put('/api/v1/auth/user', data)
+        await this.$auth.fetchUser()
+      } catch (e) {
+        console.error(e)
+      }
     },
     async savePassword () {
       if (!this.$refs.pwForm.validate()) { return }
       const data = { ...this.password }
-      await this.$emit('password', data)
+      try {
+        await this.$axios.$put('/api/v1/auth/user/change_password', data)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 }

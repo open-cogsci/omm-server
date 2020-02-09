@@ -1,7 +1,14 @@
 <template>
   <v-card>
-    <v-card-title class="justify-center">
-      Reset password
+    <v-card-title>
+      <v-img
+        :src="require('@/assets/img/cogsci.png')"
+        max-height="40"
+        max-width="40"
+        class="mx-2"
+        contain
+      />
+      <span class="display-1 font-weight-light">Open Monkey Mind</span>
     </v-card-title>
     <v-card-text>
       <p>Send a password reset link to the provided e-mail address.</p>
