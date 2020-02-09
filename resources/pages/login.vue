@@ -48,12 +48,17 @@
 </template>
 
 <script>
-import { validateEmail } from '~/assets/js/validationrules'
+import { emailRule } from '~/assets/js/validationrules'
 
 export default {
   layout: 'guest',
   middleware: ['auth'],
   auth: 'guest',
+  head () {
+    return {
+      title: 'Login'
+    }
+  },
   data () {
     return {
       email: '',
@@ -63,7 +68,7 @@ export default {
       validation: {
         email: [
           v => !!v || 'Please provide your email address',
-          v => validateEmail(v) || 'This e-mail address is invalid'
+          v => emailRule(v) || 'This e-mail address is invalid'
         ],
         password: [
           v => !!v || 'Please provide a password'
