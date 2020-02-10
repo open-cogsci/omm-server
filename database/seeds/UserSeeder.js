@@ -24,7 +24,7 @@ const users = [
   {
     name: 'Sebastiaan Mathôt',
     username: 'smathot',
-    email: 'smathot@cogsci.nl',
+    email: 's.mathot@cogsci.nl',
     password: 'sebastiaan'
   }
 ]
