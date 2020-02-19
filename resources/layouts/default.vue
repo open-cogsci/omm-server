@@ -89,11 +89,15 @@
     >
       <span>&copy; 2019</span>
     </v-footer>
+    <notification-box />
   </v-app>
 </template>
 
 <script>
 export default {
+  components: {
+    NotificationBox: () => import('@/components/NotificationBox')
+  },
   data () {
     return {
       clipped: true,

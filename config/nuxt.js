@@ -34,7 +34,8 @@ module.exports = {
   */
   plugins: [
     '~/plugins/syncprops',
-    '~/plugins/routersync'
+    '~/plugins/routersync',
+    '~/plugins/mdifont'
   ],
   /*
   ** Nuxt.js dev-modules
@@ -77,6 +78,9 @@ module.exports = {
   */
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
+    defaultAssets: {
+      icons: false
+    },
     theme: {
       dark: false,
       themes: {

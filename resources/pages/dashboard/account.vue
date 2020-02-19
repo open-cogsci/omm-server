@@ -41,6 +41,7 @@
                   <v-col cols="12" class="text-right">
                     <v-btn
                       :disabled="!detailsFormValid"
+                      :loading="savingDetails"
                       class="success"
                       @click="saveDetails"
                     >
@@ -96,6 +97,7 @@
                   <v-col cols="12" class="text-right">
                     <v-btn
                       :disabled="!pwFormValid"
+                      :loading="savingPassword"
                       class="success"
                       @click="savePassword"
                     >
@@ -113,6 +115,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { emailRule } from '~/assets/js/validationrules'
 
 export default {
@@ -142,30 +145,49 @@ export default {
         ]
       },
       detailsFormValid: true,
-      pwFormValid: true
+      pwFormValid: true,
+      savingDetails: false,
+      savingPassword: false
     }
   },
   methods: {
+    ...mapActions('notifications', ['notify']),
     async saveDetails () {
       if (!this.$refs.detailsForm.validate()) { return }
       const data = { ...this.user }
+      this.savingDetails = true
       try {
         await this.$axios.$put('/api/v1/auth/user', data)
+        this.notify({
+          message: 'Data saved',
+          color: 'success'
+        })
         await this.$auth.fetchUser()
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e)
+        this.notify({
+          message: `Error saving data: ${e}`,
+          color: 'danger'
+        })
       }
+      this.savingDetails = false
     },
     async savePassword () {
       if (!this.$refs.pwForm.validate()) { return }
       const data = { ...this.password }
+      this.savingPassword = true
       try {
         await this.$axios.$put('/api/v1/auth/user/change_password', data)
+        this.notify({
+          message: 'Password saved',
+          color: 'success'
+        })
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e)
+        this.notify({
+          message: `Error saving password: ${e}`,
+          color: 'danger'
+        })
       }
+      this.savingPassword = false
     }
   },
   head () {
