@@ -8,7 +8,6 @@ class StatesSchema extends Schema {
     this.create('states', (table) => {
       table.increments()
       table.string('label', 100).unique()
-      table.timestamps()
     })
   }
 

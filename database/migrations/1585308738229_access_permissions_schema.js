@@ -8,7 +8,6 @@ class AccessPermissionsSchema extends Schema {
     this.create('access_permissions', (table) => {
       table.increments()
       table.string('name', 25)
-      table.timestamps()
     })
   }
 
