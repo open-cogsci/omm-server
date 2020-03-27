@@ -41,8 +41,8 @@
                   <v-col cols="12" class="text-right">
                     <v-btn
                       :disabled="!detailsFormValid"
-                      @click="saveDetails"
                       class="success"
+                      @click="saveDetails"
                     >
                       Save
                     </v-btn>
@@ -96,8 +96,8 @@
                   <v-col cols="12" class="text-right">
                     <v-btn
                       :disabled="!pwFormValid"
-                      @click="savePassword"
                       class="success"
+                      @click="savePassword"
                     >
                       Change password
                     </v-btn>
@@ -116,11 +116,6 @@
 import { emailRule } from '~/assets/js/validationrules'
 
 export default {
-  head () {
-    return {
-      title: 'Settings'
-    }
-  },
   data () {
     return {
       user: { ...this.$auth.user },
@@ -158,6 +153,7 @@ export default {
         await this.$axios.$put('/api/v1/auth/user', data)
         await this.$auth.fetchUser()
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(e)
       }
     },
@@ -167,8 +163,14 @@ export default {
       try {
         await this.$axios.$put('/api/v1/auth/user/change_password', data)
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(e)
       }
+    }
+  },
+  head () {
+    return {
+      title: 'Settings'
     }
   }
 }

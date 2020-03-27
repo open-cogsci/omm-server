@@ -18,16 +18,16 @@
         <v-row>
           <v-col cols="12">
             <v-text-field
-              :rules="validation.email"
               v-model="email"
+              :rules="validation.email"
               validate-on-blur
               label="Email address"
             />
           </v-col>
           <v-col cols="12">
             <v-text-field
-              :rules="validation.password"
               v-model="password"
+              :rules="validation.password"
               label="password"
               type="password"
             />
@@ -45,8 +45,8 @@
       </v-btn>
       <v-btn
         :disabled="!valid"
-        @click="login"
         color="primary"
+        @click="login"
       >
         Sign in
         <v-icon right>
@@ -64,11 +64,7 @@ export default {
   layout: 'guest',
   middleware: ['auth'],
   auth: 'guest',
-  head () {
-    return {
-      title: 'Login'
-    }
-  },
+
   data () {
     return {
       email: '',
@@ -111,6 +107,11 @@ export default {
       } catch (e) {
         this.error = e + ''
       }
+    }
+  },
+  head () {
+    return {
+      title: 'Login'
     }
   }
 }
