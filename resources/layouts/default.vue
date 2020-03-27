@@ -55,9 +55,9 @@
       <v-menu bottom offset-y left>
         <template v-slot:activator="{ on }">
           <v-btn
-            v-on="on"
             x-large
             icon
+            v-on="on"
           >
             <v-icon>mdi-account-circle</v-icon>
           </v-btn>
