@@ -24,10 +24,10 @@
     "@adonisjs/session": "^1.0.19",
     "@adonisjs/shield": "^1.0.4",
     "@nuxtjs/auth": "^4.9.0",
-    "@nuxtjs/axios": "^5.9.5",
+    "@nuxtjs/axios": "^5.9.7",
     "@nuxtjs/dotenv": "^1.4.0",
     "cross-env": "^5.2.0",
-    "nuxt": "^2.12.1",
+    "nuxt": "^2.12.2",
     "sqlite3": "^4.1.1",
     "vuex-pathify": "^1.4.1",
     "vuex-router-sync": "^5.0.0"

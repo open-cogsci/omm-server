@@ -10,20 +10,16 @@
 |
 */
 
-/** @type {import('@adonisjs/lucid/src/Factory')} */
-const Database = use('Database')
 const User = use('App/Models/User')
 
 const users = [
   {
     name: 'Daniel Schreij',
-    username: 'dschreij',
     email: 'dschreij@gmail.com',
     password: 'daniel'
   },
   {
     name: 'Sebastiaan Mathôt',
-    username: 'smathot',
     email: 's.mathot@cogsci.nl',
     password: 'sebastiaan'
   }
