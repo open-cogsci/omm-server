@@ -8,12 +8,25 @@
       app
     >
       <v-list>
-        <v-list-item @click.stop="miniVariant = !miniVariant">
+        <v-list-item>
+          <v-list-item-action>
+            <v-icon>mdi-account</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $auth.user.name }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider />
+        <v-list-item v-if="$vuetify.breakpoint.smAndUp" @click.stop="miniVariant = !miniVariant">
           <v-list-item-action>
             <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title />
+            <v-list-item-title class="grey--text">
+              Collapse
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -52,14 +65,16 @@
         {{ title }}
       </v-toolbar-title>
       <v-spacer />
-      <v-menu bottom offset-y left>
+      <v-menu v-if="$vuetify.breakpoint.smAndUp" bottom offset-y left>
         <template v-slot:activator="{ on }">
           <v-btn
-            x-large
-            icon
+            text
             v-on="on"
           >
-            <v-icon>mdi-account-circle</v-icon>
+            <v-icon left>
+              mdi-account-circle
+            </v-icon>
+            {{ $auth.user.name }}
           </v-btn>
         </template>
         <v-list>
@@ -105,14 +120,14 @@ export default {
       fixed: true,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
+          icon: 'mdi-view-dashboard',
+          title: 'Dashboard',
+          to: '/dashboard'
         },
         {
           icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
+          title: 'Studies',
+          to: '/dashboard/studies'
         }
       ],
       miniVariant: false,
