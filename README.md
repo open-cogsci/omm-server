@@ -48,3 +48,6 @@ adonis seed
 ```
 
 command. This will insert the data specified in the seed files under `database/seeds`.
+
+> Note: the process may hang after this operation forcing you to quit it with ctrl-c, but it will
+> likely have succeeded.
