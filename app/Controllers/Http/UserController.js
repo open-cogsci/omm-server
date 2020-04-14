@@ -12,7 +12,6 @@ class UserController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-    // get user data from signup form
     const userData = request.only(['name', 'username', 'email', 'password'])
 
     try {
@@ -112,7 +111,8 @@ class UserController {
     if (!verifyPassword) {
       return response.status(400).json({
         status: 'error',
-        message: 'Current password could not be verified! Please try again.'
+        message: 'Current password is incorrect.',
+        errors: { password: 'Incorrect password' }
       })
     }
 

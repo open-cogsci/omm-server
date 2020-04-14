@@ -71,7 +71,9 @@
                       v-model="password.password"
                       :rules="validation.password"
                       label="Old password"
+                      :error-messages="errors.password"
                       type="password"
+                      @input="errors.password = ''"
                     />
                   </v-col>
                   <v-col cols="12">
@@ -144,6 +146,7 @@ export default {
           v => v === this.password.newPassword || 'Does not match with first new password'
         ]
       },
+      errors: {},
       detailsFormValid: true,
       pwFormValid: true,
       savingDetails: false,
@@ -157,9 +160,9 @@ export default {
       const data = { ...this.user }
       this.savingDetails = true
       try {
-        await this.$axios.$put('/api/v1/auth/user', data)
+        const response = await this.$axios.$put('/api/v1/auth/user', data)
         this.notify({
-          message: 'Data saved',
+          message: response.message,
           color: 'success'
         })
         await this.$auth.fetchUser()
@@ -174,6 +177,7 @@ export default {
     async savePassword () {
       if (!this.$refs.pwForm.validate()) { return }
       const data = { ...this.password }
+      this.errors = {}
       this.savingPassword = true
       try {
         await this.$axios.$put('/api/v1/auth/user/change_password', data)
@@ -181,10 +185,14 @@ export default {
           message: 'Password saved',
           color: 'success'
         })
+        this.$refs.pwForm.reset()
       } catch (e) {
+        if (e.response.data.errors) {
+          this.errors = { ...e.response.data.errors }
+        }
         this.notify({
-          message: `Error saving password: ${e}`,
-          color: 'danger'
+          message: `Error saving password: ${e.response.data.message}`,
+          color: 'error'
         })
       }
       this.savingPassword = false
