@@ -104,7 +104,7 @@ export default {
           }
         })
       } catch (e) {
-        this.error = e + ''
+        this.error = e.response?.data?.message || e + ''
       }
     }
   },
