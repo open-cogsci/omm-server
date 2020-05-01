@@ -8,7 +8,7 @@
       app
     >
       <v-list>
-        <v-template class="hidden-sm-and-up">
+        <template class="hidden-sm-and-up">
           <v-list-item :to="{name: 'dashboard-account'}" nuxt>
             <v-list-item-action>
               <v-icon>mdi-account</v-icon>
@@ -27,7 +27,7 @@
             </v-list-item-action>
           </v-list-item>
           <v-divider />
-        </v-template>
+        </template>
         <v-list-item v-if="$vuetify.breakpoint.smAndUp" @click.stop="miniVariant = !miniVariant">
           <v-list-item-action>
             <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
@@ -103,7 +103,7 @@
       </v-menu>
     </v-app-bar>
     <v-content>
-      <v-container fluid>
+      <v-container class="fill-height align-start" fluid>
         <nuxt />
       </v-container>
     </v-content>
@@ -134,7 +134,7 @@ export default {
           to: '/dashboard'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-flask',
           title: 'Studies',
           to: '/dashboard/studies'
         }
