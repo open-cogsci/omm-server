@@ -8,31 +8,33 @@
       app
     >
       <v-list>
-        <v-list-item :to="{name: 'dashboard-account'}" nuxt>
-          <v-list-item-action>
-            <v-icon>mdi-account</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $auth.user.name }}
-            </v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-btn icon @click="logout">
-              <v-icon color="grey">
-                mdi-logout
-              </v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </v-list-item>
-        <v-divider />
+        <v-template class="hidden-sm-and-up">
+          <v-list-item :to="{name: 'dashboard-account'}" nuxt>
+            <v-list-item-action>
+              <v-icon>mdi-account</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $auth.user.name }}
+              </v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-btn icon @click="logout">
+                <v-icon color="grey">
+                  mdi-logout
+                </v-icon>
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+          <v-divider />
+        </v-template>
         <v-list-item v-if="$vuetify.breakpoint.smAndUp" @click.stop="miniVariant = !miniVariant">
           <v-list-item-action>
             <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title class="grey--text">
-              Collapse
+            <v-list-item-title class="font-italic font-weight-light">
+              Collapse menu
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
