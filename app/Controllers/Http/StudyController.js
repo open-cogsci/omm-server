@@ -4,6 +4,8 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
+const Study = use('App/Models/Study')
+
 /**
  * Resourceful controller for interacting with studies
  */
@@ -17,6 +19,9 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async index ({ request, response }) {
+    const active = request.input('active', true)
+    const studies = await Study.where('active', active)
+    return response.json(studies)
   }
 
   /**

@@ -23,6 +23,7 @@ Route.group(() => {
   Route.put('/auth/user/change_password', 'UserController.changePassword').as('users.password')
   Route.resource('jobs', 'JobController').apiOnly()
   Route.resource('participants', 'ParticipantController').apiOnly()
+  Route.resource('studies', 'StudyController').apiOnly()
 }).prefix(API_PREFIX).middleware(['auth:jwt'])
 
 Route.group(() => {

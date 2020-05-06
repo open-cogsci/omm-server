@@ -1,12 +1,11 @@
 <template>
   <div>
-    <v-toolbar color="secondary lighten-3" dark flat>
+    <v-toolbar color="primary" dark flat>
       <v-spacer />
       <v-toolbar-title class="headline">
         Studies
       </v-toolbar-title>
       <v-spacer />
-
       <template v-slot:extension>
         <v-tabs v-model="openTab" grow centered slider-color="yellow">
           <v-tab :href="`#tab-current`">

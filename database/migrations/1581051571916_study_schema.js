@@ -9,6 +9,7 @@ class StudySchema extends Schema {
       table.increments()
       table.string('name').notNullable()
       table.string('description')
+      table.boolean('active').default(true)
       table.timestamps()
     })
   }
