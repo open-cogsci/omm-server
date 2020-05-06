@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { STUDIES } from '@/assets/js/endpoints'
 
 export default {
@@ -54,11 +55,17 @@ export default {
   },
   async created () {
     this.loading = true
-    const response = await this.$axios.get(STUDIES, { active: true })
-    this.studies = response.data
+    try {
+      const response = await this.$axios.get(STUDIES, { active: true })
+      this.studies = response.data
+    } catch (e) {
+      this.notify(e.response.data?.error?.message || 'Unspecified error', { color: 'error' })
+    }
+
     this.loading = false
   },
   methods: {
+    ...mapActions('notifications', ['notify']),
     openNewStudyModal () {
 
     }
