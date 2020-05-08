@@ -19,8 +19,11 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async index ({ request, response }) {
-    const active = request.input('active', true)
-    const studies = await Study.where('active', active)
+    const active = request.input('active') !== 'false'
+    const studies = await Study
+      .query()
+      .where('active', active)
+      .fetch()
     return response.json(studies)
   }
 
