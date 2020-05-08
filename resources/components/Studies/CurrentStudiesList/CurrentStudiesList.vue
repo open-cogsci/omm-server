@@ -1,6 +1,10 @@
 <template>
   <div>
-    <new-study-dialog v-model="showDialog" v-bind.sync="newStudyData" />
+    <new-study-dialog
+      v-model="showDialog"
+      v-bind.sync="newStudyData"
+      @clicked-save="saveNewStudy"
+    />
     <v-list class="py-0">
       <v-list-item
         class="success"
@@ -91,6 +95,13 @@ export default {
     ...mapActions('notifications', ['notify']),
     openNewStudyDialog () {
       this.showDialog = true
+    },
+    saveNewStudy () {
+      this.newStudyData.name = ''
+      this.newStudyData.description = ''
+
+      this.notify({ message: 'Study has been added', color: 'success' })
+      this.showDialog = false
     }
   }
 }

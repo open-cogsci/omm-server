@@ -1,21 +1,29 @@
 <template>
-  <!-- eslint-disable vue/valid-v-on -->
   <v-dialog
     :value="value"
     max-width="750px"
-    @input="(val) => $emit('input', val)"
+    @input="$emit('input', val)"
   >
     <v-card>
-      <v-card-title>Add new study</v-card-title>
+      <v-card-title>Add a new study</v-card-title>
+      <v-card-text class="body-1 font-weight-light">
+        Please enter the information below
+      </v-card-text>
       <v-card-text>
-        <v-form>
-          <v-text-field v-model="name" label="Title" />
-          <v-text-field v-model="description" label="Description" />
+        <v-form ref="form">
+          <v-text-field
+            v-model="name"
+            label="Title"
+          />
+          <v-text-field
+            v-model="description"
+            label="Description"
+          />
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn class="success">
+        <v-btn class="success" @click="save">
           Save
         </v-btn>
         <v-btn @click="cancel">
@@ -40,6 +48,11 @@ export default {
       this.name = ''
       this.description = ''
       this.$emit('input', false)
+    },
+    save () {
+      if (this.$refs.form.validate()) {
+        this.$emit('clicked-save')
+      }
     }
   }
 }
