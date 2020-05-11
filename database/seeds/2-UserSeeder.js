@@ -10,7 +10,6 @@
 |
 */
 
-/** @type {import('@adonisjs/lucid/src/Factory')} */
 const Database = use('Database')
 const User = use('App/Models/User')
 

@@ -16,13 +16,15 @@ class StudyController {
    *
    * @param {object} ctx
    * @param {Request} ctx.request
+   * @param {Auth} ctx.auth
    * @param {Response} ctx.response
    */
-  async index ({ request, response }) {
+  async index ({ request, auth, response }) {
     const active = request.input('active') !== 'false'
-    const studies = await Study
-      .query()
+    const studies = await auth.user
+      .studies()
       .where('active', active)
+      .orderBy('created_at', 'desc')
       .fetch()
     return response.json(studies)
   }
@@ -35,7 +37,10 @@ class StudyController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, auth, response }) {
+    const data = request.only(['name', 'description'])
+    const study = await auth.user.studies().create(data)
+    response.json(study)
   }
 
   /**

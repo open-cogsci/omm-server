@@ -11,7 +11,7 @@
 |
 */
 
-// const Factory = use('Factory')
+const Factory = use('Factory')
 
 /**
   Factory.blueprint('App/Models/User', (faker) => {
@@ -20,3 +20,11 @@
     }
   })
 */
+
+Factory.blueprint('App/Models/Study', (faker) => {
+  return {
+    name: faker.sentence({ words: 5 }),
+    description: faker.sentence({ words: 10 }),
+    active: faker.bool()
+  }
+})

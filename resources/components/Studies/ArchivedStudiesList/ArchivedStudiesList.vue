@@ -13,7 +13,7 @@
       </div>
       <div v-else key="loaded">
         <template v-for="study in studies">
-          <v-list-item :key="study.id">
+          <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`">
             <v-list-item-content>
               <v-list-item-title v-text="study.name" />
               <v-list-item-subtitle v-text="study.description" />

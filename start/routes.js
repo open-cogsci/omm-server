@@ -24,6 +24,10 @@ Route.group(() => {
   Route.resource('jobs', 'JobController').apiOnly()
   Route.resource('participants', 'ParticipantController').apiOnly()
   Route.resource('studies', 'StudyController').apiOnly()
+    .validator(new Map([
+      [['studies.store'], ['SaveStudy']],
+      [['studies.update'], ['SaveStudy']]
+    ]))
 }).prefix(API_PREFIX).middleware(['auth:jwt'])
 
 Route.group(() => {

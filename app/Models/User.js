@@ -33,6 +33,32 @@ class User extends Model {
   tokens () {
     return this.hasMany('App/Models/Token')
   }
+
+  /**
+   * The type of this user (i.e. standard/administrator)
+   *
+   * @method userType
+   *
+   * @return {Object}
+   */
+  userType () {
+    return this.belongsTo('App/Models/UserType')
+  }
+
+  /**
+   * A user can have many studies, but a study can also belong to more than one user
+   * (i.e. a shared study)
+   *
+  * @method studies
+   *
+   * @return {Object}
+   */
+  studies () {
+    return this
+      .belongsToMany('App/Models/Study')
+      .pivotModel('App/Models/StudyUser')
+      .withPivot(['is_owner'])
+  }
 }
 
 module.exports = User

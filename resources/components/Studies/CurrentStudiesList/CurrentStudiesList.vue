@@ -3,7 +3,10 @@
     <new-study-dialog
       v-model="showDialog"
       v-bind.sync="newStudyData"
+      :saving="saving"
+      :errors.sync="errors"
       @clicked-save="saveNewStudy"
+      @input="clearErrors"
     />
     <v-list class="py-0">
       <v-list-item
@@ -33,23 +36,11 @@
       </v-list>
       <v-list v-else key="loaded" three-line>
         <template v-for="study in studies">
-          <v-list-item :key="study.id">
+          <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`" nuxt>
             <v-list-item-content>
               <v-list-item-title v-text="study.name" />
               <v-list-item-subtitle v-text="study.description" />
             </v-list-item-content>
-            <v-list-item-action>
-              <v-list-item-action-text class="primary--text">
-                <v-icon small color="primary">
-                  mdi-account
-                </v-icon> 33
-              </v-list-item-action-text>
-              <v-btn icon>
-                <v-icon small color="primary">
-                  mdi-archive
-                </v-icon>
-              </v-btn>
-            </v-list-item-action>
           </v-list-item>
           <v-divider :key="`divider-${study.id}`" />
         </template>
@@ -60,6 +51,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import { isArray } from 'lodash'
 import { STUDIES } from '@/assets/js/endpoints'
 
 export default {
@@ -70,8 +62,13 @@ export default {
     return {
       showDialog: false,
       loading: false,
+      saving: false,
       studies: [],
       newStudyData: {
+        name: '',
+        description: ''
+      },
+      errors: {
         name: '',
         description: ''
       }
@@ -87,21 +84,72 @@ export default {
         message: e.response.data?.error?.message || 'Unspecified error',
         color: 'error'
       })
+    } finally {
+      this.loading = false
     }
-
-    this.loading = false
   },
   methods: {
     ...mapActions('notifications', ['notify']),
+    /**
+     * Opens the study form
+     * */
     openNewStudyDialog () {
       this.showDialog = true
     },
-    saveNewStudy () {
-      this.newStudyData.name = ''
-      this.newStudyData.description = ''
-
-      this.notify({ message: 'Study has been added', color: 'success' })
-      this.showDialog = false
+    /**
+     *  Save a study
+     */
+    async saveNewStudy () {
+      this.saving = true
+      try {
+        const response = await this.$axios.post(STUDIES, {
+          name: this.newStudyData.name,
+          description: this.newStudyData.description
+        })
+        const study = response.data
+        this.studies.unshift(study)
+        this.notify({ message: 'Study has been added', color: 'success' })
+        this.showDialog = false
+      } catch (e) {
+        this.processError(e)
+      } finally {
+        this.saving = false
+      }
+    },
+    /**
+     * Process errors returned by axios
+     *
+     * @param {object} e the error provided by axios
+     *
+     * @returns {void}
+     * */
+    processError (e) {
+      const unexpectedError = e.response.data?.error?.message
+      if (unexpectedError) {
+        this.notify({
+          message: e.response.data?.error?.message || 'Unspecified error',
+          color: 'error'
+        })
+        return
+      }
+      if (isArray(e.response.data)) {
+        const validationErrors = e.response.data
+        for (const err of validationErrors) {
+          this.errors[err.field] = err.validation
+        }
+        this.notify({
+          message: 'There were some problems with your input. Please review the form.',
+          color: 'error'
+        })
+      }
+    },
+    /**
+     *  Clear possible validation errors sent by adonis after closing the dialog.
+     */
+    clearErrors (val) {
+      if (!val) {
+        this.errors = { name: '', description: '' }
+      }
     }
   }
 }
