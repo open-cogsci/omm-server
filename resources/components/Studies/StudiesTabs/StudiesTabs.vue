@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-toolbar color="primary" dark flat>
+  <v-row class="fill-height flex-column flex-nowrap">
+    <v-toolbar color="primary" dark flat class="flex-grow-0">
       <v-spacer />
       <v-toolbar-title class="headline">
         Studies
@@ -18,22 +18,23 @@
       </template>
     </v-toolbar>
 
-    <v-tabs-items v-model="openTab">
-      <v-tab-item value="tab-current">
+    <v-tabs-items v-model="openTab" class="fill-height">
+      <v-tab-item value="tab-current" class="fill-height">
         <current-studies-list />
       </v-tab-item>
       <v-tab-item value="tab-archived">
         <archived-studies-list />
       </v-tab-item>
     </v-tabs-items>
-  </div>
+  </v-row>
 </template>
 
 <script>
 export default {
   components: {
     CurrentStudiesList: () => import('@/components/Studies/CurrentStudiesList'),
-    ArchivedStudiesList: () => import('@/components/Studies/ArchivedStudiesList')
+    ArchivedStudiesList: () =>
+      import('@/components/Studies/ArchivedStudiesList')
   },
   data () {
     return {

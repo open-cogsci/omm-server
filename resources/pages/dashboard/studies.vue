@@ -1,6 +1,6 @@
 <template>
-  <v-row no-gutters class="fill-height">
-    <v-col cols="12" md="4" xl="3" class="ml-n3 mt-n3 mb-n3">
+  <v-row class="mt-n3 limit-height">
+    <v-col cols="12" md="4" xl="3" class="py-0">
       <studies-tabs />
     </v-col>
     <v-col cols="12" md="8" xl="9">
@@ -21,3 +21,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  .limit-height {
+    height: calc(100% + 24px);
+  }
+</style>

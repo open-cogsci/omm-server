@@ -1,5 +1,5 @@
 <template>
-  <v-list three-line class="py-0">
+  <v-list three-line class="py-0" style="overflow-x: hidden; overflow-y: auto">
     <transition name="fade" mode="out-in">
       <div v-if="loading" key="loading">
         <template v-for="i in 7">
@@ -59,5 +59,10 @@ export default {
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+.fill-space {
+  max-height: calc(100vh - 336px);
+  overflow-x: hidden;
+  overflow-y: scroll
 }
 </style>

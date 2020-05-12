@@ -108,7 +108,7 @@
       </v-container>
     </v-content>
     <v-footer
-      :fixed="fixed"
+      :fixed="false"
       app
     >
       <span>&copy; 2019</span>
@@ -137,6 +137,11 @@ export default {
           icon: 'mdi-flask',
           title: 'Studies',
           to: '/dashboard/studies'
+        },
+        {
+          icon: 'mdi-baby-face',
+          title: 'Participants',
+          to: '/dashboard/participants'
         },
         {
           icon: 'mdi-account-group',

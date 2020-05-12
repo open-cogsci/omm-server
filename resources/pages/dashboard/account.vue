@@ -200,7 +200,7 @@ export default {
   },
   head () {
     return {
-      title: 'Settings'
+      title: 'Account'
     }
   }
 }

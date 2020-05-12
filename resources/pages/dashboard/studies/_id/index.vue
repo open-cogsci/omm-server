@@ -8,12 +8,14 @@
           transition="fade-transition"
           height="294"
         >
-          <p class="display-1 font-weight-light" v-text="study.name" />
-          <h2
-            v-if="study.description"
-            class="title font-weight-light grey--text"
-            v-text="study.description"
-          />
+          <div>
+            <p class="display-1 font-weight-light" v-text="study.name" />
+            <h2
+              v-if="study.description"
+              class="title font-weight-light grey--text"
+              v-text="study.description"
+            />
+          </div>
         </v-skeleton-loader>
       </v-col>
     </v-row>
@@ -61,6 +63,11 @@ export default {
       this.fetch(to.params.id)
     }
     next()
+  },
+  head () {
+    return {
+      title: 'Studies'
+    }
   }
 }
 </script>

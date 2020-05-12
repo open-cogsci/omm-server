@@ -34,7 +34,7 @@
           <v-divider :key="`divider-${i}`" />
         </template>
       </v-list>
-      <v-list v-else key="loaded" three-line class="py-0" style="overflow: auto; max-height: 75vh">
+      <v-list v-else key="loaded" three-line class="py-0 fill-space">
         <template v-for="study in studies">
           <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`" nuxt>
             <v-list-item-content>
@@ -161,5 +161,9 @@ export default {
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+.fill-space {
+  height: calc(100vh - 280px);
+  overflow: auto;
 }
 </style>
