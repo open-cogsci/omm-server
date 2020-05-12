@@ -18,7 +18,7 @@
           <v-icon>mdi-plus</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>New study</v-list-item-title>
+          <v-list-item-title>Add a new study</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
