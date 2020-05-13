@@ -1,5 +1,5 @@
 <template>
-  <v-row class="mt-n3 limit-height">
+  <v-row class="limit-height">
     <v-col cols="12" md="4" xl="3" class="py-0">
       <studies-tabs />
     </v-col>

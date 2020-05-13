@@ -51,6 +51,6 @@ describe('StudiesTabs', () => {
 
   test('is a Vue instance', () => {
     const wrapper = mountFunc()
-    expect(wrapper.isVueInstance()).toBeTruthy()
+    expect(wrapper.exists()).toBeTruthy()
   })
 })

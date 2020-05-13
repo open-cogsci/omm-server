@@ -7,6 +7,16 @@ import ArchivedStudiesList from './ArchivedStudiesList.vue'
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
+jest.mock('axios', () => ({
+  $get: Promise.resolve({
+    data: [
+      { id: 1, name: 'Study 1', description: 'Description 1' },
+      { id: 2, name: 'Study 1', description: 'Description 2' },
+      { id: 3, name: 'Study 1', description: 'Description 3' }
+    ]
+  })
+}))
+
 describe('ArchivedStudiesList', () => {
   let vuetify
   let store
@@ -17,20 +27,17 @@ describe('ArchivedStudiesList', () => {
       current: {},
       pending: []
     }
-    const actions = {
-      pop: jest.fn()
-    }
 
     store = new Vuex.Store({
       state: {},
       modules: {
         notifications: {
           namespaced: true,
-          state,
-          actions
+          state
         }
       }
     })
+
     vuetify = new Vuetify({
       mocks: {
         $vuetify: {
@@ -51,6 +58,11 @@ describe('ArchivedStudiesList', () => {
 
   test('is a Vue instance', () => {
     const wrapper = mountFunc()
-    expect(wrapper.isVueInstance()).toBeTruthy()
+    expect(wrapper.exists()).toBeTruthy()
+  })
+
+  test('Fetch has been called after', () => {
+    const wrapper = mountFunc()
+    expect(wrapper.exists()).toBeTruthy()
   })
 })

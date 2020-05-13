@@ -14,7 +14,7 @@
       <div v-else key="loaded">
         <template v-for="study in studies">
           <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`">
-            <v-list-item-content>
+            <v-list-item-content class="px-3">
               <v-list-item-title v-text="study.name" />
               <v-list-item-subtitle v-text="study.description" />
             </v-list-item-content>
@@ -36,19 +36,23 @@ export default {
       studies: []
     }
   },
-  async created () {
-    this.loading = true
-    try {
-      const response = await this.$axios.get(STUDIES, { params: { active: false } })
-      this.studies = response.data
-    } catch (e) {
-      this.notify({
-        message: e.response.data?.error?.message || 'Unspecified error',
-        color: 'error'
-      })
+  created () {
+    this.fetch()
+  },
+  methods: {
+    async fetch () {
+      this.loading = true
+      try {
+        const response = await this.$axios.get(STUDIES, { params: { active: false } })
+        this.studies = response.data
+      } catch (e) {
+        this.notify({
+          message: e.response.data?.error?.message || 'Unspecified error',
+          color: 'error'
+        })
+      }
+      this.loading = false
     }
-
-    this.loading = false
   }
 }
 </script>

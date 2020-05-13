@@ -37,7 +37,7 @@
       <v-list v-else key="loaded" three-line class="py-0 fill-space">
         <template v-for="study in studies">
           <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`" nuxt>
-            <v-list-item-content>
+            <v-list-item-content class="px-3">
               <v-list-item-title v-text="study.name" />
               <v-list-item-subtitle v-text="study.description" />
             </v-list-item-content>
@@ -74,19 +74,8 @@ export default {
       }
     }
   },
-  async created () {
-    this.loading = true
-    try {
-      const response = await this.$axios.get(STUDIES)
-      this.studies = response.data
-    } catch (e) {
-      this.notify({
-        message: e.response.data?.error?.message || 'Unspecified error',
-        color: 'error'
-      })
-    } finally {
-      this.loading = false
-    }
+  created () {
+    this.fetch()
   },
   methods: {
     ...mapActions('notifications', ['notify']),
@@ -95,6 +84,20 @@ export default {
      * */
     openNewStudyDialog () {
       this.showDialog = true
+    },
+    async fetch () {
+      this.loading = true
+      try {
+        const response = await this.$axios.get(STUDIES)
+        this.studies = response.data
+      } catch (e) {
+        this.notify({
+          message: e.response.data?.error?.message || 'Unspecified error',
+          color: 'error'
+        })
+      } finally {
+        this.loading = false
+      }
     },
     /**
      *  Save a study
@@ -163,7 +166,7 @@ export default {
   opacity: 0;
 }
 .fill-space {
-  height: calc(100vh - 280px);
+  height: calc(100vh - 268px);
   overflow: auto;
 }
 </style>
