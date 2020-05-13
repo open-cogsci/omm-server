@@ -24,7 +24,7 @@ class StudyController {
       .where('active', active)
       .orderBy('created_at', 'desc')
       .fetch()
-    return studies
+    return { data: studies }
   }
 
   /**
@@ -38,7 +38,7 @@ class StudyController {
   async store ({ request, auth }) {
     const data = request.only(['name', 'description'])
     const study = await auth.user.studies().create(data)
-    return study
+    return { data: study }
   }
 
   /**

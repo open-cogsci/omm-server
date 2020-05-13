@@ -89,7 +89,7 @@ export default {
       this.loading = true
       try {
         const response = await this.$axios.get(STUDIES)
-        this.studies = response.data
+        this.studies = response.data.data
       } catch (e) {
         this.notify({
           message: e.response.data?.error?.message || 'Unspecified error',
@@ -109,7 +109,7 @@ export default {
           name: this.newStudyData.name,
           description: this.newStudyData.description
         })
-        const study = response.data
+        const study = response.data.data
         this.studies.unshift(study)
         this.notify({ message: 'Study has been added', color: 'success' })
         this.showDialog = false
