@@ -13,7 +13,7 @@
       </div>
       <div v-else key="loaded">
         <template v-for="study in studies">
-          <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`">
+          <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`" nuxt>
             <v-list-item-content class="px-3">
               <v-list-item-title v-text="study.name" />
               <v-list-item-subtitle v-text="study.description" />
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { STUDIES } from '@/assets/js/endpoints'
 
 export default {
@@ -40,6 +41,7 @@ export default {
     this.fetch()
   },
   methods: {
+    ...mapActions('notifications', ['notify']),
     async fetch () {
       this.loading = true
       try {

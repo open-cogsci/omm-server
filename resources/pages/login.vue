@@ -45,6 +45,7 @@
       </v-btn>
       <v-btn
         :disabled="!valid"
+        :loading="authenticating"
         color="primary"
         @click="login"
       >
@@ -66,6 +67,7 @@ export default {
   auth: 'guest',
   data () {
     return {
+      authenticating: false,
       email: '',
       password: '',
       valid: true,
@@ -96,6 +98,7 @@ export default {
     // eslint-disable-next-line require-await
     async login () {
       if (!this.$refs.form.validate()) { return }
+      this.authenticating = true
       try {
         await this.$auth.loginWith('local', {
           data: {
@@ -106,6 +109,7 @@ export default {
       } catch (e) {
         this.error = e.response?.data?.message || e + ''
       }
+      this.authenticating = false
     }
   },
   head () {

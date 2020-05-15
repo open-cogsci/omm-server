@@ -7,7 +7,8 @@ module.exports = {
   },
   moduleFileExtensions: ['js', 'vue', 'json', 'ts'],
   transform: {
-    '.*\\.(j|t)s$': '<rootDir>/node_modules/babel-jest',
+    '.*\\.(ts)$': '<rootDir>/node_modules/ts-jest',
+    '.*\\.(js)$': '<rootDir>/node_modules/babel-jest',
     '.*\\.(vue)$': 'vue-jest',
     '.+\\.(css|styl|less|sass|scss|png|jpg|svg|ttf|woff|woff2)$': 'jest-transform-stub'
   },
@@ -21,6 +22,6 @@ module.exports = {
     '<rootDir>/resources/test/jestSetup.js'
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!vue-router)'
+    'node_modules/(?!vue-router|@babel|vuetify)'
   ]
 }
