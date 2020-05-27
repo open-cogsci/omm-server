@@ -5,7 +5,7 @@ import axios from 'axios'
 
 // import { Breakpoint } from 'vuetify/lib/services'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import ArchivedStudiesList from './ArchivedStudiesList.vue'
+import ArchivedStudies from './ArchivedStudies.vue'
 import { STUDIES } from '@/assets/js/endpoints'
 
 jest.mock('axios')
@@ -13,7 +13,7 @@ jest.mock('axios')
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
-describe('ArchivedStudiesList', () => {
+describe('ArchivedStudies', () => {
   let vuetify
   let store
   let actions
@@ -47,7 +47,7 @@ describe('ArchivedStudiesList', () => {
   })
 
   function mountFunc (options = {}) {
-    return shallowMount(ArchivedStudiesList, {
+    return shallowMount(ArchivedStudies, {
       localVue,
       vuetify,
       store,
@@ -63,37 +63,6 @@ describe('ArchivedStudiesList', () => {
     axios.get.mockResolvedValue(response)
     mountFunc()
     expect(axios.get).toHaveBeenCalledWith(STUDIES, { params: { active: false } })
-  })
-
-  test('Data is shown after reception', async () => {
-    const studies = [{ id: 1, name: 'Test study', description: 'Description' }]
-    const response = { data: { data: studies } }
-    axios.get.mockResolvedValue(response)
-    const wrapper = mountFunc()
-    // Wait until all promises have resolved
-    await flushPromises()
-    // Wait until component is rerendered
-    await wrapper.vm.$nextTick()
-
-    // Expect a list item to be created
-    const listItem = wrapper.find('.v-list-item')
-    expect(listItem.exists()).toBe(true)
-
-    // Expect a list item title to be same as study name
-    expect(listItem.find('.v-list-item__title').text()).toBe(studies[0].name)
-    // Expect a list item description to be the same as study name
-    expect(listItem.find('.v-list-item__subtitle').text()).toBe(studies[0].description)
-  })
-
-  test('Skeleton is shown during loading', async () => {
-    const response = { data: { data: [] } }
-    axios.get.mockResolvedValue(response)
-    const wrapper = mountFunc()
-    expect(wrapper.find('.v-skeleton-loader').exists()).toBe(true)
-    expect(wrapper.find('.v-list-item').exists()).toBe(false)
-    await flushPromises()
-    await wrapper.vm.$nextTick()
-    expect(wrapper.find('.v-skeleton-loader').exists()).toBe(false)
   })
 
   test('Should notify the user after an error occurs', async () => {

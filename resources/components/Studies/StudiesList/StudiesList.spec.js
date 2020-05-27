@@ -67,9 +67,13 @@ describe('StudiesList', () => {
     const wrapper = mountFunc({
       propsData: {
         studies: [],
-        addStudyButton: true
+        addStudyButton: false
       }
     })
+
+    expect(wrapper.find('.v-list-item.success').exists()).toBe(false)
+    await wrapper.setProps({ addStudyButton: true })
+
     // Check if the button exists and contains the right text
     const addStudyButton = wrapper.find('.v-list-item.success')
     expect(addStudyButton.exists()).toBe(true)
