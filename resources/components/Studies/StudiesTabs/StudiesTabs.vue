@@ -20,10 +20,10 @@
 
     <v-tabs-items v-model="openTab" class="fill-height">
       <v-tab-item value="tab-current" class="fill-height">
-        <current-studies-list />
+        <current-studies />
       </v-tab-item>
       <v-tab-item value="tab-archived">
-        <archived-studies-list />
+        <archived-studies />
       </v-tab-item>
     </v-tabs-items>
   </v-row>
@@ -32,9 +32,8 @@
 <script>
 export default {
   components: {
-    CurrentStudiesList: () => import('@/components/Studies/CurrentStudiesList'),
-    ArchivedStudiesList: () =>
-      import('@/components/Studies/ArchivedStudiesList')
+    CurrentStudies: () => import('@/components/Studies/CurrentStudies'),
+    ArchivedStudies: () => import('@/components/Studies/ArchivedStudies')
   },
   data () {
     return {

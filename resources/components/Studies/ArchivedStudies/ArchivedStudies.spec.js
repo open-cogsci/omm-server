@@ -4,7 +4,7 @@ import flushPromises from 'flush-promises'
 import axios from 'axios'
 
 // import { Breakpoint } from 'vuetify/lib/services'
-import { mount, createLocalVue } from '@vue/test-utils'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 import ArchivedStudiesList from './ArchivedStudiesList.vue'
 import { STUDIES } from '@/assets/js/endpoints'
 
@@ -47,14 +47,13 @@ describe('ArchivedStudiesList', () => {
   })
 
   function mountFunc (options = {}) {
-    return mount(ArchivedStudiesList, {
+    return shallowMount(ArchivedStudiesList, {
       localVue,
       vuetify,
       store,
       mocks: {
         $axios: axios
       },
-      stubs: ['nuxt-link'],
       ...options
     })
   }

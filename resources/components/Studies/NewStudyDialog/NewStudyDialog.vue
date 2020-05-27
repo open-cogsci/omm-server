@@ -2,7 +2,7 @@
   <v-dialog
     :value="value"
     max-width="750px"
-    @input="val => $emit('input', val)"
+    @input="$emit('input', $event)"
   >
     <v-card>
       <v-card-title>Add a new study</v-card-title>
@@ -12,7 +12,7 @@
       <v-card-text>
         <v-form ref="form" v-model="formValid">
           <v-text-field
-            v-model="name"
+            v-model="study.name"
             label="Title"
             :counter="maxNameLength"
             :rules="validation.name"
@@ -20,7 +20,7 @@
             @input="removeErrors('name')"
           />
           <v-textarea
-            v-model="description"
+            v-model="study.description"
             rows="2"
             label="Description"
             :counter="maxDescLength"
@@ -52,7 +52,6 @@
 import { notEmpty, maxLength } from '@/assets/js/validationrules'
 
 export default {
-  sync: ['name', 'description'],
   props: {
     value: {
       type: Boolean,
@@ -69,6 +68,10 @@ export default {
   },
   data () {
     return {
+      study: {
+        name: '',
+        description: ''
+      },
       formValid: true,
       maxNameLength: 50,
       maxDescLength: 100,
@@ -98,7 +101,7 @@ export default {
     },
     save () {
       if (this.$refs.form.validate()) {
-        this.$emit('clicked-save')
+        this.$emit('clicked-save', this.study)
       }
     },
     removeErrors (field) {

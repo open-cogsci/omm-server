@@ -1,7 +1,22 @@
 <template>
-  <v-list three-line class="py-0" style="overflow-x: hidden; overflow-y: auto">
+  <div>
+    <v-list v-if="addStudyButton" class="py-0">
+      <v-list-item
+        class="success"
+        dark
+        @click="$emit('clicked-new-study')"
+      >
+        <v-list-item-icon>
+          <v-icon>mdi-plus</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Add a new study</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
+
     <transition name="fade" mode="out-in">
-      <div v-if="loading" key="loading">
+      <v-list v-if="loading" key="loading" three-line class="py-0">
         <template v-for="i in 7">
           <v-skeleton-loader
             :key="i"
@@ -10,8 +25,8 @@
           />
           <v-divider :key="`divider-${i}`" />
         </template>
-      </div>
-      <div v-else key="loaded">
+      </v-list>
+      <v-list v-else key="loaded" three-line class="py-0 fill-space">
         <template v-for="study in studies">
           <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`" nuxt>
             <v-list-item-content class="px-3">
@@ -21,39 +36,25 @@
           </v-list-item>
           <v-divider :key="`divider-${study.id}`" />
         </template>
-      </div>
+      </v-list>
     </transition>
-  </v-list>
+  </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import { STUDIES } from '@/assets/js/endpoints'
-
 export default {
-  data () {
-    return {
-      loading: false,
-      studies: []
-    }
-  },
-  created () {
-    this.fetch()
-  },
-  methods: {
-    ...mapActions('notifications', ['notify']),
-    async fetch () {
-      this.loading = true
-      try {
-        const response = await this.$axios.get(STUDIES, { params: { active: false } })
-        this.studies = response.data.data
-      } catch (e) {
-        this.notify({
-          message: e.response.data?.error?.message || 'Unspecified error',
-          color: 'error'
-        })
-      }
-      this.loading = false
+  props: {
+    studies: {
+      type: Array,
+      required: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    addStudyButton: {
+      type: Boolean,
+      default: false
     }
   }
 }
@@ -67,8 +68,7 @@ export default {
   opacity: 0;
 }
 .fill-space {
-  max-height: calc(100vh - 336px);
-  overflow-x: hidden;
-  overflow-y: scroll
+  height: calc(100vh - 268px);
+  overflow: auto;
 }
 </style>

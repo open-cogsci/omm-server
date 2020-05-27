@@ -1,51 +1,18 @@
 <template>
   <div>
     <new-study-dialog
-      v-model="showDialog"
-      v-bind.sync="newStudyData"
+      v-model="dialog"
       :saving="saving"
       :errors.sync="errors"
       @clicked-save="saveNewStudy"
       @input="clearErrors"
     />
-    <v-list class="py-0">
-      <v-list-item
-        class="success"
-        dark
-        @click="openNewStudyDialog"
-      >
-        <v-list-item-icon>
-          <v-icon>mdi-plus</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>Add a new study</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-
-    <transition name="fade" mode="out-in">
-      <v-list v-if="loading" key="loading" three-line class="py-0">
-        <template v-for="i in 7">
-          <v-skeleton-loader
-            :key="i"
-            :loading="loading"
-            type="list-item-three-line"
-          />
-          <v-divider :key="`divider-${i}`" />
-        </template>
-      </v-list>
-      <v-list v-else key="loaded" three-line class="py-0 fill-space">
-        <template v-for="study in studies">
-          <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`" nuxt>
-            <v-list-item-content class="px-3">
-              <v-list-item-title v-text="study.name" />
-              <v-list-item-subtitle v-text="study.description" />
-            </v-list-item-content>
-          </v-list-item>
-          <v-divider :key="`divider-${study.id}`" />
-        </template>
-      </v-list>
-    </transition>
+    <studies-list
+      :studies="studies"
+      :loading="loading"
+      :add-study-button="true"
+      @clicked-new-study="dialog = true"
+    />
   </div>
 </template>
 
@@ -56,22 +23,16 @@ import { STUDIES } from '@/assets/js/endpoints'
 
 export default {
   components: {
+    StudiesList: () => import('../StudiesList'),
     newStudyDialog: () => import('../NewStudyDialog')
   },
   data () {
     return {
-      showDialog: false,
-      loading: false,
-      saving: false,
       studies: [],
-      newStudyData: {
-        name: '',
-        description: ''
-      },
-      errors: {
-        name: '',
-        description: ''
-      }
+      dialog: false,
+      saving: false,
+      loading: false,
+      errors: {}
     }
   },
   created () {
@@ -79,12 +40,6 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    /**
-     * Opens the study form
-     * */
-    openNewStudyDialog () {
-      this.showDialog = true
-    },
     async fetch () {
       this.loading = true
       try {
@@ -102,17 +57,17 @@ export default {
     /**
      *  Save a study
      */
-    async saveNewStudy () {
+    async saveNewStudy (newStudyData) {
       this.saving = true
       try {
         const response = await this.$axios.post(STUDIES, {
-          name: this.newStudyData.name,
-          description: this.newStudyData.description
+          name: newStudyData.name,
+          description: newStudyData.description
         })
         const study = response.data.data
         this.studies.unshift(study)
         this.notify({ message: 'Study has been added', color: 'success' })
-        this.showDialog = false
+        this.dialog = false
       } catch (e) {
         this.processError(e)
       } finally {
@@ -157,16 +112,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .2s;
-}
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-}
-.fill-space {
-  height: calc(100vh - 268px);
-  overflow: auto;
-}
-</style>

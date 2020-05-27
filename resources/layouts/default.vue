@@ -76,10 +76,7 @@
       <v-spacer />
       <v-menu v-if="$vuetify.breakpoint.smAndUp" bottom offset-y left>
         <template v-slot:activator="{ on }">
-          <v-btn
-            text
-            v-on="on"
-          >
+          <v-btn text v-on="on">
             <v-icon left>
               mdi-account-circle
             </v-icon>
@@ -105,10 +102,7 @@
     <v-content>
       <nuxt />
     </v-content>
-    <v-footer
-      :fixed="false"
-      app
-    >
+    <v-footer :fixed="false" app>
       <span>&copy; 2019</span>
     </v-footer>
     <notification-box />
