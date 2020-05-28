@@ -123,4 +123,12 @@ describe('CurrentStudies', () => {
     expect(wrapper.vm.saving).toBe(false)
     expect(actions.notify).toHaveBeenCalled()
   })
+
+  test('Errors should be correctly processed', async () => {
+    const wrapper = mountFunc()
+    await flushPromises()
+    expect(actions.notify).not.toHaveBeenCalled()
+    wrapper.vm.processError(new Error('Something'))
+    expect(actions.notify).toHaveBeenCalled()
+  })
 })

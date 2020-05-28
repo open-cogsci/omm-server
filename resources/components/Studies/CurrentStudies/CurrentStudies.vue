@@ -83,15 +83,7 @@ export default {
      * @returns {void}
      * */
     processError (e) {
-      const unexpectedError = e.response.data?.error?.message
-      if (unexpectedError) {
-        this.notify({
-          message: e.response?.data || e,
-          color: 'error'
-        })
-        return
-      }
-      if (isArray(e.response.data)) {
+      if (isArray(e?.response?.data)) {
         const validationErrors = e.response.data
         for (const err of validationErrors) {
           this.errors[err.field] = err.validation
@@ -100,7 +92,13 @@ export default {
           message: 'There were some problems with your input. Please review the form.',
           color: 'error'
         })
+        return
       }
+
+      this.notify({
+        message: e?.response?.data?.error?.message || e.response?.data || e,
+        color: 'error'
+      })
     },
     /**
      *  Clear possible validation errors sent by adonis after closing the dialog.
