@@ -46,8 +46,9 @@ export default {
         const response = await this.$axios.get(STUDIES)
         this.studies = response.data.data
       } catch (e) {
+        const msg = e?.response?.data?.error?.message || e?.response?.data
         this.notify({
-          message: e.response.data?.error?.message || 'Unspecified error',
+          message: msg || 'Unspecified error',
           color: 'error'
         })
       } finally {
@@ -85,7 +86,7 @@ export default {
       const unexpectedError = e.response.data?.error?.message
       if (unexpectedError) {
         this.notify({
-          message: e.response.data?.error?.message || 'Unspecified error',
+          message: e.response?.data || e,
           color: 'error'
         })
         return

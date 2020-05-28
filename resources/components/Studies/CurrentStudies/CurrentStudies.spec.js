@@ -38,6 +38,10 @@ describe('CurrentStudies', () => {
     })
     vuetify = new Vuetify()
     jest.resetAllMocks()
+
+    // Make sure the fetch() function works for all tests
+    const response = { data: { data: [] } }
+    axios.get.mockResolvedValue(response)
   })
 
   function mountFunc (options = {}) {
@@ -47,6 +51,7 @@ describe('CurrentStudies', () => {
       localVue,
       vuetify,
       store,
+      stubs: ['nuxt-link'],
       mocks: {
         $axios: axios
       },
@@ -55,16 +60,18 @@ describe('CurrentStudies', () => {
   }
 
   test('Data is fetched after creation of component', () => {
-    const response = { data: { data: [] } }
-    axios.get.mockResolvedValue(response)
     mountFunc()
     expect(axios.get).toHaveBeenCalledWith(STUDIES)
   })
 
   test('Should notify the user after an error occurs', async () => {
+    jest.resetAllMocks()
     axios.get.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
+    // Notify should not have been called yet.
+    expect(actions.notify).not.toHaveBeenCalled()
     mountFunc()
     await flushPromises()
+    // Notify should have been called
     expect(actions.notify).toHaveBeenCalled()
   })
 
@@ -81,10 +88,39 @@ describe('CurrentStudies', () => {
   })
 
   test('Sends data to the server', async () => {
-    const study = { name: 'Boop', description: 'Beep' }
-    const response = { data: { data: { id: 1, ...study } } }
-    axios.post.mockResolvedValue(response)
     const wrapper = mountFunc()
-    wrapper.vm.saveNewStudy()
+    await flushPromises()
+    // Compose the expected server response
+    const study = { name: 'Boop', description: 'Beep' }
+    const studyAddedId = { id: 1, ...study }
+    const response = { data: { data: studyAddedId } }
+    // ... and mock it
+    axios.post.mockResolvedValue(response)
+    // The saving indicator should be hidden at first.
+    expect(wrapper.vm.saving).toBe(false)
+    // Save the study
+    wrapper.vm.saveNewStudy(study)
+    // Check if saving indicator is active
+    expect(wrapper.vm.saving).toBe(true)
+    await flushPromises()
+    // After the operation is complete, the saving indicator should be deactivated
+    expect(wrapper.vm.saving).toBe(false)
+    // The studies array should now contain the saved study
+    expect(wrapper.vm.studies).toContain(studyAddedId)
+  })
+
+  test('In case of an error, the user should be notified', async () => {
+    const wrapper = mountFunc()
+    await flushPromises()
+    axios.post.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
+    // Notify should not have been called yet
+    expect(actions.notify).not.toHaveBeenCalled()
+    // The buttons saving indicator should be hidden at first.
+    expect(wrapper.vm.saving).toBe(false)
+    wrapper.vm.saveNewStudy({ name: 'Boop', description: 'Beep' })
+    expect(wrapper.vm.saving).toBe(true)
+    await flushPromises()
+    expect(wrapper.vm.saving).toBe(false)
+    expect(actions.notify).toHaveBeenCalled()
   })
 })
