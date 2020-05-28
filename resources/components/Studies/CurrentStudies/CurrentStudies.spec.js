@@ -81,8 +81,10 @@ describe('CurrentStudies', () => {
   })
 
   test('Sends data to the server', async () => {
-    const response = { data: { data: [] } }
+    const study = { name: 'Boop', description: 'Beep' }
+    const response = { data: { data: { id: 1, ...study } } }
     axios.post.mockResolvedValue(response)
-    mountFunc()
+    const wrapper = mountFunc()
+    wrapper.vm.saveNewStudy()
   })
 })

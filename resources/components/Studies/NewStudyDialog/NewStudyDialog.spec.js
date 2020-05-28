@@ -9,42 +9,18 @@ localVue.use(Vuex)
 
 describe('NewStudyDialog', () => {
   let vuetify
-  let store
-  // const opts = {}
 
   beforeEach(() => {
-    const state = {
-      current: {},
-      pending: []
-    }
-    const actions = {
-      pop: jest.fn()
-    }
-
-    store = new Vuex.Store({
-      state: {},
-      modules: {
-        notifications: {
-          namespaced: true,
-          state,
-          actions
-        }
-      }
-    })
-    vuetify = new Vuetify({
-      mocks: {
-        $vuetify: {
-          breakpoint: {}
-        }
-      }
-    })
+    vuetify = new Vuetify()
   })
 
   function mountFunc (options = {}) {
     return shallowMount(NewStudyDialog, {
-      store,
       localVue,
       vuetify,
+      propsData: {
+        value: true
+      },
       ...options
     })
   }
