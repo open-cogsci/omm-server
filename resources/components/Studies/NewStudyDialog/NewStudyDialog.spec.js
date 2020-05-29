@@ -82,6 +82,10 @@ describe('NewStudyDialog', () => {
     // The button should be disabled at first
     const saveBtn = wrapper.find('.v-btn.success')
     expect(saveBtn.attributes('disabled')).toBe('disabled')
+    // Force a save action and see if that guard works too
+    wrapper.vm.save()
+    expect(wrapper.emitted('clicked-save')).not.toBeTruthy()
+    // Set data to make save button available
     wrapper.setData({ study })
     await flushPromises()
     expect(saveBtn.attributes()).not.toContain('disabled')
