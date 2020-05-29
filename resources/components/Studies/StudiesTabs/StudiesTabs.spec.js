@@ -10,34 +10,26 @@ localVue.use(Vuex)
 describe('StudiesTabs', () => {
   let vuetify
   let store
-  // const opts = {}
+  let actions
 
   beforeEach(() => {
-    const state = {
-      current: {},
-      pending: []
+    actions = {
+      notify: jest.fn()
     }
-    const actions = {
-      pop: jest.fn()
-    }
-
     store = new Vuex.Store({
       state: {},
       modules: {
         notifications: {
           namespaced: true,
-          state,
+          state: {
+            current: {},
+            pending: []
+          },
           actions
         }
       }
     })
-    vuetify = new Vuetify({
-      mocks: {
-        $vuetify: {
-          breakpoint: {}
-        }
-      }
-    })
+    vuetify = new Vuetify()
   })
 
   function mountFunc (options = {}) {
@@ -51,6 +43,6 @@ describe('StudiesTabs', () => {
 
   test('is a Vue instance', () => {
     const wrapper = mountFunc()
-    expect(wrapper.exists()).toBeTruthy()
+    expect(wrapper.exists()).toBe(true)
   })
 })

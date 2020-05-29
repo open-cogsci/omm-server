@@ -22,6 +22,7 @@ module.exports = {
     '<rootDir>/resources/test/jestSetup.js'
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!vue-router|@babel|vuetify)'
-  ]
+    'node_modules/(?!vue-router|@babel)'
+  ],
+  snapshotSerializers: ['jest-serializer-vue']
 }

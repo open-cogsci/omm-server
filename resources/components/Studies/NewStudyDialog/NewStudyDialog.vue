@@ -10,7 +10,7 @@
         Please enter the information below
       </v-card-text>
       <v-card-text>
-        <v-form ref="form" v-model="formValid">
+        <v-form ref="form" v-model="formValid" @submit.prevent="save">
           <v-text-field
             v-model="study.name"
             label="Title"
@@ -40,7 +40,7 @@
         >
           Save
         </v-btn>
-        <v-btn @click="cancel">
+        <v-btn class="cancel" @click="cancel">
           Cancel
         </v-btn>
       </v-card-actions>
@@ -78,10 +78,12 @@ export default {
       validation: {
         name: [
           v => notEmpty(v) || 'Please give your study a name',
-          v => maxLength(v, this.maxNameLength) || `This field has a maximum of ${this.maxNameLength} characters`
+          v => maxLength(v, this.maxNameLength) ||
+          `This field has a maximum of ${this.maxNameLength} characters`
         ],
         description: [
-          v => maxLength(v, this.maxDescLength) || `This field has a maximum of ${this.maxDescLength} characters`
+          v => maxLength(v, this.maxDescLength) ||
+          `This field has a maximum of ${this.maxDescLength} characters`
         ]
       }
     }
@@ -89,9 +91,7 @@ export default {
   watch: {
     value (val) {
       if (!val) {
-        this.name = ''
-        this.description = ''
-        this.$refs.form.resetValidation()
+        this.clear()
       }
     }
   },
@@ -103,6 +103,11 @@ export default {
       if (this.$refs.form.validate()) {
         this.$emit('clicked-save', this.study)
       }
+    },
+    clear () {
+      this.study.name = ''
+      this.study.description = ''
+      this.$refs.form.resetValidation()
     },
     removeErrors (field) {
       const errors = {

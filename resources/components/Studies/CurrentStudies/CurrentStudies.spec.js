@@ -19,10 +19,6 @@ describe('CurrentStudies', () => {
   let actions
 
   beforeEach(() => {
-    const state = {
-      current: {},
-      pending: []
-    }
     actions = {
       notify: jest.fn()
     }
@@ -31,7 +27,10 @@ describe('CurrentStudies', () => {
       modules: {
         notifications: {
           namespaced: true,
-          state,
+          state: {
+            current: {},
+            pending: []
+          },
           actions
         }
       }
@@ -124,11 +123,29 @@ describe('CurrentStudies', () => {
     expect(actions.notify).toHaveBeenCalled()
   })
 
-  test('Errors should be correctly processed', async () => {
-    const wrapper = mountFunc()
+  test('Errors should be reset after the dialog closes', async () => {
+    const errors = { name: 'Invalid', description: 'Required' }
+    const wrapper = mountFunc({
+      data () {
+        return { errors }
+      }
+    })
     await flushPromises()
-    expect(actions.notify).not.toHaveBeenCalled()
-    wrapper.vm.processError(new Error('Something'))
-    expect(actions.notify).toHaveBeenCalled()
+    expect(wrapper.vm.errors).toEqual(errors)
+    wrapper.vm.clearErrors(false)
+    expect(wrapper.vm.errors).toEqual({ name: '', description: '' })
+  })
+
+  test('Errors should not be reset if a dialog hasn not closed', async () => {
+    const errors = { name: 'Invalid', description: 'Required' }
+    const wrapper = mountFunc({
+      data () {
+        return { errors }
+      }
+    })
+    await flushPromises()
+    expect(wrapper.vm.errors).toEqual(errors)
+    wrapper.vm.clearErrors(true)
+    expect(wrapper.vm.errors).toEqual(errors)
   })
 })

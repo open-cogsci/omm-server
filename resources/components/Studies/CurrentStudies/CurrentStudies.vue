@@ -1,6 +1,7 @@
 <template>
   <div>
     <new-study-dialog
+      ref="dialog"
       v-model="dialog"
       :saving="saving"
       :errors.sync="errors"
@@ -18,8 +19,8 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { isArray } from 'lodash'
 import { STUDIES } from '@/assets/js/endpoints'
+import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   components: {
@@ -32,7 +33,7 @@ export default {
       dialog: false,
       saving: false,
       loading: false,
-      errors: {}
+      errors: { name: '', description: '' }
     }
   },
   created () {
@@ -69,36 +70,12 @@ export default {
         this.studies.unshift(study)
         this.notify({ message: 'Study has been added', color: 'success' })
         this.dialog = false
+        this.$refs.dialog.clear()
       } catch (e) {
-        this.processError(e)
+        this.errors = processErrors(e, this.notify)
       } finally {
         this.saving = false
       }
-    },
-    /**
-     * Process errors returned by axios
-     *
-     * @param {object} e the error provided by axios
-     *
-     * @returns {void}
-     * */
-    processError (e) {
-      if (isArray(e?.response?.data)) {
-        const validationErrors = e.response.data
-        for (const err of validationErrors) {
-          this.errors[err.field] = err.validation
-        }
-        this.notify({
-          message: 'There were some problems with your input. Please review the form.',
-          color: 'error'
-        })
-        return
-      }
-
-      this.notify({
-        message: e?.response?.data?.error?.message || e.response?.data || e,
-        color: 'error'
-      })
     },
     /**
      *  Clear possible validation errors sent by adonis after closing the dialog.

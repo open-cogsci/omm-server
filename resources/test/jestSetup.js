@@ -31,14 +31,7 @@ Vue.mixin({
 
 config.mocks.$t = key => key
 
-const vuetify = new Vuetify({
-  mocks: {
-    $vuetify: {
-      breakpoint: {}
-    }
-  }
-})
-
-export const commonVueParams = {
-  vuetify
-}
+// Necessary for components such as v-dialog and v-menu to function correctly
+const app = document.createElement('div')
+app.setAttribute('data-app', true)
+document.body.appendChild(app)

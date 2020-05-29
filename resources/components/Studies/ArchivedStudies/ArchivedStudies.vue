@@ -30,8 +30,9 @@ export default {
         const response = await this.$axios.get(STUDIES, { params: { active: false } })
         this.studies = response.data.data
       } catch (e) {
+        const msg = e?.response?.data?.error?.message || e?.response?.data
         this.notify({
-          message: e.response.data?.error?.message || 'Unspecified error',
+          message: msg || 'Unspecified error',
           color: 'error'
         })
       }
