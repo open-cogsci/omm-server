@@ -23,4 +23,9 @@ describe('Password wrapper', () => {
     const wrapper = mountFunc()
     expect(wrapper.exists()).toBe(true)
   })
+
+  it('Should match snapshot', () => {
+    const wrapper = mountFunc()
+    expect(wrapper).toMatchSnapshot()
+  })
 })

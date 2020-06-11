@@ -24,6 +24,7 @@ module.exports = {
     'nuxt/no-cjs-in-config': 'off',
     'vuetify/no-deprecated-classes': 'error',
     'vuetify/grid-unknown-attributes': 'error',
-    'vuetify/no-legacy-grid': 'error',
-  }
+    'vuetify/no-legacy-grid': 'error'
+  },
+  ignorePatterns: ['resources/test/__snapshots__/**/*.js']
 }
