@@ -1,10 +1,10 @@
 import Vuetify from 'vuetify'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import Password from './password.vue'
+import Dashboard from './dashboard.vue'
 
 const localVue = createLocalVue()
 
-describe('Password wrapper', () => {
+describe('Dashboard wrapper', () => {
   let vuetify
 
   beforeEach(() => {
@@ -12,9 +12,10 @@ describe('Password wrapper', () => {
   })
 
   function mountFunc (options = {}) {
-    return shallowMount(Password, {
+    return shallowMount(Dashboard, {
       localVue,
       vuetify,
+      stubs: ['nuxt-child'],
       ...options
     })
   }
@@ -22,10 +23,5 @@ describe('Password wrapper', () => {
   it('Mounts and renders', () => {
     const wrapper = mountFunc()
     expect(wrapper.exists()).toBe(true)
-  })
-
-  it('Matches snapshot', () => {
-    const wrapper = mountFunc()
-    expect(wrapper).toMatchSnapshot()
   })
 })

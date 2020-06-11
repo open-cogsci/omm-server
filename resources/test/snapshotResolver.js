@@ -1,7 +1,7 @@
 module.exports = {
-  testPathForConsistencyCheck: 'some/example.test.js',
+  testPathForConsistencyCheck: 'resources/pages/index.test.js',
   resolveSnapshotPath: (testPath, snapshotExtension) =>
-    testPath.replace(/\.spec\.([tj]sx?)/, `${snapshotExtension}.$1`),
+    testPath.replace(/\.test\.([tj]sx?)/, `${snapshotExtension}.$1`),
   resolveTestPath: (snapshotFilePath, snapshotExtension) =>
-    snapshotFilePath.replace(snapshotExtension, '.spec')
+    snapshotFilePath.replace(snapshotExtension, '.test')
 }
