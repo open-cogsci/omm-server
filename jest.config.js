@@ -24,5 +24,6 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!vue-router|@babel)'
   ],
-  snapshotSerializers: ['jest-serializer-vue']
+  snapshotSerializers: ['jest-serializer-vue'],
+  snapshotResolver: '<rootDir>/resources/test/snapshotResolver.js'
 }

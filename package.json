@@ -30,6 +30,7 @@
     "cross-env": "^7.0.2",
     "nuxt": "^2.12.2",
     "sqlite3": "^4.2.0",
+    "validator": "^13.1.0",
     "vuex-pathify": "^1.4.1",
     "vuex-router-sync": "^5.0.0"
   },
