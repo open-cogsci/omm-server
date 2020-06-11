@@ -12,7 +12,7 @@
     </v-card-title>
     <v-card-text>
       <h1 class="text-center subtitle-1">
-        Please sign in
+        {{ $t('login.signin') }}
       </h1>
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-row>
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { emailRule } from '~/assets/js/validationrules'
+import { isEmpty, isEmail } from 'validator'
 
 export default {
   layout: 'guest',
@@ -74,11 +74,11 @@ export default {
       error: '',
       validation: {
         email: [
-          v => !!v || 'Please provide your email address',
-          v => emailRule(v) || 'This e-mail address is invalid'
+          v => !isEmpty(v) || 'Please provide your email address',
+          v => isEmail(v) || 'This e-mail address is invalid'
         ],
         password: [
-          v => !!v || 'Please provide a password'
+          v => !isEmpty(v) || 'Please provide a password'
         ]
       }
     }

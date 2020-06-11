@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Password wrapper Should match snapshot 1`] = `
+exports[`Password wrapper matches its snapshot 1`] = `
 <v-card-stub loaderheight="4" tag="div">
   <v-card-title-stub>
     <v-img-stub maxheight="40" maxwidth="40" contain="true" options="[object Object]" position="center center" src="" transition="fade-transition" class="mx-2"></v-img-stub> <span class="display-1 font-weight-light">Open Monkey Mind</span>

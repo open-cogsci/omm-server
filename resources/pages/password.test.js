@@ -19,12 +19,7 @@ describe('Password wrapper', () => {
     })
   }
 
-  it('Mounts and renders', () => {
-    const wrapper = mountFunc()
-    expect(wrapper.exists()).toBe(true)
-  })
-
-  it('Should match snapshot', () => {
+  it('matches its snapshot', () => {
     const wrapper = mountFunc()
     expect(wrapper).toMatchSnapshot()
   })

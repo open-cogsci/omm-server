@@ -1,5 +1,6 @@
 const { resolve } = require('path')
 const colors = require('vuetify/es5/util/colors').default
+const i18n = require('../config/i18n.js')
 
 module.exports = {
   mode: 'spa',
@@ -54,7 +55,8 @@ module.exports = {
     '@nuxtjs/axios',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
-    '@nuxtjs/auth'
+    '@nuxtjs/auth',
+    'nuxt-i18n'
   ],
   /*
   ** Axios module configuration
@@ -62,6 +64,10 @@ module.exports = {
   */
   axios: {
   },
+  /*
+  ** Auth module configuration
+  ** See https://auth.nuxtjs.org/
+  */
   auth: {
     strategies: {
       local: {
@@ -73,6 +79,11 @@ module.exports = {
       }
     }
   },
+  /*
+  ** i18n module configuration
+  ** See https://nuxt-community.github.io/nuxt-i18n/
+  */
+  i18n,
   /*
   ** vuetify module configuration
   ** https://github.com/nuxt-community/vuetify-module
@@ -105,6 +116,9 @@ module.exports = {
     ** You can extend webpack config here
     */
     extend (config, ctx) {
-    }
+    },
+    watch: [
+      'lang/**/*.js'
+    ]
   }
 }
