@@ -30,6 +30,7 @@ Vue.mixin({
 })
 
 config.mocks.$t = key => key
+config.mocks.localePath = v => v
 
 // Necessary for components such as v-dialog and v-menu to function correctly
 const app = document.createElement('div')

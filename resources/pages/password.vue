@@ -11,14 +11,15 @@
       <span class="display-1 font-weight-light">Open Monkey Mind</span>
     </v-card-title>
     <v-card-text>
-      <p>Send a password reset link to the provided e-mail address.</p>
+      <p>{{ $t('password.subheader') }}</p>
       <v-form v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="12">
             <v-text-field
+              v-model="email"
               :rules="validation.email"
               validate-on-blur
-              label="Email address"
+              :label="$t('password.fields.email.label')"
             />
           </v-col>
         </v-row>
@@ -26,11 +27,11 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn color="primary" to="/login" nuxt>
-        Sign in
+      <v-btn color="primary" :to="localePath({name: 'login'})" nuxt>
+        {{ $t('password.buttons.signin') }}
       </v-btn>
       <v-btn :disabled="!valid" color="success">
-        Send e-mail
+        {{ $t('password.buttons.email') }}
         <v-icon right>
           mdi-send
         </v-icon>
@@ -40,7 +41,7 @@
 </template>
 
 <script>
-import { emailRule } from '~/assets/js/validationrules'
+import { isEmpty, isEmail } from 'validator'
 
 export default {
   layout: 'guest',
@@ -48,15 +49,11 @@ export default {
   data () {
     return {
       email: '',
-      password: '',
       valid: true,
       validation: {
         email: [
-          v => !!v || 'Please provide your email address',
-          v => emailRule(v) || 'This e-mail address is invalid'
-        ],
-        password: [
-          v => !!v || 'Please provide a password'
+          v => !isEmpty(`${v}`) || this.$t('password.fields.email.validation.empty'),
+          v => isEmail(v) || this.$t('password.fields.email.validation.invalid')
         ]
       }
     }

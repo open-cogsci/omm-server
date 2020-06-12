@@ -9,7 +9,7 @@
     >
       <v-list>
         <div class="d-flex d-sm-none">
-          <v-list-item :to="{name: 'dashboard-account'}" nuxt>
+          <v-list-item :to="localePath({name: 'dashboard-account'})" nuxt>
             <v-list-item-action>
               <v-icon>mdi-account</v-icon>
             </v-list-item-action>
@@ -42,7 +42,7 @@
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :to="item.to"
+          :to="localePath(item.to)"
           router
           exact
         >
@@ -84,7 +84,7 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-item :to="{name: 'dashboard-account'}" nuxt>
+          <v-list-item :to="localePath({name: 'dashboard-account'})" nuxt>
             <v-list-item-icon>
               <v-icon>mdi-account</v-icon>
             </v-list-item-icon>
@@ -153,6 +153,9 @@ export default {
         this.error = e + ''
       }
     }
+  },
+  head () {
+    return this.$nuxtI18nSeo()
   }
 }
 </script>

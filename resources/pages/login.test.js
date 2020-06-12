@@ -19,9 +19,11 @@ describe('Login wrapper', () => {
       vuetify,
       mocks: {
         $auth: {
-          login
+          login,
+          user: null
         }
       },
+      stubs: ['nuxt-link'],
       ...options
     })
   }

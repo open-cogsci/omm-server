@@ -15,7 +15,10 @@ describe('Password wrapper', () => {
     return shallowMount(Password, {
       localVue,
       vuetify,
-      ...options
+      ...options,
+      mocks: {
+        localePath: v => v
+      }
     })
   }
 

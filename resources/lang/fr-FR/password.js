@@ -1,3 +1,5 @@
+// TODO: Translato to French
+
 export default {
   subheader: 'Send a password reset link to the provided e-mail address.',
   fields: {

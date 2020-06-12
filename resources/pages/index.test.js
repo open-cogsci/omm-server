@@ -28,7 +28,8 @@ describe('Index', () => {
         },
         $router: {
           replace
-        }
+        },
+        localePath: v => v
       }
     })
     expect(replace.mock.calls.length).toBe(1)
@@ -44,7 +45,8 @@ describe('Index', () => {
         },
         $router: {
           replace
-        }
+        },
+        localePath: v => v
       }
     })
     expect(replace.mock.calls.length).toBe(1)

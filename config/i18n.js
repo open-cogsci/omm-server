@@ -1,8 +1,7 @@
 module.exports = {
-  parsePages: false,
   lazy: true,
   langDir: 'lang/',
-  seo: false, // change this back to true once https://github.com/nuxt-community/nuxt-i18n/issues/100 has been fixed
+  seo: false,
   locales: [
     {
       code: 'en',

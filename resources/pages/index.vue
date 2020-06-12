@@ -9,9 +9,9 @@ export default {
   layout: 'guest',
   mounted () {
     if (this.$auth.loggedIn) {
-      this.$router.replace({ name: 'dashboard' })
+      this.$router.replace(this.localePath({ name: 'dashboard' }))
     } else {
-      this.$router.replace({ name: 'login' })
+      this.$router.replace(this.localePath({ name: 'login' }))
     }
   }
 }

@@ -21,15 +21,15 @@
               v-model="email"
               :rules="validation.email"
               validate-on-blur
-              label="Email address"
+              :label="$t('login.fields.email.label')"
             />
           </v-col>
           <v-col cols="12">
             <v-text-field
               v-model="password"
               :rules="validation.password"
-              label="password"
               type="password"
+              :label="$t('login.fields.password.label')"
             />
           </v-col>
         </v-row>
@@ -40,16 +40,14 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn to="/password" nuxt>
-        Recover password
-      </v-btn>
+      <v-btn :to="localePath({name : 'password'})" nuxt v-text="$t('login.buttons.recover')" />
       <v-btn
         :disabled="!valid"
         :loading="authenticating"
         color="primary"
         @click="login"
       >
-        Sign in
+        {{ $t('login.buttons.signin') }}
         <v-icon right>
           mdi-login
         </v-icon>
@@ -74,11 +72,11 @@ export default {
       error: '',
       validation: {
         email: [
-          v => !isEmpty(v) || 'Please provide your email address',
-          v => isEmail(v) || 'This e-mail address is invalid'
+          v => !isEmpty(v) || this.$t('login.fields.email.validation.empty'),
+          v => isEmail(v) || this.$t('login.fields.email.validation.invalid')
         ],
         password: [
-          v => !isEmpty(v) || 'Please provide a password'
+          v => !isEmpty(v) || this.$t('login.fields.password.validation.empty')
         ]
       }
     }
