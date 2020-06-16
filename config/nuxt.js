@@ -37,7 +37,8 @@ module.exports = {
   plugins: [
     '~/plugins/syncprops',
     '~/plugins/routersync',
-    '~/plugins/mdifont'
+    '~/plugins/mdifont',
+    '~/plugins/vuex-orm-axios'
   ],
   /*
   ** Nuxt.js dev-modules
@@ -115,6 +116,9 @@ module.exports = {
     extend (config, ctx) {},
     watch: [
       'lang/**/*.js'
-    ]
+    ],
+    babel: {
+      plugins: ['@babel/plugin-proposal-class-properties']
+    }
   }
 }

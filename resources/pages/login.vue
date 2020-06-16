@@ -93,7 +93,6 @@ export default {
     }
   },
   methods: {
-    // eslint-disable-next-line require-await
     async login () {
       if (!this.$refs.form.validate()) { return }
       this.authenticating = true

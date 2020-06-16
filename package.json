@@ -27,6 +27,8 @@
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.11.0",
     "@nuxtjs/dotenv": "^1.4.0",
+    "@vuex-orm/core": "^0.36.3",
+    "@vuex-orm/plugin-axios": "^0.9.3",
     "cross-env": "^7.0.2",
     "nuxt": "^2.12.2",
     "nuxt-i18n": "^6.12.2",
@@ -36,6 +38,7 @@
     "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
     "@mdi/font": "^5.3.45",
     "@nuxtjs/eslint-config": "^3.0.0",
     "@nuxtjs/eslint-module": "^2.0.0",
