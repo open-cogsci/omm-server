@@ -19,8 +19,9 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { STUDIES } from '@/assets/js/endpoints'
 import { processErrors } from '@/assets/js/errorhandling'
+
+import Study from '@/models/Study'
 
 export default {
   components: {
@@ -29,11 +30,18 @@ export default {
   },
   data () {
     return {
-      studies: [],
       dialog: false,
       saving: false,
       loading: false,
       errors: { name: '', description: '' }
+    }
+  },
+  computed: {
+    studies () {
+      return Study.query()
+        .where('active', true)
+        .orderBy('created_at', 'desc')
+        .get()
     }
   },
   created () {
@@ -44,8 +52,7 @@ export default {
     async fetch () {
       this.loading = true
       try {
-        const response = await this.$axios.get(STUDIES)
-        this.studies = response.data.data
+        await Study.fetch()
       } catch (e) {
         const msg = e?.response?.data?.error?.message || e?.response?.data
         this.notify({
@@ -62,12 +69,10 @@ export default {
     async saveNewStudy (newStudyData) {
       this.saving = true
       try {
-        const response = await this.$axios.post(STUDIES, {
+        await Study.persist({
           name: newStudyData.name,
           description: newStudyData.description
         })
-        const study = response.data.data
-        this.studies.unshift(study)
         this.notify({ message: 'Study has been added', color: 'success' })
         this.dialog = false
         this.$refs.dialog.clear()

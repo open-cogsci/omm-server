@@ -7,7 +7,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { STUDIES } from '@/assets/js/endpoints'
+import Study from '@/models/Study'
 
 export default {
   components: {
@@ -15,8 +15,15 @@ export default {
   },
   data () {
     return {
-      loading: false,
-      studies: []
+      loading: false
+    }
+  },
+  computed: {
+    studies () {
+      return Study.query()
+        .where('active', false)
+        .orderBy('created_at', 'desc')
+        .get()
     }
   },
   created () {
@@ -27,8 +34,7 @@ export default {
     async fetch () {
       this.loading = true
       try {
-        const response = await this.$axios.get(STUDIES, { params: { active: false } })
-        this.studies = response.data.data
+        await Study.fetch({ params: { active: false } })
       } catch (e) {
         const msg = e?.response?.data?.error?.message || e?.response?.data
         this.notify({
