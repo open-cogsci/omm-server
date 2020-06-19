@@ -32,6 +32,42 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
+
+  // When a participant enters, the client announces this to the server, and the server replies by
+  // sending the experiment file. (Implementation detail: the experiment file should be cached.).
+  // The rfid parameter is the RFID code of the participant, transmitted by its chip.
+  Route.get('/announce/:rfid', 'StudyController.announce').as('announce')
+
+  // The client asks for a job, and the server replies by sending job data. The current job is always
+  // the first job in the table with a ready state. The rfid parameter is the RFID code of the
+  // participant, transmitted by its chip.
+  Route.get('/jobs/:rfid/fetch', 'StudyController.fetchJob').as('fetch_job')
+
+  // Once a job has been completed, the client sends the resulting data to the server.
+  // The id parameter is the job ID
+  Route.patch('/jobs/:id/result', 'JobController.processResult').as('post_job_result')
+
+  // The client asks the server the current job index, i.e. the row of the job table.
+  // The rfid parameter is the RFID code of the participant, transmitted by its chip.
+  Route.get('/jobs/:rfid/index', 'StudyController.currentJobIndex').as('current_job_index')
+
+  // The client gets a list of jobs from the server. This is not for running the jobs. Rather, it allows
+  // the client to modify the jobs, and then update them on the server.
+  // By default, the endpoint returns all the jobs of the current study. With optional from and to
+  // query params (e.g. GET /studies/2/jobs?from=5&to=10) this can be limited to a subset of the jobs.
+  // The id parameter is the study ID to retrieve the jobs from.
+  Route.get('/studies/:id/jobs', 'StudyController.fetchJobs').as('get_job_sequence')
+
+  // The client inserts a list of jobs into the job table of the server.
+  Route.post('/studies/:id/jobs', 'StudyController.insertJobs').as('insert_job_sequence')
+
+  // The client deletes a list of jobs in the job table of the server. The index parameters are specified
+  // in the url for making them required (and thus for safety of not deleting all records)
+  Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('delete_job_sequence')
+
+  // The client changes the state of a list of jobs on the server. This is convenience operation which
+  // could also be done by getting jobs, changing them, removing them, and finally inserting them again.
+  Route.patch('/studies/:id/jobs/:from/:to', 'StudyController.updateJobs').as('update_job_sequence')
 }).prefix(API_PREFIX)
 
 Route.any('*', 'NuxtController.render')

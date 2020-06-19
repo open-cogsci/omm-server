@@ -9,12 +9,12 @@ class JobStatesSchema extends Schema {
       table.increments()
       table.integer('participant_id').unsigned().notNullable()
       table.integer('job_id').unsigned().notNullable()
-      table.integer('state_id').unsigned().notNullable()
+      table.integer('status_id').unsigned().notNullable()
       table.timestamps()
 
       table.foreign('participant_id').references('id').inTable('participants')
       table.foreign('job_id').references('id').inTable('jobs')
-      table.foreign('state_id').references('id').inTable('states')
+      table.foreign('status_id').references('id').inTable('job_statuses')
     })
   }
 

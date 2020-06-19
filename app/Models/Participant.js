@@ -4,6 +4,10 @@
 const Model = use('Model')
 
 class Participant extends Model {
+  studies () {
+    return this.belongsToMany('App/Models/Study')
+      .pivotModel('App/Models/Participation')
+  }
 }
 
 module.exports = Participant

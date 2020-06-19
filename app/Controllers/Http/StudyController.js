@@ -80,6 +80,25 @@ class StudyController {
    */
   async destroy ({ params, request, response }) {
   }
+
+  announce ({ params, request, response }) {
+    response.send({ message: `Called announce with rfid ${params.rfid}` })
+  }
+
+  fetchJob ({ params, request, response }) {
+    response.send({ message: `Called fetchJob with rfid ${params.rfid}` })
+  }
+
+  fetchJobs ({ params, request, response }) {
+    let message = `Called fetchJobs with studyID ${params.id}`
+    message += ` with jobindex from ${request.input('from')} to ${request.input('to')}`
+
+    response.send({ message })
+  }
+
+  currentJobIndex ({ params, request, response }) {
+    response.send({ message: `Called currentJobIndex with rfid ${params.rfid}` })
+  }
 }
 
 module.exports = StudyController

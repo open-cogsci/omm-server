@@ -2,7 +2,7 @@
   <div>
     <v-list v-if="addStudyButton" class="py-0">
       <v-list-item
-        class="success"
+        class="success pl-6"
         dark
         @click="$emit('clicked-new-study')"
       >
