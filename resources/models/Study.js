@@ -4,12 +4,20 @@ import { STUDIES } from '@/assets/js/endpoints'
 export default class Study extends Model {
   static entity = 'studies'
 
+  static apiConfig = {
+    baseURL: STUDIES
+  }
+
   static fetch (config) {
-    return this.api().get(STUDIES, config)
+    return this.api().get('', config)
+  }
+
+  static fetchById (id, config) {
+    return this.api().get(id, config)
   }
 
   static persist (data, config) {
-    return this.api().post(STUDIES, data, config)
+    return this.api().post('', data, config)
   }
 
   static fields () {

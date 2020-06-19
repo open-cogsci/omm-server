@@ -11,6 +11,7 @@
 
 <script>
 export default {
+  name: 'StudyWrapper',
   components: {
     StudiesTabs: () => import('@/components/Studies/StudiesTabs')
   },

@@ -38,6 +38,7 @@ class StudyController {
   async store ({ request, auth }) {
     const data = request.only(['name', 'description'])
     const study = await auth.user.studies().create(data)
+    await study.reload() // Refresh data otherwise some parameters are missing
     return { data: study }
   }
 
@@ -52,7 +53,8 @@ class StudyController {
   async show ({ params, auth, response }) {
     const data = await auth.user.studies().where('id', params.id).first()
     if (data === null) {
-      return response.notFound().send({ message: 'Study could not be found' })
+      response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
+      return
     }
     return { data }
   }

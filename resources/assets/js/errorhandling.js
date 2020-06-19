@@ -26,7 +26,7 @@ export function processErrors (e, notify = null) {
     }
   } else if (isFunction(notify)) {
     notify({
-      message: e?.response?.data?.error?.message || e.response?.data || e,
+      message: e?.response?.data?.error?.message || e?.response?.data || e,
       color: 'error'
     })
   }

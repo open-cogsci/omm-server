@@ -8,13 +8,18 @@
           transition="fade-transition"
           height="294"
         >
-          <div>
+          <div v-if="study">
             <p class="display-1 font-weight-light" v-text="study.name" />
             <h2
               v-if="study.description"
               class="title font-weight-light grey--text"
               v-text="study.description"
             />
+          </div>
+          <div v-else>
+            <p class="display-1 font-weight-light red--text">
+              Study could not be found.
+            </p>
           </div>
         </v-skeleton-loader>
       </v-col>
@@ -24,29 +29,32 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { STUDIES } from '@/assets/js/endpoints'
+import Study from '@/models/Study'
+import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
+  name: 'Study',
   data () {
     return {
-      loading: false,
-      study: {}
+      loading: false
+    }
+  },
+  computed: {
+    study () {
+      return Study.find(this.$route.params.id)
     }
   },
   mounted () {
-    this.fetch(this.$route.params.id)
+    this.fetchStudy(this.$route.params.id)
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async fetch (studyId) {
+    async fetchStudy (studyId) {
       this.loading = true
       try {
-        this.study = (await this.$axios.get(`${STUDIES}/${studyId}`)).data.data
+        await Study.fetchById(studyId)
       } catch (e) {
-        this.notify({
-          message: e.response.data?.message || 'Unspecified error',
-          color: 'error'
-        })
+        processErrors(e, this.notify)
       } finally {
         this.loading = false
       }
@@ -60,13 +68,13 @@ export default {
     // The component is reused if the id simply changed, so mounted is not called in this case.
     // Force a refetch if the id has changed.
     if (to.params.id !== from.params.id) {
-      this.fetch(to.params.id)
+      this.fetchStudy(to.params.id)
     }
     next()
   },
   head () {
     return {
-      title: 'Studies'
+      title: 'Study -- ' + this.study?.name || 404
     }
   }
 }

@@ -45,20 +45,16 @@ export default {
     }
   },
   created () {
-    this.fetch()
+    this.loadStudies()
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async fetch () {
+    async loadStudies () {
       this.loading = true
       try {
         await Study.fetch()
       } catch (e) {
-        const msg = e?.response?.data?.error?.message || e?.response?.data
-        this.notify({
-          message: msg || 'Unspecified error',
-          color: 'error'
-        })
+        processErrors(e, this.notify)
       } finally {
         this.loading = false
       }

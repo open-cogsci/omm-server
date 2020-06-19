@@ -4,6 +4,7 @@
 
 <script>
 export default {
+  name: 'DashboardWrapper',
   middleware: ['auth']
 }
 </script>
