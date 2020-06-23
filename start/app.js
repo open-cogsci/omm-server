@@ -22,6 +22,7 @@ const providers = [
   '@adonisjs/session/providers/SessionProvider',
   '@adonisjs/auth/providers/AuthProvider',
   '@adonisjs/validator/providers/ValidatorProvider',
+  'adonis-swagger/providers/SwaggerProvider',
   path.join(__dirname, '..', 'providers', 'NuxtProvider')
 ]
 

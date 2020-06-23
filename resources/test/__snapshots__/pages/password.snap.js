@@ -12,23 +12,23 @@ exports[`Password wrapper matches its snapshot 1`] = `
         <v-col-stub cols="12" tag="div">
           <v-text-field-stub errorcount="1" errormessages="" messages="" rules="v => {
             /* istanbul ignore next */
-            cov_2o0u0gd9re().f[2]++;
-            cov_2o0u0gd9re().s[6]++;
+            cov_1ufdabfevv().f[2]++;
+            cov_1ufdabfevv().s[6]++;
             return (
               /* istanbul ignore next */
-              (cov_2o0u0gd9re().b[0][0]++, !(0, _validator.isEmpty)(\`\${v}\`)) ||
+              (cov_1ufdabfevv().b[0][0]++, !(0, _validator.isEmpty)(\`\${v}\`)) ||
               /* istanbul ignore next */
-              (cov_2o0u0gd9re().b[0][1]++, this.$t('password.fields.email.validation.empty'))
+              (cov_1ufdabfevv().b[0][1]++, this.$t('password.fields.email.validation.empty'))
             );
           },v => {
             /* istanbul ignore next */
-            cov_2o0u0gd9re().f[3]++;
-            cov_2o0u0gd9re().s[7]++;
+            cov_1ufdabfevv().f[3]++;
+            cov_1ufdabfevv().s[7]++;
             return (
               /* istanbul ignore next */
-              (cov_2o0u0gd9re().b[1][0]++, (0, _validator.isEmail)(v)) ||
+              (cov_1ufdabfevv().b[1][0]++, (0, _validator.isEmail)(v)) ||
               /* istanbul ignore next */
-              (cov_2o0u0gd9re().b[1][1]++, this.$t('password.fields.email.validation.invalid'))
+              (cov_1ufdabfevv().b[1][1]++, this.$t('password.fields.email.validation.invalid'))
             );
           }" successmessages="" validateonblur="true" value="" backgroundcolor="" label="password.fields.email.label" loaderheight="2" clearicon="$clear" type="text"></v-text-field-stub>
         </v-col-stub>

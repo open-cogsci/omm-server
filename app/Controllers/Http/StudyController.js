@@ -24,7 +24,6 @@ class StudyController {
       .where('active', active)
       .orderBy('created_at', 'desc')
       .fetch()
-    console.log(studies)
     return { data: studies }
   }
 
@@ -68,7 +67,7 @@ class StudyController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request }) {
   }
 
   /**
@@ -79,19 +78,19 @@ class StudyController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, request }) {
   }
 
-  announce ({ params, request, response }) {
-    response.send({ message: `Called announce with rfid ${params.rfid}` })
+  announce ({ params, request }) {
+    return { message: `Called announce with rfid ${params.rfid}` }
   }
 
-  fetchJob ({ params, request, response }) {
-    response.send({ message: `Called fetchJob with rfid ${params.rfid}` })
+  fetchJob ({ params, request }) {
+    return { message: `Called fetchJob with rfid ${params.rfid}` }
   }
 
-  currentJobIndex ({ params, request, response }) {
-    response.send({ message: `Called currentJobIndex with rfid ${params.rfid}` })
+  currentJobIndex ({ params, request }) {
+    return { message: `Called currentJobIndex with rfid ${params.rfid}` }
   }
 
   /**
@@ -100,7 +99,7 @@ class StudyController {
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  insertJobs ({ params, request, response }) {
+  insertJobs ({ params, request }) {
     const studyID = params.id
     const index = parseInt(request.input('at'))
     const jobs = request.input('jobs', [])
@@ -109,7 +108,7 @@ class StudyController {
       message += `at index ${index} `
     }
 
-    response.send({ message, jobs })
+    return { message, jobs }
   }
 
   /**
@@ -118,11 +117,11 @@ class StudyController {
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  fetchJobs ({ params, request, response }) {
+  fetchJobs ({ params, request }) {
     let message = `Called fetchJobs with studyID ${params.id}`
     message += ` with jobindex from ${request.input('from')} to ${request.input('to')}`
 
-    response.send({ message })
+    return { message }
   }
 
   /**
@@ -131,10 +130,10 @@ class StudyController {
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  updateJobs ({ params, request, response }) {
+  updateJobs ({ params, request }) {
     const message = `Called updateJobs with studyID ${params.id}`
     const jobs = request.input('jobs', [])
-    response.send({ message, jobs })
+    return { message, jobs }
   }
 
   /**
@@ -143,14 +142,14 @@ class StudyController {
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  deleteJobs ({ params, request, response }) {
+  deleteJobs ({ params, request }) {
     const studyID = params.id
     const jobStart = params.from
     const jobEnd = params.to
 
     let message = `Called deleteJobs with studyID ${studyID}`
     message += ` with jobindex from ${jobStart} to ${jobEnd}`
-    response.send({ message })
+    return { message }
   }
 }
 
