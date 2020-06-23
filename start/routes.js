@@ -33,23 +33,98 @@ Route.group(() => {
 Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
 
-  // When a participant enters, the client announces this to the server, and the server replies by
-  // sending the experiment file. (Implementation detail: the experiment file should be cached.).
-  // The rfid parameter is the RFID code of the participant, transmitted by its chip.
+  /**
+  * @swagger
+  * /announce/{rfid}:
+  *   get:
+  *     tags:
+  *       - Job distribution
+  *     summary: >
+  *         When a participant enters a cubicle, the omm client announces this to the server, and the server replies by
+  *         sending the experiment file. (Implementation detail: the experiment file should be cached.).
+  *     parameters:
+  *       - in: path
+  *         name: rfid
+  *         description: the RFID code of the participant transmitted by its chip.
+  *         required: true
+  *         type: string
+  *     responses:
+  *       200:
+  *         description: Sends the study to perform, including a download link to the osexp file.
+  *         example:
+  *           message: Hello Guess
+  *       404:
+  *         description: The participant with the specified rfid was not found.
+  */
   Route.get('/announce/:rfid', 'StudyController.announce').as('announce')
 
-  // The client asks for a job, and the server replies by sending job data. The current job is always
-  // the first job in the table with a ready state. The rfid parameter is the RFID code of the
-  // participant, transmitted by its chip.
-  Route.get('/jobs/:rfid/fetch', 'StudyController.fetchJob').as('fetch_job')
+  /**
+  * @swagger
+  * /jobs/fetchfor/{rfid}:
+  *   get:
+  *     tags:
+  *       - Job distribution
+  *     summary: >
+  *         The client asks for a job, and the server replies by sending job data. The current job is always
+  *         the first job in the table with a ready state.
+  *     parameters:
+  *       - in: path
+  *         name: rfid
+  *         description: the RFID code of the participant transmitted by its chip.
+  *         required: true
+  *         type: string
+  *     responses:
+  *       200:
+  *         description: Sends the current job in line
+  *         example:
+  *           message: Hello Guess
+  *       404:
+  *         description: The participant with the specified rfid was not found.
+  */
+  Route.get('/jobs/fetchfor/:rfid', 'StudyController.fetchJob').as('fetch_job')
 
-  // Once a job has been completed, the client sends the resulting data to the server.
-  // The id parameter is the job ID
-  Route.patch('/jobs/:id/result', 'JobController.processResult').as('post_job_result')
+  /**
+  * @swagger
+  * /jobs/indexfor/{rfid}:
+  *   get:
+  *     tags:
+  *       - Job distribution
+  *     summary: >
+  *       The client asks the server the current job index, i.e. the row of the job table.
+  *       The rfid parameter is the RFID code of the participant, transmitted by its chip.
+  *     parameters:
+  *       - in: path
+  *         name: rfid
+  *         description: the RFID code of the participant transmitted by its chip.
+  *         required: true
+  *         type: string
+  *     responses:
+  *       200:
+  *         description: Sends the current job index in line
+  *         example:
+  *           message: Hello Guess
+  *       404:
+  *         description: The participant with the specified rfid was not found.
+  */
+  Route.get('/jobs/indexfor/:rfid', 'StudyController.currentJobIndex').as('current_job_index')
 
-  // The client asks the server the current job index, i.e. the row of the job table.
-  // The rfid parameter is the RFID code of the participant, transmitted by its chip.
-  Route.get('/jobs/:rfid/index', 'StudyController.currentJobIndex').as('current_job_index')
+  /**
+  * @swagger
+  * /jobs/result:
+  *   post:
+  *     tags:
+  *       - Job distribution
+  *     summary: >
+  *         Once a job has been completed, the client sends the resulting data to the server.
+  *     responses:
+  *       200:
+  *         description: Sends the current job in line
+  *         example:
+  *           message: Hello Guess
+  *       404:
+  *         description: The participant with the specified rfid was not found.
+  */
+  Route.post('/jobs/result', 'JobController.processResult').as('post_job_result')
 
   /* Public job CRUD actions */
 
@@ -74,6 +149,10 @@ Route.group(() => {
   // The client deletes a list of jobs in the job table of the server. The index parameters are specified
   // in the url for making them required (and thus for safety of not deleting all records)
   Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('delete_job_sequence')
+
+  Route.any('*', ({ response }) => {
+    response.badRequest('This endpoint does not exist')
+  })
 }).prefix(API_PREFIX)
 
 Route.any('*', 'NuxtController.render')

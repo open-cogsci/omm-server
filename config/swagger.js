@@ -15,11 +15,10 @@ module.exports = {
   options: {
     swaggerDefinition: {
       info: {
-        title: 'Adonis 💘 Swagger',
-        version: '1.0.0',
+        title: 'Open Monkey Mind',
+        version: '1.0.0'
       },
-  
-      basePath: '/',
+      basePath: '/api/v1/',
 
       // Example security definitions.
       securityDefinitions: {
@@ -40,7 +39,7 @@ module.exports = {
             write: 'Grants write access (this is just sample)',
             admin: 'Grants read and write access to administrative information (this is just sample)'
           }
-        },
+        }
       }
     },
 
