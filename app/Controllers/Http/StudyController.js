@@ -17,14 +17,14 @@ class StudyController {
    * @param {Auth} ctx.auth
    * @param {Response} ctx.response
    */
-  async index ({ request, auth }) {
+  async index ({ request, auth, transform }) {
     const active = request.input('active') !== 'false'
     const studies = await auth.user
       .studies()
       .where('active', active)
       .orderBy('created_at', 'desc')
       .fetch()
-    return { data: studies }
+    return transform.collection(studies, 'StudyTransformer')
   }
 
   /**
@@ -35,11 +35,11 @@ class StudyController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, auth }) {
+  async store ({ request, auth, transform }) {
     const data = request.only(['name', 'description'])
     const study = await auth.user.studies().create(data)
     await study.reload() // Refresh data otherwise some parameters are missing
-    return { data: study }
+    return transform.item(study, 'StudyTransformer')
   }
 
   /**
@@ -50,13 +50,13 @@ class StudyController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, auth, response }) {
-    const data = await auth.user.studies().where('id', params.id).first()
-    if (data === null) {
+  async show ({ params, auth, response, transform }) {
+    const study = await auth.user.studies().where('id', params.id).first()
+    if (study === null) {
       response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
       return
     }
-    return { data }
+    return transform.item(study, 'StudyTransformer')
   }
 
   /**
@@ -79,18 +79,6 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, request }) {
-  }
-
-  announce ({ params, request }) {
-    return { message: `Called announce with rfid ${params.rfid}` }
-  }
-
-  fetchJob ({ params, request }) {
-    return { message: `Called fetchJob with rfid ${params.rfid}` }
-  }
-
-  currentJobIndex ({ params, request }) {
-    return { message: `Called currentJobIndex with rfid ${params.rfid}` }
   }
 
   /**

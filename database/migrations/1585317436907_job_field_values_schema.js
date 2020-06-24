@@ -6,7 +6,6 @@ const Schema = use('Schema')
 class JobFieldValuesSchema extends Schema {
   up () {
     this.create('job_field_values', (table) => {
-      table.increments()
       table.integer('job_field_id').unsigned().notNullable()
       table.integer('job_id').unsigned().notNullable()
       table.text('value')
@@ -14,6 +13,7 @@ class JobFieldValuesSchema extends Schema {
 
       table.foreign('job_field_id').references('id').inTable('job_fields')
       table.foreign('job_id').references('id').inTable('jobs')
+      table.primary(['job_field_id', 'job_id'])
     })
   }
 

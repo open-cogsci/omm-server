@@ -109,6 +109,10 @@ module.exports = {
       }
     }
   },
+  telemetry: {
+    enabled: true,
+    consent: true
+  },
   /*
   ** Build configuration
   */

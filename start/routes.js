@@ -41,26 +41,32 @@ Route.group(() => {
   *       - Job distribution
   *     summary: >
   *         When a participant enters a cubicle, the omm client announces this to the server, and the server replies by
-  *         sending the experiment file. (Implementation detail: the experiment file should be cached.).
+  *         sending the experiment file.
   *     parameters:
   *       - in: path
   *         name: rfid
-  *         description: the RFID code of the participant transmitted by its chip.
   *         required: true
   *         type: string
+  *         description: The RFID code of the participant transmitted by its chip.
   *     responses:
   *       200:
-  *         description: Sends the study to perform, including a download link to the osexp file.
-  *         example:
-  *           message: Hello Guess
+  *         description: Sends the study to perform, including a download link for the osexp file.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Study'
+  *       400:
+  *         description: The specified rfid is invalid (e.g. not the expected ttype).
   *       404:
   *         description: The participant with the specified rfid was not found.
+  *       default:
+  *         description: Unexpected error
   */
-  Route.get('/announce/:rfid', 'StudyController.announce').as('announce')
+  Route.get('/announce/:rfid', 'ParticipantController.announce').as('announce')
 
   /**
   * @swagger
-  * /jobs/fetchfor/{rfid}:
+  * /participants/{rfid}/fetchjob:
   *   get:
   *     tags:
   *       - Job distribution
@@ -81,17 +87,16 @@ Route.group(() => {
   *       404:
   *         description: The participant with the specified rfid was not found.
   */
-  Route.get('/jobs/fetchfor/:rfid', 'StudyController.fetchJob').as('fetch_job')
+  Route.get('/participants/:rfid/fetchjob', 'ParticipantController.fetchJob').as('fetch_job')
 
   /**
   * @swagger
-  * /jobs/indexfor/{rfid}:
+  * /participants/{rfid}/jobindex:
   *   get:
   *     tags:
   *       - Job distribution
   *     summary: >
   *       The client asks the server the current job index, i.e. the row of the job table.
-  *       The rfid parameter is the RFID code of the participant, transmitted by its chip.
   *     parameters:
   *       - in: path
   *         name: rfid
@@ -106,14 +111,14 @@ Route.group(() => {
   *       404:
   *         description: The participant with the specified rfid was not found.
   */
-  Route.get('/jobs/indexfor/:rfid', 'StudyController.currentJobIndex').as('current_job_index')
+  Route.get('/participants/:rfid/jobindex', 'ParticipantController.currentJobIndex').as('current_job_index')
 
   /**
   * @swagger
   * /jobs/result:
   *   post:
   *     tags:
-  *       - Job distribution
+  *       - Sending results
   *     summary: >
   *         Once a job has been completed, the client sends the resulting data to the server.
   *     responses:

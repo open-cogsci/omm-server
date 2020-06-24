@@ -22,6 +22,7 @@ const providers = [
   '@adonisjs/session/providers/SessionProvider',
   '@adonisjs/auth/providers/AuthProvider',
   '@adonisjs/validator/providers/ValidatorProvider',
+  'adonis-bumblebee/providers/BumblebeeProvider',
   'adonis-swagger/providers/SwaggerProvider',
   path.join(__dirname, '..', 'providers', 'NuxtProvider')
 ]
@@ -36,6 +37,7 @@ const providers = [
 |
 */
 const aceProviders = [
+  'adonis-bumblebee/providers/CommandsProvider',
   '@adonisjs/lucid/providers/MigrationsProvider'
 ]
 

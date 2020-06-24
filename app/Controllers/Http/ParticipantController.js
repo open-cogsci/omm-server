@@ -1,5 +1,7 @@
 'use strict'
 
+const Study = use('App/Models/Study')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -18,18 +20,6 @@ class ParticipantController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-  }
-
-  /**
-   * Render a form to be used for creating a new participant.
-   * GET participants/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
   }
 
   /**
@@ -56,18 +46,6 @@ class ParticipantController {
   }
 
   /**
-   * Render a form to update an existing participant.
-   * GET participants/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
    * Update participant details.
    * PUT or PATCH participants/:id
    *
@@ -87,6 +65,21 @@ class ParticipantController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, request, response }) {
+  }
+
+  async announce ({ transform }) {
+    const study = await Study.firstOrFail()
+    return transform.item(study, 'StudyTransformer')
+  }
+
+  async fetchJob ({ transform }) {
+    const study = await Study.firstOrFail()
+    const jobs = study.jobs().fetch()
+    return transform.item(jobs, 'JobTransformer')
+  }
+
+  currentJobIndex ({ params, request }) {
+    return { message: `Called currentJobIndex with rfid ${params.rfid}` }
   }
 }
 

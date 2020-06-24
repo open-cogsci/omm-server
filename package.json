@@ -29,11 +29,13 @@
     "@nuxtjs/dotenv": "^1.4.0",
     "@vuex-orm/core": "^0.36.3",
     "@vuex-orm/plugin-axios": "^0.9.3",
+    "adonis-bumblebee": "^2.2.0",
     "adonis-swagger": "github:ahmadarif/adonis-swagger#v1.3.0",
     "cross-env": "^7.0.2",
     "nuxt": "^2.13.0",
     "nuxt-i18n": "^6.12.2",
     "sqlite3": "^4.2.0",
+    "swagger-jsdoc": "^4.0.0",
     "validator": "^13.1.1",
     "vuex-pathify": "^1.4.1",
     "vuex-router-sync": "^5.0.0"
