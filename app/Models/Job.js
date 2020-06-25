@@ -2,6 +2,34 @@
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
+/**
+*  @swagger
+*  definitions:
+*    Job:
+*      type: object
+*      properties:
+*        id:
+*          type: integer
+*        study_id:
+*          type: integer
+*        order:
+*          type: integer
+*        created_at:
+*          type: string
+*          format: date-time
+*        updated_at:
+*          type: string
+*          format: date-time
+*      required:
+*        - name
+*    JobWithRelations:
+*      allOf:
+*         - $ref: '#/definitions/Job'
+*         - type: object
+*           properties:
+*             study:
+*               $ref: '#/definitions/Study'
+*/
 
 class Job extends Model {
   study () {

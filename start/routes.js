@@ -33,102 +33,10 @@ Route.group(() => {
 Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
 
-  /**
-  * @swagger
-  * /announce/{rfid}:
-  *   get:
-  *     tags:
-  *       - Job distribution
-  *     summary: >
-  *         When a participant enters a cubicle, the omm client announces this to the server, and the server replies by
-  *         sending the experiment file.
-  *     parameters:
-  *       - in: path
-  *         name: rfid
-  *         required: true
-  *         type: string
-  *         description: The RFID code of the participant transmitted by its chip.
-  *     responses:
-  *       200:
-  *         description: Sends the study to perform, including a download link for the osexp file.
-  *         schema:
-  *           properties:
-  *             data:
-  *               $ref: '#/definitions/Study'
-  *       400:
-  *         description: The specified rfid is invalid (e.g. not the expected ttype).
-  *       404:
-  *         description: The participant with the specified rfid was not found.
-  *       default:
-  *         description: Unexpected error
-  */
-  Route.get('/announce/:rfid', 'ParticipantController.announce').as('announce')
-
-  /**
-  * @swagger
-  * /participants/{rfid}/fetchjob:
-  *   get:
-  *     tags:
-  *       - Job distribution
-  *     summary: >
-  *         The client asks for a job, and the server replies by sending job data. The current job is always
-  *         the first job in the table with a ready state.
-  *     parameters:
-  *       - in: path
-  *         name: rfid
-  *         description: the RFID code of the participant transmitted by its chip.
-  *         required: true
-  *         type: string
-  *     responses:
-  *       200:
-  *         description: Sends the current job in line
-  *         example:
-  *           message: Hello Guess
-  *       404:
-  *         description: The participant with the specified rfid was not found.
-  */
+  Route.get('participants/:rfid/announce', 'ParticipantController.announce').as('announce')
   Route.get('/participants/:rfid/fetchjob', 'ParticipantController.fetchJob').as('fetch_job')
+  Route.get('/participants/:rfid/jobindex', 'ParticipantController.fetchJobIndex').as('fetch_job_index')
 
-  /**
-  * @swagger
-  * /participants/{rfid}/jobindex:
-  *   get:
-  *     tags:
-  *       - Job distribution
-  *     summary: >
-  *       The client asks the server the current job index, i.e. the row of the job table.
-  *     parameters:
-  *       - in: path
-  *         name: rfid
-  *         description: the RFID code of the participant transmitted by its chip.
-  *         required: true
-  *         type: string
-  *     responses:
-  *       200:
-  *         description: Sends the current job index in line
-  *         example:
-  *           message: Hello Guess
-  *       404:
-  *         description: The participant with the specified rfid was not found.
-  */
-  Route.get('/participants/:rfid/jobindex', 'ParticipantController.currentJobIndex').as('current_job_index')
-
-  /**
-  * @swagger
-  * /jobs/result:
-  *   post:
-  *     tags:
-  *       - Sending results
-  *     summary: >
-  *         Once a job has been completed, the client sends the resulting data to the server.
-  *     responses:
-  *       200:
-  *         description: Sends the current job in line
-  *         example:
-  *           message: Hello Guess
-  *       404:
-  *         description: The participant with the specified rfid was not found.
-  */
   Route.post('/jobs/result', 'JobController.processResult').as('post_job_result')
 
   /* Public job CRUD actions */

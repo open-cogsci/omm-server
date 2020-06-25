@@ -18,19 +18,6 @@ class JobController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    return response.json({ 'data': 'all Jobs' })
-  }
-
-  /**
-   * Render a form to be used for creating a new job.
-   * GET jobs/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
   }
 
   /**
@@ -53,19 +40,7 @@ class JobController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing job.
-   * GET jobs/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
+  async show ({ params, request, response }) {
   }
 
   /**
@@ -88,6 +63,26 @@ class JobController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, request, response }) {
+  }
+
+  /**
+  * @swagger
+  * /jobs/result:
+  *   post:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Once a job has been completed, the client sends the resulting data to the server.
+  *     responses:
+  *       200:
+  *         description: Sends the current job in line
+  *         example:
+  *           message: Hello Guess
+  *       404:
+  *         description: The participant with the specified rfid was not found.
+  */
+  async processResults ({ params }) {
+
   }
 }
 

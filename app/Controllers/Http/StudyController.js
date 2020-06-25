@@ -9,6 +9,27 @@
  */
 class StudyController {
   /**
+  * @swagger
+  * /studies:
+  *   get:
+  *     tags:
+  *       - Studies
+  *     summary: >
+  *         Retrieves a list of all studies currently present in the database.
+  *     responses:
+  *       200:
+  *         description: An array of studies
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/Study'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Show a list of all studies.
    * GET studies
    *
@@ -41,6 +62,35 @@ class StudyController {
     await study.reload() // Refresh data otherwise some parameters are missing
     return transform.item(study, 'StudyTransformer')
   }
+
+  /**
+  * @swagger
+  * /studies/{id}:
+  *   get:
+  *     tags:
+  *       - Studies
+  *     summary: >
+  *         Retrieves a single study along with all its relations.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the study to retrieve
+  *     responses:
+  *       200:
+  *         description: The study with its related data.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/StudyWithRelations'
+  *       400:
+  *         description: The specified id is invalid (e.g. not the expected dtype).
+  *       404:
+  *         description: The study with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
 
   /**
    * Display a single study.

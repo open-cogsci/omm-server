@@ -10,10 +10,13 @@ const Model = use('Model')
 *      properties:
 *        id:
 *          type: integer
+*          example: 42
 *        name:
 *          type: string
+*          example: Awesome task
 *        description:
 *          type: string
+*          example: This task is awesome
 *        active:
 *          type: boolean
 *        osexp_path:
@@ -26,6 +29,15 @@ const Model = use('Model')
 *          format: date-time
 *      required:
 *        - name
+*    StudyWithRelations:
+*      allOf:
+*         - $ref: '#/definitions/Study'
+*         - type: object
+*           properties:
+*             jobs:
+*               type: array
+*               items:
+*                 $ref: '#/definitions/Job'
 */
 class Study extends Model {
   /**
