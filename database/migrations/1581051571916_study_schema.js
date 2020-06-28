@@ -11,6 +11,7 @@ class StudySchema extends Schema {
       table.string('description')
       table.boolean('active').default(true)
       table.string('osexp_path')
+      table.string('osexp_hash')
       table.timestamps()
     })
   }
