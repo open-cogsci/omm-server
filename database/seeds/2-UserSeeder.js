@@ -10,13 +10,7 @@
 |
 */
 
-const Database = use('Database')
 const User = use('App/Models/User')
-
-const userTypes = [
-  { name: 'Administrator' },
-  { name: 'Standard' }
-]
 
 const users = [
   {
@@ -35,15 +29,11 @@ const users = [
 
 class UserSeeder {
   async run () {
-    const userTypesTbl = Database.table('user_types')
-    if (await userTypesTbl.getCount() !== 0) {
-      userTypesTbl.insert(userTypes)
-    }
-
     // Don't seed any users if there already are some.
-    if (await User.getCount() !== 0) { return }
-    for (const user of users) {
-      User.create(user)
+    if (await User.getCount() === 0) {
+      for (const user of users) {
+        await User.create(user)
+      }
     }
   }
 }

@@ -5,14 +5,14 @@ const Schema = use('Schema')
 
 class ParticipationStatusesSchema extends Schema {
   up () {
-    this.create('parcipation_statuses', (table) => {
+    this.create('participation_statuses', (table) => {
       table.increments()
-      table.string('label', 100).unique()
+      table.string('name', 100).unique()
     })
   }
 
   down () {
-    this.drop('parcipation_statuses')
+    this.drop('participation_statuses')
   }
 }
 

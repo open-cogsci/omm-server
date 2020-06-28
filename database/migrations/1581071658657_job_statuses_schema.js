@@ -7,7 +7,7 @@ class JobStatusesSchema extends Schema {
   up () {
     this.create('job_statuses', (table) => {
       table.increments()
-      table.string('label', 100).unique()
+      table.string('name', 100).unique()
     })
   }
 

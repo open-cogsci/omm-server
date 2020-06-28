@@ -8,7 +8,6 @@ class UserTypesSchema extends Schema {
     this.create('user_types', (table) => {
       table.increments('id')
       table.string('name', 50).notNullable()
-      table.timestamps()
     })
   }
 

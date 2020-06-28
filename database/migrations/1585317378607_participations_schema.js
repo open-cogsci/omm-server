@@ -19,7 +19,7 @@ class ParticipationsSchema extends Schema {
   }
 
   down () {
-    this.drop('study_states')
+    this.drop('participations')
   }
 }
 

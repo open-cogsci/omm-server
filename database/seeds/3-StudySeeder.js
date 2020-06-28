@@ -22,10 +22,12 @@ class StudySeeder {
     const daniel = await User.findOrFail(1)
     let studies = await Factory.model('App/Models/Study').makeMany(6)
     await daniel.studies().saveMany(studies)
+    await daniel.studies().pivotQuery().update({ is_owner: true })
 
     const sebastiaan = await User.findOrFail(2)
     studies = await Factory.model('App/Models/Study').makeMany(6)
     await sebastiaan.studies().saveMany(studies)
+    await sebastiaan.studies().pivotQuery().update({ is_owner: true })
   }
 }
 

@@ -1,5 +1,7 @@
 'use strict'
 
+const sample = require('lodash/sample')
+
 /*
 |--------------------------------------------------------------------------
 | Factory
@@ -22,9 +24,11 @@ const Factory = use('Factory')
 */
 
 Factory.blueprint('App/Models/Study', (faker) => {
+  const experiment = sample(['attentional-capture', 'omm-entry-point', 'omm-template'])
   return {
     name: faker.sentence({ words: 5 }),
     description: faker.sentence({ words: 10 }),
-    active: faker.bool()
+    active: faker.bool(),
+    osexp_path: `/public/osexp/${experiment}.osexp`
   }
 })
