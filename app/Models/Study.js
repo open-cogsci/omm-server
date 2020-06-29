@@ -54,18 +54,50 @@ class Study extends Model {
       .withPivot(['is_owner'])
   }
 
+  /**
+   * The jobs belonging to this study
+   *
+   * @method jobs
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
   jobs () {
     return this.hasMany('App/Models/Job')
   }
 
+  /**
+   * The column headers of the job table (i.e. variable names per job)
+   *
+   * @method jobFields
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
   jobFields () {
     return this.hasMany('App/Models/JobField')
   }
 
+  /**
+   * Participations to this study
+   *
+   * @method participations
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
   participations () {
     return this.hasMany('App/Models/Participation')
   }
 
+  /**
+   * Participants of this study
+   *
+   * @method participants
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
   participants () {
     return this.manyThrough('App/Models/Participations', 'participant')
   }

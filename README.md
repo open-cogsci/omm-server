@@ -57,7 +57,7 @@ command. This will insert the data specified in the seed files under `database/s
 Tests are implemented on the frontend with [Jest](https://jestjs.io/) and for the backend using _TBD_.
 Tests can be run with the command `npm test`.
 
-## Built on the shoulders of giants.
+## Built on the shoulders of giants
 
 This project uses prominent open-source frameworks and libraries:
 
