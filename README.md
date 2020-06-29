@@ -51,3 +51,29 @@ command. This will insert the data specified in the seed files under `database/s
 
 > Note: the process may hang after this operation forcing you to quit it with ctrl-c, but it will
 > likely have succeeded.
+
+## Running tests
+
+Tests are implemented on the frontend with [Jest](https://jestjs.io/) and for the backend using _TBD_.
+Tests can be run with the command `npm test`.
+
+## Built on the shoulders of giants.
+
+This project uses prominent open-source frameworks and libraries:
+
+### Frontend
+
+- [Vue](https://vuejs.org): Progressive JavaScript component framework.
+  - [Vuetify](https://vuetifyjs.com): Material Design Components for Vue.
+- [Vuex](https://vuex.vuejs.org/guide/): State management system.
+  - [Vuex-ORM](https://vuex-orm.org/): ORM system for Vuex.
+- [Nuxt](https://nuxtjs.org/): Frontend framework that makes wiring different Vue components easier.
+  - [Axios for Nuxt](https://axios.nuxtjs.org/): Axios module for Nuxt
+  - [Auth for Nuxt](https://auth.nuxtjs.org/): Authentication module for Nuxt.
+
+### Backend
+
+- [Adonis](https://adonisjs.com/): MVC and REST API framework based on Laravel.
+  - [Bumblebee](https://github.com/rhwilr/adonis-bumblebee): Data serializer for structured json responses.
+  - [Adonis-swagger](https://github.com/ahmadarif/adonis-swagger): Easy swagger documentation with Adonis.
+
