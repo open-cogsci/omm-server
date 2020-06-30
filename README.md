@@ -62,15 +62,15 @@ Tests can be run with the command `npm test`.
 The API endpoints are documented using [Swagger UI](https://swagger.io/tools/swagger-ui/). This makes the documentation dynamic and interactive.
 Once the dev server is started with `npm run dev`, the documentation will be available at <http://localhost:3000/docs>.
 
-Some endpoints are protected by authentication. These require a logged in user to function correctly.
-These protected endpoints are indicated by a lock icon at the right side of the endpoint entry. To access
-these endpoints from swagger, you need to provide it with an JWT token first. This process is a bit
-cumbersome, and needs to be performed after each refresh of Swagger UI (as it operates statelessly).
+Some endpoints are protected and require a logged in user to function correctly.
+These endpoints are indicated by a lock icon at the right side of their entry. To access
+these endpoints from swagger, you need to provide it with a JWT token first. This process is a bit
+cumbersome, and needs to be performed after each refresh of Swagger UI (as it is stateless).
 
-To retrieve the JWT token, first login as usual in <http://localhost:3000/login>. If you are already logged in,
-you will be redirected to the dashboard right away. Next, open the Chrome dev console
+To retrieve the JWT token, first login as usual at <http://localhost:3000/login>. If you are already logged in,
+you will be redirected to the dashboard right away. Next, open the Chrome (or your browser's) dev console
 (`ctrl+shift+i` on non Macs, and `option+cmd+J` on Macs) and navigate to the network tab.
-To filter out most irrelevant requests, make sure XHR is selected in the third tab bar from the top.
+To filter out irrelevant requests, make sure XHR is selected in the third tab bar from the top.
 In the left column, select a request which contains the path `/api/v1`. In the panel that opens, go to
 **Request Headers**, and find the entry labelled _Authorization_. This will contain a value starting with
 `Bearer ...`. Copy the whole line, including `Bearer` to your clipboard.
@@ -81,8 +81,11 @@ Next in Swagger-UI at <http://localhost:3000/docs>, click on the button authoriz
 
 ![Click Authorize](/docs/clickAuthorize.png)
 
-Finally, paste your copied `Bearer XXXXX` string into the `Value` field and click *Authorize*. You should
-now be able to access the protected endpoints.
+Finally, paste your copied `Bearer XXXXX` string into the `Value` field and click *Authorize*.
+
+![Enter token](/docs/enterToken.png)
+
+You should now be able to access the protected endpoints.
 
 ## Built on the shoulders of giants
 
