@@ -33,23 +33,20 @@ const Model = use('Model')
 
 class Job extends Model {
   study () {
-    return this.belongsTo('App/Model/Study')
+    return this.belongsTo('App/Models/Study')
   }
 
-  fields () {
-    return this.manyThrough('App/Model/Study', 'jobFields')
+  variables () {
+    return this
+      .belongsToMany('App/Models/Variable')
+      .withPivot(['value'])
+      .withTimestamps()
   }
 
-  fieldValues () {
-    return this.hasMany('App/Model/JobFieldValue')
-  }
-
-  states () {
-    return this.hasMany('App/Model/JobState')
-  }
-
-  results () {
-    return this.hasMany('App/Model/JobResults')
+  participants () {
+    return this
+      .belongsToMany('App/Models/Participant')
+      .pivotModel('App/Models/JobState')
   }
 }
 

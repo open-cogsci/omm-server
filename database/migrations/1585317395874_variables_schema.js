@@ -5,11 +5,11 @@ const Schema = use('Schema')
 
 class JobFieldsSchema extends Schema {
   up () {
-    this.create('job_fields', (table) => {
+    this.create('variables', (table) => {
       table.increments()
       table.integer('study_id').unsigned().notNullable()
       table.integer('dtype_id').unsigned().notNullable()
-      table.string('name', 50)
+      table.string('name')
       table.timestamps()
 
       table.foreign('study_id').references('id').inTable('studies')
@@ -18,7 +18,7 @@ class JobFieldsSchema extends Schema {
   }
 
   down () {
-    this.drop('job_fields')
+    this.drop('variables')
   }
 }
 

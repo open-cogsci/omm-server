@@ -74,20 +74,8 @@ class Study extends Model {
    * @returns {Object}
    * @memberof Study
    */
-  jobFields () {
-    return this.hasMany('App/Models/JobField')
-  }
-
-  /**
-   * Participations to this study
-   *
-   * @method participations
-   *
-   * @returns {Object}
-   * @memberof Study
-   */
-  participations () {
-    return this.hasMany('App/Models/Participation')
+  variables () {
+    return this.hasMany('App/Models/Variable')
   }
 
   /**
@@ -99,7 +87,9 @@ class Study extends Model {
    * @memberof Study
    */
   participants () {
-    return this.manyThrough('App/Models/Participations', 'participant')
+    return this
+      .belongsToMany('App/Models/Participant')
+      .pivotModel('App/Models/Participation')
   }
 }
 

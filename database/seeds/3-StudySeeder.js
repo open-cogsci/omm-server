@@ -14,20 +14,60 @@ const Factory = use('Factory')
 const Study = use('App/Models/Study')
 const User = use('App/Models/User')
 
+async function createCaptureJobs (study) {
+  const distractorVariable = await study.variables().create({
+    name: 'distractor',
+    dtype_id: 1
+  })
+
+  for (const [key, value] of Object.entries(['present', 'absent'])) {
+    const job = await study.jobs().create({
+      order: parseInt(key) + 1
+    })
+
+    await job.variables().attach([distractorVariable.id], (row) => {
+      row.value = value
+    })
+  }
+}
+
 class StudySeeder {
   async run () {
-    // Don't seed any users if there already are some.
+    // Don't seed any studies if there already are some.
     if (await Study.getCount() !== 0) { return }
 
     const daniel = await User.findOrFail(1)
-    let studies = await Factory.model('App/Models/Study').makeMany(6)
-    await daniel.studies().saveMany(studies)
-    await daniel.studies().pivotQuery().update({ is_owner: true })
-
     const sebastiaan = await User.findOrFail(2)
-    studies = await Factory.model('App/Models/Study').makeMany(6)
+
+    const captureStudy = await daniel.studies().create({
+      name: 'Attentional Capture',
+      description: 'Basic attentional capture experiment',
+      osexp_path: '/public/osexp/attentional-capture.osexp'
+    }, (row) => {
+      row.is_owner = true
+    })
+
+    await createCaptureJobs(captureStudy)
+
+    let studies = await Factory.model('App/Models/Study').makeMany(4)
+    await daniel.studies().saveMany(studies)
+    await daniel.studies().pivotQuery().update({
+      is_owner: true,
+      access_permission_id: 2
+    })
+
+    studies = await Factory.model('App/Models/Study').makeMany(4)
     await sebastiaan.studies().saveMany(studies)
-    await sebastiaan.studies().pivotQuery().update({ is_owner: true })
+    await sebastiaan.studies().pivotQuery().update({
+      is_owner: true,
+      access_permission_id: 2
+    })
+
+    // Make Sebastiaan co-owner of the study
+    await sebastiaan.studies().attach([captureStudy.id], (row) => {
+      row.access_permission_id = 2
+      row.is_owner = false
+    })
   }
 }
 

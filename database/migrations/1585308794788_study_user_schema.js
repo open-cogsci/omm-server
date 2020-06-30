@@ -8,8 +8,8 @@ class StudyUserSchema extends Schema {
     this.create('study_users', (table) => {
       table.integer('user_id').unsigned().notNullable()
       table.integer('study_id').unsigned().notNullable()
-      table.integer('access_permission_id').unsigned().notNullable()
-      table.boolean('is_owner').defaultTo(false)
+      table.integer('access_permission_id').unsigned().notNullable().defaultTo(1)
+      table.boolean('is_owner').notNullable().defaultTo(false)
       table.timestamps()
 
       table.foreign('user_id').references('id').inTable('users')

@@ -1,14 +1,12 @@
-# omm
+# OpenMonkeyMind
 
-> OpenMonkeyMind
-
-## Build Setup
+## Initial Setup
 
 ``` bash
 # install dependencies
 $ npm ci (or `npm install` if that fails)
 
-# serve with hot reload at localhost:3000
+# Start a dev server and serve with hot reload at localhost:3000
 $ npm run dev
 
 # build for production and launch server
@@ -30,6 +28,19 @@ npm i -g @adonisjs/cli
 This installs the adonis tool in you global namespace (making it available regardless of the current
 working directory of you terminal). If succesfully installed, you should be presented with a list
 of available commands when entering `adonis` in your terminal.
+
+If you don't want to install adonis-cli globally, or do not have permission to do so, you can alternatively
+access it using `npx`, e.g.
+
+```
+npx adonis <command>
+```
+
+or use the alternative cli tool that is included with the framework, but accepts the same parameters.
+
+```
+npx ace <command>
+```
 
 ## Initializing the database
 

@@ -9,11 +9,16 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
  * @constructor
  */
 class StudyTransformer extends BumblebeeTransformer {
-  /**
-   * This method is used to transform the data.
-   */
+  static get availableInclude () {
+    return ['jobs', 'variables', 'participants']
+  }
+
   transform (model) {
-    return { ...model.$attributes }
+    return { ...model.toObject() }
+  }
+
+  includeJobs (study) {
+    return this.collection(study.getRelated('jobs'), 'JobTransformer')
   }
 }
 

@@ -4,14 +4,6 @@
 const Model = use('Model')
 
 class StudyUser extends Model {
-  static boot () {
-    super.boot()
-    this.addHook('beforeCreate', (studyModel) => {
-      studyModel.is_owner = false
-      studyModel.access_permission_id = 2
-    })
-  }
-
   /**
    * The permissions the related user has on this study (e.g. read, write)
    *

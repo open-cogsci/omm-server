@@ -14,6 +14,8 @@ class StudyController {
   *   get:
   *     tags:
   *       - Studies
+  *     security:
+  *       - JWT: []
   *     summary: >
   *         Retrieves a list of all studies currently present in the database.
   *     responses:
@@ -69,6 +71,8 @@ class StudyController {
   *   get:
   *     tags:
   *       - Studies
+  *     security:
+  *       - JWT: []
   *     summary: >
   *         Retrieves a single study along with all its relations.
   *     parameters:
@@ -101,12 +105,20 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async show ({ params, auth, response, transform }) {
-    const study = await auth.user.studies().where('id', params.id).first()
+    const study = await auth.user.studies()
+      .where('id', params.id)
+      .with('jobs.variables.dtype')
+      .with('participants')
+      .first()
+
     if (study === null) {
       response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
       return
     }
-    return transform.item(study, 'StudyTransformer')
+    // return { data: study }
+    return transform
+      .include('jobs')
+      .item(study, 'StudyTransformer')
   }
 
   /**
@@ -130,6 +142,33 @@ class StudyController {
    */
   async destroy ({ params, request }) {
   }
+
+  // async upload ({ params, request, response }) {
+  //   const { id } = params
+  //   const expense = await Expense.find(id)
+
+  //   if (!expense) {
+  //     return response.json({ success: false })
+  //   }
+
+  //   const receiptImage = request.file('receipt')
+  //   const imageName = receiptImage.clientName
+
+  //   const Helpers = use('Helpers')
+  //   await receiptImage.move(Helpers.publicPath('uploads'), {
+  //     name: imageName,
+  //     overwrite: true
+  //   })
+
+  //   if (!receiptImage.moved()) {
+  //     return receiptImage.error()
+  //   }
+
+  //   expense.image = imageName
+  //   await expense.save()
+
+  //   return response.json(expense)
+  // }
 
   /**
    * CREATE jobs (insert)
