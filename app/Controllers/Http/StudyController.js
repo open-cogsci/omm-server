@@ -18,6 +18,12 @@ class StudyController {
   *       - JWT: []
   *     summary: >
   *         Retrieves a list of all studies currently present in the database.
+  *     parameters:
+  *       - in: query
+  *         name: active
+  *         required: false
+  *         type: boolean
+  *         description: Whether to retrieve active or archived studies.
   *     responses:
   *       200:
   *         description: An array of studies
@@ -51,6 +57,35 @@ class StudyController {
   }
 
   /**
+  * @swagger
+  * /studies:
+  *   post:
+  *     tags:
+  *       - Studies
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Stores a new study in the database.
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: body
+  *         name: study
+  *         description: The study to create
+  *         schema:
+  *           $ref: '#/definitions/Study'
+  *     responses:
+  *       201:
+  *         description: OK
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Study'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Create/save a new study.
    * POST studies
    *
@@ -58,10 +93,11 @@ class StudyController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, auth, transform }) {
+  async store ({ request, response, auth, transform }) {
     const data = request.only(['name', 'description'])
     const study = await auth.user.studies().create(data)
     await study.reload() // Refresh data otherwise some parameters are missing
+    response.status(201)
     return transform.item(study, 'StudyTransformer')
   }
 
@@ -115,7 +151,7 @@ class StudyController {
       response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
       return
     }
-    // return { data: study }
+
     return transform
       .include('jobs')
       .item(study, 'StudyTransformer')

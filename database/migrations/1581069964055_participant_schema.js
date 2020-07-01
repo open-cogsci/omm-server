@@ -8,7 +8,8 @@ class ParticipantSchema extends Schema {
     this.create('participants', (table) => {
       table.increments()
       table.string('name').notNullable()
-      table.string('identifier').notNullable()
+      table.string('rfid').notNullable().unique()
+      table.boolean('active').notNullable().defaultTo(true)
       table.timestamps()
     })
   }

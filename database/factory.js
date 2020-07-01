@@ -15,14 +15,6 @@ const sample = require('lodash/sample')
 
 const Factory = use('Factory')
 
-/**
-  Factory.blueprint('App/Models/User', (faker) => {
-    return {
-      username: faker.username()
-    }
-  })
-*/
-
 Factory.blueprint('App/Models/Study', (faker) => {
   const experiment = sample(['attentional-capture', 'omm-entry-point', 'omm-template'])
   const osexpPath = `/public/osexp/${experiment}.osexp`
@@ -32,5 +24,12 @@ Factory.blueprint('App/Models/Study', (faker) => {
     description: faker.sentence({ words: 10 }),
     active: faker.bool(),
     osexp_path: osexpPath
+  }
+})
+
+Factory.blueprint('App/Models/Participant', (faker) => {
+  return {
+    name: faker.name(),
+    rfid: faker.string({ length: 4, alpha: true })
   }
 })

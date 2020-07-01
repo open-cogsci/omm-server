@@ -18,8 +18,8 @@ class EnumSeeder {
     const userTypesTbl = Database.table('user_types')
     if (await userTypesTbl.getCount() === 0) {
       await userTypesTbl.insert([
-        { name: 'Administrator' },
-        { name: 'Standard' }
+        { name: 'administrator' },
+        { name: 'standard' }
       ])
     }
 

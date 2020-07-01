@@ -1,6 +1,7 @@
 'use strict'
 
 const Study = use('App/Models/Study')
+const Participant = use('App/Models/Participant')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -11,6 +12,35 @@ const Study = use('App/Models/Study')
  */
 class ParticipantController {
   /**
+  * @swagger
+  * /participants:
+  *   get:
+  *     tags:
+  *       - Participants
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Retrieves a list of all participants currently present in the database.
+  *     parameters:
+  *       - in: query
+  *         name: active
+  *         required: false
+  *         type: boolean
+  *         description: Whether to retrieve active or archived studies.
+  *     responses:
+  *       200:
+  *         description: An array of participants
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/Participant'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Show a list of all participants.
    * GET participants
    *
@@ -18,7 +48,14 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async index ({ request, response }) {
+  async index ({ request, transform }) {
+    const active = request.input('active') !== 'false'
+    const participants = await Participant
+      .query()
+      .where('active', active)
+      .orderBy('created_at', 'desc')
+      .fetch()
+    return transform.collection(participants, 'ParticipantTransformer')
   }
 
   /**
@@ -33,6 +70,37 @@ class ParticipantController {
   }
 
   /**
+  * @swagger
+  * /participants/{id}:
+  *   get:
+  *     tags:
+  *       - Participants
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Retrieves a single participant along with all its relations.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the participant to retrieve
+  *     responses:
+  *       200:
+  *         description: The participant with its related data.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/ParticipantWithRelations'
+  *       400:
+  *         description: The specified id is invalid (e.g. not the expected dtype).
+  *       404:
+  *         description: The participant with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Display a single participant.
    * GET participants/:id
    *
@@ -40,7 +108,21 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, request, response }) {
+  async show ({ params, response, transform }) {
+    const ptcp = await Participant
+      .query()
+      .where('id', params.id)
+      .with('studies.jobs.variables.dtype')
+      .first()
+
+    if (ptcp === null) {
+      response.notFound({ error: { message: `Participant with ID:${params.id} could not be found` } })
+      return
+    }
+
+    return transform
+      .include('studies.jobs.variables.dtype')
+      .item(ptcp, 'ParticipantTransformer')
   }
 
   /**

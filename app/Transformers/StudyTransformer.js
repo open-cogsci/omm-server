@@ -20,6 +20,14 @@ class StudyTransformer extends BumblebeeTransformer {
   includeJobs (study) {
     return this.collection(study.getRelated('jobs'), 'JobTransformer')
   }
+
+  includeVariables (study) {
+    return this.collection(study.getRelated('variables'), 'VariableTransformer')
+  }
+
+  includeParticipants (study) {
+    return this.collection(study.getRelated('participants'), 'ParticipantTransformer')
+  }
 }
 
 module.exports = StudyTransformer

@@ -4,6 +4,7 @@ import VuexORMAxios from '@vuex-orm/plugin-axios'
 
 import User from '@/models/User'
 import Study from '@/models/Study'
+import Participant from '@/models/Participant'
 
 VuexORM.use(VuexORMAxios, {
   dataKey: 'data'
@@ -12,6 +13,7 @@ VuexORM.use(VuexORMAxios, {
 const database = new VuexORM.Database()
 database.register(User)
 database.register(Study)
+database.register(Participant)
 
 export const plugins = [
   pathify.plugin,

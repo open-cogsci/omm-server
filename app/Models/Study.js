@@ -37,7 +37,7 @@ const Model = use('Model')
 *             jobs:
 *               type: array
 *               items:
-*                 $ref: '#/definitions/Job'
+*                 $ref: '#/definitions/JobWithRelations'
 */
 class Study extends Model {
   /**

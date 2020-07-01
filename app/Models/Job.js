@@ -21,7 +21,8 @@ const Model = use('Model')
 *          type: string
 *          format: date-time
 *      required:
-*        - name
+*        - study_id
+*        - order
 *    JobWithRelations:
 *      allOf:
 *         - $ref: '#/definitions/Job'
@@ -29,6 +30,10 @@ const Model = use('Model')
 *           properties:
 *             study:
 *               $ref: '#/definitions/Study'
+*             variables:
+*               type: array
+*               items:
+*                 $ref: '#/definitions/Variable'
 */
 
 class Job extends Model {

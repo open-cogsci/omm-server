@@ -6,7 +6,6 @@ const Schema = use('Schema')
 class JobStatesSchema extends Schema {
   up () {
     this.create('job_states', (table) => {
-      table.increments()
       table.integer('participant_id').unsigned().notNullable()
       table.integer('job_id').unsigned().notNullable()
       table.integer('status_id').unsigned().notNullable().defaultTo(1)
@@ -16,6 +15,8 @@ class JobStatesSchema extends Schema {
       table.foreign('participant_id').references('id').inTable('participants')
       table.foreign('job_id').references('id').inTable('jobs')
       table.foreign('status_id').references('id').inTable('job_statuses')
+
+      table.primary(['participant_id', 'job_id'])
     })
   }
 
