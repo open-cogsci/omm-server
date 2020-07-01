@@ -33,12 +33,12 @@
             <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title class="font-italic font-weight-light">
+            <v-list-item-title class="font-weight-light">
               Collapse menu
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-
+        <v-divider />
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
