@@ -48,11 +48,9 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async index ({ request, transform }) {
-    const active = request.input('active') !== 'false'
+  async index ({ transform }) {
     const participants = await Participant
       .query()
-      .where('active', active)
       .orderBy('created_at', 'desc')
       .fetch()
     return transform.collection(participants, 'ParticipantTransformer')
@@ -66,7 +64,12 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, response, transform }) {
+    const data = request.only(['name', 'rfid', 'active'])
+    const ptcp = await Participant.create(data)
+    await ptcp.reload() // Refresh data otherwise some parameters are missing
+    response.status(201)
+    return transform.item(ptcp, 'ParticipantTransformer')
   }
 
   /**
@@ -133,7 +136,12 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, transform }) {
+    const ptcp = await Participant.findOrFail(params.id)
+    const data = request.only(['name', 'rfid', 'active'])
+    ptcp.merge(data)
+    await ptcp.save()
+    return transform.item(ptcp, 'ParticipantTransformer')
   }
 
   /**

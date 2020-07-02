@@ -1,6 +1,12 @@
 <template>
   <v-container>
-    <new-participant-dialog ref="dialog" />
+    <new-participant-dialog
+      ref="dialog"
+      v-model="dialog"
+      :saving="saving"
+      :errors="errors"
+      @save-participant="saveParticipant"
+    />
     <v-row>
       <v-col cols="12">
         <h1 class="display-1 font-weight-light">
@@ -11,20 +17,37 @@
     <v-row>
       <v-col cols="12" xl="8" offset-xl="2">
         <participants-list
+          ref="list"
           :participants="participants"
+          @update-participant="saveParticipant"
         />
       </v-col>
     </v-row>
+    <v-fab-transition>
+      <v-btn
+        v-show="fabVisible"
+        class="mb-12"
+        color="accent"
+        fab
+        large
+        dark
+        bottom
+        right
+        absolute
+        @click="dialog=true"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+    </v-fab-transition>
   </v-container>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import { pick } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
 import Participant from '@/models/Participant'
-
-const emptyErrors = { name: '', rfid: '' }
 
 export default {
   components: {
@@ -36,7 +59,8 @@ export default {
       dialog: false,
       saving: false,
       loading: false,
-      errors: { ...emptyErrors }
+      fabVisible: false,
+      errors: {}
     }
   },
   computed: {
@@ -47,7 +71,11 @@ export default {
     }
   },
   created () {
+    this.clearErrors(false)
     this.loadParticipants()
+  },
+  mounted () {
+    this.fabVisible = true
   },
   methods: {
     ...mapActions('notifications', ['notify']),
@@ -64,16 +92,17 @@ export default {
     /**
      *  Save a study
      */
-    async saveNewStudy (newPtcpData) {
+    async saveParticipant (ptcpData) {
       this.saving = true
       try {
-        await Participant.persist({
-          name: newPtcpData.name,
-          description: newPtcpData.description
-        })
-        this.notify({ message: 'Study has been added', color: 'success' })
-        this.dialog = false
-        this.$refs.dialog.clear()
+        await Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'rfid', 'active']))
+        this.notify({ message: 'Participant has been saved', color: 'success' })
+        if (ptcpData.id) {
+          this.$refs.list.clearEditing()
+        } else {
+          this.dialog = false
+          this.$refs.dialog.clear()
+        }
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       } finally {
@@ -85,7 +114,7 @@ export default {
      */
     clearErrors (val) {
       if (!val) {
-        this.errors = { ...emptyErrors }
+        this.errors = { name: '', rfid: '' }
       }
     }
   },

@@ -39,6 +39,7 @@
     "sqlite3": "^4.2.0",
     "swagger-jsdoc": "^4.0.0",
     "validator": "^13.1.1",
+    "vue-fragment": "^1.5.1",
     "vuex-pathify": "^1.4.1",
     "vuex-router-sync": "^5.0.0"
   },
