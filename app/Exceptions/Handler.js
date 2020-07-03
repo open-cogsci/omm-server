@@ -20,14 +20,12 @@ class ExceptionHandler extends BaseExceptionHandler {
    *
    * @return {void}
    */
-  async handle (error, { request, response }) {
-    console.log('ERROR!!!!', error)
-    response.send('Suckah!')
-    // response.status(error.status)
-    // if (error.name === 'ModelNotFoundException') {
-    //   return response.send('No record found with the supplied ID')
-    // }
-    // return super.handle(...arguments)
+  async handle (error, { params, response }) {
+    response.status(error.status)
+    if (error.name === 'ModelNotFoundException') {
+      return response.send('No record found with the supplied ID: ' + params.id)
+    }
+    return super.handle(...arguments)
   }
 
   /**

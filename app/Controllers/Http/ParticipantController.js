@@ -330,14 +330,14 @@ class ParticipantController {
     const ptcp = await Participant.findByOrFail('identifier', identifier)
 
     // First find studies that are in progress.
-    let study = ptcp.studies()
+    let study = await ptcp.studies()
       .wherePivot('status_id', 2)
       .orderBy('created_at', 'asc')
       .first()
 
     // If there are none, find a pending study.
     if (study === null) {
-      study = ptcp.studies()
+      study = await ptcp.studies()
         .wherePivot('status_id', 1)
         .orderBy('created_at', 'asc')
         .first()

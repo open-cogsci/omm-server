@@ -9,10 +9,10 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="dialog = false">
+          <v-btn text @click="dialog = false">
             No, take me back
           </v-btn>
-          <v-btn color="primary" @click="stopEdit">
+          <v-btn text color="primary" @click="stopEdit">
             Yes, I am sure
           </v-btn>
         </v-card-actions>
