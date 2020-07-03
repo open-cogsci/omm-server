@@ -1,118 +1,120 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="12">
-        <h1 class="display-1 font-weight-light">
-          Your account
-        </h1>
-      </v-col>
-    </v-row>
+    <v-col cols="12" xl="8" offset-xl="2">
+      <v-row>
+        <v-col cols="12">
+          <h1 class="display-1 font-weight-light">
+            Your account
+          </h1>
+        </v-col>
+      </v-row>
 
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title>
-            <v-col cols="12">
-              Your details
-            </v-col>
-          </v-card-title>
-          <v-card-text>
-            <v-form ref="detailsForm" v-model="detailsFormValid">
-              <v-container fluid>
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="user.name"
-                      :rules="validation.name"
-                      label="Name"
-                      validate-on-blur
-                    />
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="user.email"
-                      :rules="validation.email"
-                      label="Email"
-                      validate-on-blur
-                    />
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="12" class="text-right">
-                    <v-btn
-                      :disabled="!detailsFormValid"
-                      :loading="savingDetails"
-                      class="success"
-                      @click="saveDetails"
-                    >
-                      Save
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-col>
+      <v-row>
+        <v-col cols="12" md="6">
+          <v-card>
+            <v-card-title>
+              <v-col cols="12">
+                Your details
+              </v-col>
+            </v-card-title>
+            <v-card-text>
+              <v-form ref="detailsForm" v-model="detailsFormValid">
+                <v-container fluid>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="user.name"
+                        :rules="validation.name"
+                        label="Name"
+                        validate-on-blur
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="user.email"
+                        :rules="validation.email"
+                        label="Email"
+                        validate-on-blur
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12" class="text-right">
+                      <v-btn
+                        :disabled="!detailsFormValid"
+                        :loading="savingDetails"
+                        class="success"
+                        @click="saveDetails"
+                      >
+                        Save
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-      <v-col cols="12" md="6">
-        <v-card>
-          <v-card-title>
-            <v-col cols="12">
-              Change your password
-            </v-col>
-          </v-card-title>
-          <v-card-text>
-            <v-form ref="pwForm" v-model="pwFormValid" lazy-validation>
-              <v-container fluid>
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="password.password"
-                      :rules="validation.password"
-                      label="Old password"
-                      :error-messages="errors.password"
-                      type="password"
-                      @input="errors.password = ''"
-                    />
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="password.newPassword"
-                      :rules="validation.newPassword"
-                      label="New password"
-                      validate-on-blur
-                      type="password"
-                    />
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="password.newPassword2"
-                      :rules="validation.newPassword2"
-                      label="Repeat new password"
-                      type="password"
-                      validate-on-blur
-                    />
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col cols="12" class="text-right">
-                    <v-btn
-                      :disabled="!pwFormValid"
-                      :loading="savingPassword"
-                      class="success"
-                      @click="savePassword"
-                    >
-                      Change password
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+        <v-col cols="12" md="6">
+          <v-card>
+            <v-card-title>
+              <v-col cols="12">
+                Change your password
+              </v-col>
+            </v-card-title>
+            <v-card-text>
+              <v-form ref="pwForm" v-model="pwFormValid" lazy-validation>
+                <v-container fluid>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="password.password"
+                        :rules="validation.password"
+                        label="Old password"
+                        :error-messages="errors.password"
+                        type="password"
+                        @input="errors.password = ''"
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="password.newPassword"
+                        :rules="validation.newPassword"
+                        label="New password"
+                        validate-on-blur
+                        type="password"
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="password.newPassword2"
+                        :rules="validation.newPassword2"
+                        label="Repeat new password"
+                        type="password"
+                        validate-on-blur
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12" class="text-right">
+                      <v-btn
+                        :disabled="!pwFormValid"
+                        :loading="savingPassword"
+                        class="success"
+                        @click="savePassword"
+                      >
+                        Change password
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-col>
   </v-container>
 </template>
 

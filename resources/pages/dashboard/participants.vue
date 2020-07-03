@@ -8,23 +8,27 @@
       @save-participant="saveParticipant"
     />
     <v-row>
-      <v-col cols="12">
-        <h1 class="display-1 font-weight-light">
-          Participants
-        </h1>
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col cols="12" xl="8" offset-xl="2">
-        <participants-list
-          ref="list"
-          :participants="participants"
-          :saving="saving"
-          :deleting="deleting"
-          :errors.sync="errors"
-          @update-participant="saveParticipant"
-          @delete-participant="deleteParticipant"
-        />
+        <v-row>
+          <v-col cols="12">
+            <h1 class="display-1 font-weight-light">
+              Participants
+            </h1>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <participants-list
+              ref="list"
+              :participants="participants"
+              :saving="saving"
+              :deleting="deleting"
+              :errors.sync="errors"
+              @update-participant="saveParticipant"
+              @delete-participant="deleteParticipant"
+            />
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
     <v-fab-transition>
@@ -121,7 +125,15 @@ export default {
     *
     */
     async deleteParticipant (ptcpID) {
-
+      this.deleting = true
+      try {
+        await Participant.destroy(ptcpID)
+        this.notify({ message: 'Participant has been deleted', color: 'success' })
+      } catch (e) {
+        this.errors = processErrors(e, this.notify)
+      } finally {
+        this.deleting = false
+      }
     },
     /**
      *  Clear possible validation errors sent by adonis after closing the dialog.

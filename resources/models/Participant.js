@@ -23,6 +23,10 @@ export default class Participant extends Model {
     return this.api().post('', data, config)
   }
 
+  static destroy (id, config) {
+    return this.api().delete(`/${id}`, { delete: id, ...config })
+  }
+
   static fields () {
     return {
       id: this.number(null),

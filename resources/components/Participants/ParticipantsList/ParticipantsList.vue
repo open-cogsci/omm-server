@@ -1,6 +1,6 @@
 <template>
-  <v-expansion-panels popout>
-    <v-expansion-panel v-for="(ptcp, i) in participants" :key="i">
+  <v-expansion-panels v-model="panel" popout>
+    <v-expansion-panel v-for="ptcp in participants" :key="ptcp.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
           <v-col cols="12" sm="4" class="text-truncate" :class="{'h2': open}">
@@ -39,7 +39,7 @@
       <v-expansion-panel-content>
         <v-row>
           <v-col cols="12" md="6">
-            <v-card>
+            <v-card outlined>
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Properties
               </v-card-title>
@@ -67,7 +67,7 @@
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
-            <v-card class="fill-height">
+            <v-card outlined class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Participations
               </v-card-title>

@@ -1,5 +1,6 @@
 <template>
   <v-dialog
+    persistent
     :value="value"
     max-width="750px"
     @input="$emit('input', $event)"

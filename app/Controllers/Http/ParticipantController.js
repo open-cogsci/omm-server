@@ -58,6 +58,41 @@ class ParticipantController {
   }
 
   /**
+  * @swagger
+  * /participants:
+  *   post:
+  *     tags:
+  *       - Participants
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Stores a new participant in the database.
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: body
+  *         name: participant
+  *         description: The participant to create
+  *         schema:
+  *           $ref: '#/definitions/Participant'
+  *     responses:
+  *       201:
+  *         description: OK
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Participant'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Create/save a new participant.
    * POST participants
    *
@@ -130,6 +165,81 @@ class ParticipantController {
   }
 
   /**
+  * @swagger
+  * /participants/{id}:
+  *   put:
+  *     tags:
+  *       - Participants
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Updates a single participant
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the participant to update
+  *       - in: body
+  *         name: participant
+  *         description: The updated participant data
+  *         schema:
+  *           $ref: '#/definitions/Participant'
+  *     responses:
+  *       200:
+  *         description: The updated participant.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Participant'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       404:
+  *         description: The participant with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  *   patch:
+  *     tags:
+  *       - Participants
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Updates a single participant
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the participant to update
+  *       - in: body
+  *         name: participant
+  *         description: The updated participant data
+  *         schema:
+  *           $ref: '#/definitions/Participant'
+  *     responses:
+  *       200:
+  *         description: The updated participant with its related data.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Participant'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       404:
+  *         description: The participant with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Update participant details.
    * PUT or PATCH participants/:id
    *
@@ -146,6 +256,33 @@ class ParticipantController {
   }
 
   /**
+  * @swagger
+  * /participants/{id}:
+  *   delete:
+  *     tags:
+  *       - Participants
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Deletes a single participant.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the participant to delete.
+  *     responses:
+  *       204:
+  *         description: The participant has been deleted.
+  *       400:
+  *         description: The specified id is invalid (e.g. not the expected dtype).
+  *       404:
+  *         description: The participant with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Delete a participant with id.
    * DELETE participants/:id
    *
@@ -154,6 +291,9 @@ class ParticipantController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, request, response }) {
+    const ptcp = await Participant.findOrFail(params.id)
+    ptcp.delete()
+    return response.noContent()
   }
 
   /**

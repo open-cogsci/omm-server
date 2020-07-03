@@ -81,6 +81,12 @@ class StudyController {
   *           properties:
   *             data:
   *               $ref: '#/definitions/Study'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
   *       default:
   *         description: Unexpected error
   */
@@ -158,6 +164,81 @@ class StudyController {
   }
 
   /**
+  * @swagger
+  * /studies/{id}:
+  *   put:
+  *     tags:
+  *       - Studies
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Updates a single study
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the study to update
+  *       - in: body
+  *         name: study
+  *         description: The updated study data
+  *         schema:
+  *           $ref: '#/definitions/Study'
+  *     responses:
+  *       200:
+  *         description: The updated study.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Study'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       404:
+  *         description: The study with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  *   patch:
+  *     tags:
+  *       - Studies
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Updates a single study
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the study to update
+  *       - in: body
+  *         name: study
+  *         description: The updated study data
+  *         schema:
+  *           $ref: '#/definitions/Study'
+  *     responses:
+  *       200:
+  *         description: The updated study.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Study'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       404:
+  *         description: The study with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Update study details.
    * PUT or PATCH studies/:id
    *
@@ -169,6 +250,33 @@ class StudyController {
   }
 
   /**
+  * @swagger
+  * /studies/{id}:
+  *   delete:
+  *     tags:
+  *       - Studies
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Deletes a single study.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: string
+  *         description: The ID of the study to delete.
+  *     responses:
+  *       204:
+  *         description: The study has been deleted.
+  *       400:
+  *         description: The specified id is invalid (e.g. not the expected dtype).
+  *       404:
+  *         description: The study with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Delete a study with id.
    * DELETE studies/:id
    *
@@ -176,7 +284,16 @@ class StudyController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request }) {
+  async destroy ({ params, auth, response }) {
+    const study = await await auth.user.studies()
+      .where('id', params.id)
+      .first()
+    if (study === null) {
+      response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
+      return
+    }
+    study.delete()
+    return response.noContent()
   }
 
   // async upload ({ params, request, response }) {
