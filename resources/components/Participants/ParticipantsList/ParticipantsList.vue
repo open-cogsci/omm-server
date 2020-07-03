@@ -24,7 +24,7 @@
                 <v-col cols="5">
                   <v-icon small>
                     mdi-flask
-                  </v-icon> 15
+                  </v-icon> {{ ptcp.studies_count }}
                 </v-col>
                 <v-col cols="2" class="text-center">
                   <span class="font-weight-light" :class="ptcp.active ? 'green--text':'red--text'">
@@ -38,27 +38,35 @@
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-row>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" md="6">
             <v-card>
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Data
+                Properties
               </v-card-title>
-              <v-fade-transition leave-absolute>
-                <participant-edit-data
-                  v-if="editing === ptcp.id"
-                  :participant="ptcp"
-                  @clicked-cancel="editing = null"
-                  @clicked-save="$emit('update-participant', $event)"
-                />
-                <participant-view-data
-                  v-else
-                  :participant="ptcp"
-                  @clicked-edit="(id) => editing = id"
-                />
-              </v-fade-transition>
+              <div class="mt-5">
+                <v-fade-transition mode="out-in">
+                  <participant-edit-data
+                    v-if="editing === ptcp.id"
+                    :participant="ptcp"
+                    :saving="saving"
+                    :errors="errors"
+                    @clicked-cancel="editing = null"
+                    @clicked-save="$emit('update-participant', $event)"
+                    @update:errors="$emit('update:errors', $event)"
+                  />
+                  <participant-view-data
+                    v-else
+                    :participant="ptcp"
+                    :deleting="deleting"
+                    style="width: 100%"
+                    @clicked-edit="(id) => editing = id"
+                    @clicked-delete="$emit('delete-participant', $event)"
+                  />
+                </v-fade-transition>
+              </div>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" md="6">
             <v-card class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Participations
@@ -82,6 +90,18 @@ export default {
     participants: {
       type: Array,
       default: () => []
+    },
+    saving: {
+      type: Boolean,
+      default: false
+    },
+    deleting: {
+      type: Boolean,
+      default: false
+    },
+    errors: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {

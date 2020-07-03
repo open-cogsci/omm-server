@@ -51,9 +51,10 @@ class ParticipantController {
   async index ({ transform }) {
     const participants = await Participant
       .query()
+      .withCount('studies')
       .orderBy('created_at', 'desc')
       .fetch()
-    return transform.collection(participants, 'ParticipantTransformer')
+    return transform.collection(participants, 'ParticipantTransformer.withStudiesCount')
   }
 
   /**

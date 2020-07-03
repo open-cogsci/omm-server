@@ -9,11 +9,16 @@
       <v-card-text class="body-1 font-weight-light">
         Please enter the information below
       </v-card-text>
-      <participant-edit-data
-        ref="form"
-        @clicked-cancel="$emit('input', false)"
-        @clicked-save="$emit('save-participant', $event)"
-      />
+      <v-fade-transition mode="out-in">
+        <participant-edit-data
+          ref="form"
+          :saving="saving"
+          :errors="errors"
+          @clicked-cancel="$emit('input', false)"
+          @clicked-save="$emit('save-participant', $event)"
+          @update:errors="$emit('update:errors', $event)"
+        />
+      </v-fade-transition>
     </v-card>
   </v-dialog>
 </template>

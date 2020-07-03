@@ -16,7 +16,7 @@ export function processErrors (e, notify = null) {
     const validationErrors = e.response.data
 
     for (const err of validationErrors) {
-      errors[err.field] = err.validation
+      errors[err.field] = err.message
     }
     if (isFunction(notify)) {
       notify({

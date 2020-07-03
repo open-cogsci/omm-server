@@ -4,7 +4,7 @@
       ref="dialog"
       v-model="dialog"
       :saving="saving"
-      :errors="errors"
+      :errors.sync="errors"
       @save-participant="saveParticipant"
     />
     <v-row>
@@ -19,7 +19,11 @@
         <participants-list
           ref="list"
           :participants="participants"
+          :saving="saving"
+          :deleting="deleting"
+          :errors.sync="errors"
           @update-participant="saveParticipant"
+          @delete-participant="deleteParticipant"
         />
       </v-col>
     </v-row>
@@ -59,6 +63,7 @@ export default {
       dialog: false,
       saving: false,
       loading: false,
+      deleting: false,
       fabVisible: false,
       errors: {}
     }
@@ -79,6 +84,9 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
+    /*
+    * Fetch participants from server
+    */
     async loadParticipants () {
       this.loading = true
       try {
@@ -90,7 +98,7 @@ export default {
       }
     },
     /**
-     *  Save a study
+     *  Save a participant
      */
     async saveParticipant (ptcpData) {
       this.saving = true
@@ -108,6 +116,12 @@ export default {
       } finally {
         this.saving = false
       }
+    },
+    /*
+    *
+    */
+    async deleteParticipant (ptcpID) {
+
     },
     /**
      *  Clear possible validation errors sent by adonis after closing the dialog.

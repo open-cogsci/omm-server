@@ -29,6 +29,7 @@ export default class Participant extends Model {
       name: this.string(''),
       rfid: this.string(''),
       active: this.boolean(true),
+      studies_count: this.number(null),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr('')

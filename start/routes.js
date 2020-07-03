@@ -23,6 +23,10 @@ Route.group(() => {
   Route.put('/auth/user/change_password', 'UserController.changePassword').as('users.password')
   Route.resource('jobs', 'JobController').apiOnly()
   Route.resource('participants', 'ParticipantController').apiOnly()
+    .validator(new Map([
+      [['participants.store'], ['SaveParticipant']],
+      [['participants.update'], ['SaveParticipant']]
+    ]))
   Route.resource('studies', 'StudyController').apiOnly()
     .validator(new Map([
       [['studies.store'], ['SaveStudy']],
@@ -33,17 +37,17 @@ Route.group(() => {
 Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
 
-  Route.get('participants/:rfid/announce', 'ParticipantController.announce').as('announce')
-  Route.get('/participants/:rfid/fetchjob', 'ParticipantController.fetchJob').as('fetch_job')
-  Route.get('/participants/:rfid/jobindex', 'ParticipantController.fetchJobIndex').as('fetch_job_index')
+  Route.get('participants/:rfid/announce', 'ParticipantController.announce').as('participants.announce')
+  Route.get('/participants/:rfid/fetchjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
+  Route.get('/participants/:rfid/jobindex', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
 
-  Route.post('/jobs/result', 'JobController.processResult').as('post_job_result')
+  Route.post('/jobs/result', 'JobController.processResult').as('jobs.submit_result')
 
   /* Public job CRUD actions */
 
   // CREATE:
   // The client inserts a list of jobs into the job table of the server.
-  Route.post('/studies/:id/jobs', 'StudyController.insertJobs').as('insert_job_sequence')
+  Route.post('/studies/:id/jobs', 'StudyController.insertJobs').as('jobs.insert_sequence')
 
   // READ:
   // The client gets a list of jobs from the server. This is not for running the jobs. Rather, it allows
@@ -51,17 +55,17 @@ Route.group(() => {
   // By default, the endpoint returns all the jobs of the current study. With optional from and to
   // query params (e.g. GET /studies/2/jobs?from=5&to=10) this can be limited to a subset of the jobs.
   // The id parameter is the study ID to retrieve the jobs from.
-  Route.get('/studies/:id/jobs', 'StudyController.fetchJobs').as('get_job_sequence')
+  Route.get('/studies/:id/jobs', 'StudyController.fetchJobs').as('jobs.get_sequence')
 
   // UPDATE:
   // The client changes the state of a list of jobs on the server. This is convenience operation which
   // could also be done by getting jobs, changing them, removing them, and finally inserting them again.
-  Route.patch('/studies/:id/jobs', 'StudyController.updateJobs').as('update_job_sequence')
+  Route.patch('/studies/:id/jobs', 'StudyController.updateJobs').as('jobs.update_sequence')
 
   // DELETE:
   // The client deletes a list of jobs in the job table of the server. The index parameters are specified
   // in the url for making them required (and thus for safety of not deleting all records)
-  Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('delete_job_sequence')
+  Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('jobs.delete_sequence')
 
   Route.any('*', ({ response }) => {
     response.badRequest('This endpoint does not exist')

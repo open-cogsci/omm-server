@@ -13,9 +13,16 @@ class ParticipantTransformer extends BumblebeeTransformer {
     return ['jobs', 'studies']
   }
 
-  transform (model) {
+  transform (participant) {
     return {
-      ...model.toObject()
+      ...participant.toObject()
+    }
+  }
+
+  transformWithStudiesCount (participant) {
+    return {
+      ...this.transform(participant),
+      studies_count: participant.$sideLoaded.studies_count
     }
   }
 

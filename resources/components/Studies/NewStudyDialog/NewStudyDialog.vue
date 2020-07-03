@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { notEmpty, maxLength } from '@/assets/js/validationrules'
+import { isEmpty, isLength } from 'validator'
 
 export default {
   props: {
@@ -77,12 +77,12 @@ export default {
       maxDescLength: 100,
       validation: {
         name: [
-          v => notEmpty(v) || 'Please give your study a name',
-          v => maxLength(v, this.maxNameLength) ||
+          v => !isEmpty(v) || 'Please give your study a name',
+          v => isLength(v, { max: this.maxNameLength }) ||
           `This field has a maximum of ${this.maxNameLength} characters`
         ],
         description: [
-          v => maxLength(v, this.maxDescLength) ||
+          v => isLength(v, { max: this.maxNameLength }) ||
           `This field has a maximum of ${this.maxDescLength} characters`
         ]
       }
