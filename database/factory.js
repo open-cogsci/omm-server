@@ -30,6 +30,6 @@ Factory.blueprint('App/Models/Study', (faker) => {
 Factory.blueprint('App/Models/Participant', (faker) => {
   return {
     name: faker.name(),
-    rfid: faker.string({ length: 4, alpha: true })
+    identifier: faker.string({ length: 8, alpha: true })
   }
 })

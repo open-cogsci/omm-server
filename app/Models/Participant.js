@@ -14,7 +14,7 @@ const Model = use('Model')
 *        name:
 *          type: string
 *          example: Benny Banana
-*        rfid:
+*        identifier:
 *          type: string
 *          example: AxcSDD
 *        active:
@@ -27,7 +27,7 @@ const Model = use('Model')
 *          format: date-time
 *      required:
 *        - name
-*        - rfid
+*        - identifier
 *    ParticipantWithRelations:
 *      allOf:
 *         - $ref: '#/definitions/Participant'

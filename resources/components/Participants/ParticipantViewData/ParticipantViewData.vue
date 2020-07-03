@@ -58,14 +58,11 @@
 </template>
 
 <script>
-import { upperFirst, upperCase, lowerCase, pick } from 'lodash'
+import { upperFirst, lowerCase, pick } from 'lodash'
 
 export default {
   filters: {
-    label: (val) => {
-      if (val === 'rfid') { return upperCase(val) }
-      return upperFirst(lowerCase(val))
-    },
+    label: val => upperFirst(lowerCase(val)),
     convertBools: (val) => {
       if (typeof val !== 'boolean') { return val }
       return val ? 'Yes' : 'No'
@@ -78,7 +75,7 @@ export default {
     }
   },
   methods: {
-    listable: ptcp => pick(ptcp, ['name', 'rfid', 'active', 'created_at', 'updated_at'])
+    listable: ptcp => pick(ptcp, ['name', 'identifier', 'active', 'created_at', 'updated_at'])
   }
 }
 </script>

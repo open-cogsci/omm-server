@@ -19,7 +19,7 @@
                 <v-col cols="5">
                   <v-icon small>
                     mdi-tag
-                  </v-icon> {{ ptcp.rfid }}
+                  </v-icon> {{ ptcp.identifier }}
                 </v-col>
                 <v-col cols="5">
                   <v-icon small>

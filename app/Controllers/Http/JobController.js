@@ -79,7 +79,7 @@ class JobController {
   *         example:
   *           message: Hello Guess
   *       404:
-  *         description: The participant with the specified rfid was not found.
+  *         description: The participant with the specified identifier was not found.
   */
   async processResults ({ params }) {
 

@@ -6,13 +6,13 @@ class SaveParticipant {
     return {
       // validation rules
       name: 'required|max:50',
-      rfid: `required|unique:participants,rfid,id,${ptcpId}`
+      identifier: `required|unique:participants,identifier,id,${ptcpId}`
     }
   }
 
   get messages () {
     return {
-      'rfid.unique': 'This RFID is already used.'
+      'identifier.unique': 'This identifier is already used.'
     }
   }
 }

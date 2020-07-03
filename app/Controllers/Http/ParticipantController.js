@@ -101,7 +101,7 @@ class ParticipantController {
    * @param {Response} ctx.response
    */
   async store ({ request, response, transform }) {
-    const data = request.only(['name', 'rfid', 'active'])
+    const data = request.only(['name', 'identifier', 'active'])
     const ptcp = await Participant.create(data)
     await ptcp.reload() // Refresh data otherwise some parameters are missing
     response.status(201)
@@ -249,7 +249,7 @@ class ParticipantController {
    */
   async update ({ params, request, transform }) {
     const ptcp = await Participant.findOrFail(params.id)
-    const data = request.only(['name', 'rfid', 'active'])
+    const data = request.only(['name', 'identifier', 'active'])
     ptcp.merge(data)
     await ptcp.save()
     return transform.item(ptcp, 'ParticipantTransformer')
@@ -298,7 +298,7 @@ class ParticipantController {
 
   /**
   * @swagger
-  * /participants/{rfid}/announce:
+  * /participants/{identifier}/announce:
   *   get:
   *     tags:
   *       - Studies
@@ -307,10 +307,10 @@ class ParticipantController {
   *         sending the study information.
   *     parameters:
   *       - in: path
-  *         name: rfid
+  *         name: identifier
   *         required: true
   *         type: string
-  *         description: The RFID code of the participant transmitted by its chip.
+  *         description: The identifier code of the participant transmitted by its chip.
   *     responses:
   *       200:
   *         description: Sends the study to perform, including a download link for the osexp file.
@@ -319,20 +319,43 @@ class ParticipantController {
   *             data:
   *               $ref: '#/definitions/Study'
   *       400:
-  *         description: The specified rfid is invalid (e.g. not the expected dtype).
+  *         description: The specified identifier is invalid (e.g. not the expected dtype).
   *       404:
-  *         description: The participant with the specified rfid was not found.
+  *         description: The participant with the specified identifier was not found.
   *       default:
   *         description: Unexpected error
   */
-  async announce ({ transform }) {
-    const study = await Study.firstOrFail()
+  async announce ({ params, transform, response }) {
+    const { identifier } = params
+    const ptcp = await Participant.findByOrFail('identifier', identifier)
+
+    // First find studies that are in progress.
+    let study = ptcp.studies()
+      .wherePivot('status_id', 2)
+      .orderBy('created_at', 'asc')
+      .first()
+
+    // If there are none, find a pending study.
+    if (study === null) {
+      study = ptcp.studies()
+        .wherePivot('status_id', 1)
+        .orderBy('created_at', 'asc')
+        .first()
+
+      // If still no study has been found, return a message that no studies are available
+      if (study === null) {
+        return response.notFound({
+          message: `No study available to perform for participant with identifier ${identifier}`
+        })
+      }
+    }
+
     return transform.item(study, 'StudyTransformer')
   }
 
   /**
   * @swagger
-  * /participants/{rfid}/fetchjob:
+  * /participants/{identifier}/fetchjob:
   *   get:
   *     tags:
   *       - Jobs
@@ -341,19 +364,19 @@ class ParticipantController {
   *         the first job in the table with a ready state.
   *     parameters:
   *       - in: path
-  *         name: rfid
-  *         description: the RFID code of the participant transmitted by its chip.
+  *         name: identifier
+  *         description: the identifier code of the participant transmitted by its chip.
   *         required: true
   *         type: string
   *     responses:
   *       200:
-  *         description: Sends the current job in line for the participant with the specified RFID.
+  *         description: Sends the current job in line for the participant with the specified identifier.
   *         schema:
   *           properties:
   *             data:
   *               $ref: '#/definitions/Job'
   *       404:
-  *         description: The participant with the specified rfid was not found.
+  *         description: The participant with the specified identifier was not found.
   */
   async fetchJob ({ transform }) {
     const study = await Study.firstOrFail()
@@ -363,7 +386,7 @@ class ParticipantController {
 
   /**
   * @swagger
-  * /participants/{rfid}/jobindex:
+  * /participants/{identifier}/jobindex:
   *   get:
   *     tags:
   *       - Jobs
@@ -371,8 +394,8 @@ class ParticipantController {
   *       The client asks the server the current job index, i.e. the row of the job table.
   *     parameters:
   *       - in: path
-  *         name: rfid
-  *         description: the RFID code of the participant transmitted by its chip.
+  *         name: identifier
+  *         description: the identifier code of the participant transmitted by its chip.
   *         required: true
   *         type: string
   *     responses:
@@ -392,10 +415,10 @@ class ParticipantController {
   *                   description: The position of the job in the jobs table of the study
   *                   example: 33
   *       404:
-  *         description: The participant with the specified rfid was not found.
+  *         description: The participant with the specified identifier was not found.
   */
   fetchJobIndex ({ params, request }) {
-    return { message: `Called currentJobIndex with rfid ${params.rfid}` }
+    return { message: `Called currentJobIndex with identifier ${params.identifier}` }
   }
 }
 

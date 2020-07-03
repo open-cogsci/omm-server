@@ -31,7 +31,7 @@ export default class Participant extends Model {
     return {
       id: this.number(null),
       name: this.string(''),
-      rfid: this.string(''),
+      identifier: this.string(''),
       active: this.boolean(true),
       studies_count: this.number(null),
       created_at: this.attr(''),

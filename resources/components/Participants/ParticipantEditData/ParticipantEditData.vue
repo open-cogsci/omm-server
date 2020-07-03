@@ -29,11 +29,11 @@
           @input="removeErrors('name')"
         />
         <v-text-field
-          v-model="ptcp.rfid"
-          :rules="validation.rfid"
-          :error-messages="errors.rfid"
-          label="RFID"
-          @input="removeErrors('rfid')"
+          v-model="ptcp.identifier"
+          :rules="validation.identifier"
+          :error-messages="errors.identifier"
+          label="Identifier"
+          @input="removeErrors('identifier')"
         />
         <v-switch
           v-model="ptcp.active"
@@ -69,7 +69,7 @@ import { isEqual } from 'lodash'
 
 const EMPTY_VALUES = {
   name: '',
-  rfid: '',
+  identifier: '',
   active: true
 }
 
@@ -100,8 +100,8 @@ export default {
           v => isLength(v, { max: this.maxNameLength }) ||
           `This field has a maximum of ${this.maxNameLength} characters`
         ],
-        rfid: [
-          v => !isEmpty(v) || 'RFID cannot be empty'
+        identifier: [
+          v => !isEmpty(v) || 'identifier cannot be empty'
         ]
       }
     }

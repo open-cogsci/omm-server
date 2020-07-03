@@ -107,7 +107,7 @@ export default {
     async saveParticipant (ptcpData) {
       this.saving = true
       try {
-        await Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'rfid', 'active']))
+        await Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
         this.notify({ message: 'Participant has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()
@@ -140,7 +140,7 @@ export default {
      */
     clearErrors (val) {
       if (!val) {
-        this.errors = { name: '', rfid: '' }
+        this.errors = { name: '', identifier: '' }
       }
     }
   },
