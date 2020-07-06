@@ -121,7 +121,7 @@ class StudyController {
   *       - in: path
   *         name: id
   *         required: true
-  *         type: string
+  *         type: integer
   *         description: The ID of the study to retrieve
   *     responses:
   *       200:
@@ -177,7 +177,7 @@ class StudyController {
   *       - in: path
   *         name: id
   *         required: true
-  *         type: string
+  *         type: integer
   *         description: The ID of the study to update
   *       - in: body
   *         name: study
@@ -212,7 +212,7 @@ class StudyController {
   *       - in: path
   *         name: id
   *         required: true
-  *         type: string
+  *         type: integer
   *         description: The ID of the study to update
   *       - in: body
   *         name: study
@@ -263,7 +263,7 @@ class StudyController {
   *       - in: path
   *         name: id
   *         required: true
-  *         type: string
+  *         type: integer
   *         description: The ID of the study to delete.
   *     responses:
   *       204:

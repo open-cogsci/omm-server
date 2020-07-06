@@ -18,15 +18,20 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <participants-list
-              ref="list"
-              :participants="participants"
-              :saving="saving"
-              :deleting="deleting"
-              :errors.sync="errors"
-              @update-participant="saveParticipant"
-              @delete-participant="deleteParticipant"
-            />
+            <v-skeleton-loader
+              :loading="loading"
+              type="table-row-divider@10"
+            >
+              <participants-list
+                ref="list"
+                :participants="participants"
+                :saving="saving"
+                :deleting="deleting"
+                :errors.sync="errors"
+                @update-participant="saveParticipant"
+                @delete-participant="deleteParticipant"
+              />
+            </v-skeleton-loader>
           </v-col>
         </v-row>
       </v-col>
@@ -58,6 +63,7 @@ import { processErrors } from '@/assets/js/errorhandling'
 import Participant from '@/models/Participant'
 
 export default {
+  inject: ['theme'],
   components: {
     ParticipantsList: () => import('@/components/Participants/ParticipantsList'),
     newParticipantDialog: () => import('@/components/Participants/NewParticipantDialog')

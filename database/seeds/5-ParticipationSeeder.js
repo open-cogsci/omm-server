@@ -20,9 +20,16 @@ class ParticipationSeeder {
       return
     }
 
+    // Sync participants to studies
     const ptcpIds = await Participant.ids()
     const study = await Study.find(1)
-    return study.participants().sync(ptcpIds)
+    await study.participants().sync(ptcpIds)
+
+    // Sync participants to jobs of the study
+    const jobs = await study.jobs().fetch()
+    for (const job of jobs.rows) {
+      await job.participants().sync(ptcpIds)
+    }
   }
 }
 

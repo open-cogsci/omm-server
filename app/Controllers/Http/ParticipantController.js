@@ -290,7 +290,7 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, response }) {
     const ptcp = await Participant.findOrFail(params.id)
     ptcp.delete()
     return response.noContent()
@@ -322,6 +322,8 @@ class ParticipantController {
   *         description: The specified identifier is invalid (e.g. not the expected dtype).
   *       404:
   *         description: The participant with the specified identifier was not found.
+  *       412:
+  *         description: The specified participant is marked as inactive.
   *       default:
   *         description: Unexpected error
   */
@@ -329,25 +331,30 @@ class ParticipantController {
     const { identifier } = params
     const ptcp = await Participant.findByOrFail('identifier', identifier)
 
-    // First find studies that are in progress.
-    let study = await ptcp.studies()
-      .wherePivot('status_id', 2)
+    if (!ptcp.active) {
+      return response.preconditionFailed({ message: 'Participant is not active' })
+    }
+
+    // First find studies that are in progress, then select pending studies.
+    const study = await ptcp.studies()
+      .whereInPivot('status_id', [1, 2])
+      .orderBy('status_id', 'asc')
       .orderBy('created_at', 'asc')
+      .withPivot(['status_id'])
       .first()
 
     // If there are none, find a pending study.
     if (study === null) {
-      study = await ptcp.studies()
-        .wherePivot('status_id', 1)
-        .orderBy('created_at', 'asc')
-        .first()
+      return response.notFound({
+        message: `No study available to perform for participant with identifier ${identifier}`
+      })
+    }
 
-      // If still no study has been found, return a message that no studies are available
-      if (study === null) {
-        return response.notFound({
-          message: `No study available to perform for participant with identifier ${identifier}`
-        })
-      }
+    // Set studies status from pending to in progress
+    if (study.status_id === 1) {
+      await ptcp.studies().pivotQuery()
+        .where('study_id', study.id)
+        .update({ status_id: 2 })
     }
 
     return transform.item(study, 'StudyTransformer')
@@ -355,7 +362,7 @@ class ParticipantController {
 
   /**
   * @swagger
-  * /participants/{identifier}/fetchjob:
+  * /participants/{identifier}/{studyID}/fetchjob:
   *   get:
   *     tags:
   *       - Jobs
@@ -368,6 +375,11 @@ class ParticipantController {
   *         description: the identifier code of the participant transmitted by its chip.
   *         required: true
   *         type: string
+  *       - in: path
+  *         name: studyID
+  *         description: the study ID from which to fetch a job.
+  *         required: true
+  *         type: integer
   *     responses:
   *       200:
   *         description: Sends the current job in line for the participant with the specified identifier.
@@ -376,17 +388,52 @@ class ParticipantController {
   *             data:
   *               $ref: '#/definitions/Job'
   *       404:
-  *         description: The participant with the specified identifier was not found.
+  *         description: The participant with the specified identifier was not found or there is no
+  *                      job in line for the participant.
+  *       412:
+  *         description: The specified participant is marked as inactive.
   */
-  async fetchJob ({ transform }) {
-    const study = await Study.firstOrFail()
-    const jobs = study.jobs().fetch()
-    return transform.item(jobs, 'JobTransformer')
+  async fetchJob ({ params, transform, response }) {
+    const { identifier, studyID } = params
+    const ptcp = await Participant.findByOrFail('identifier', identifier)
+
+    if (!ptcp.active) {
+      return response.preconditionFailed({ message: 'Participant is not active' })
+    }
+
+    const study = await ptcp.studies().where('studies.id', studyID).first()
+    if (study === null) {
+      return response.notFound({ message: `The study with ${studyID} could not be found` })
+    }
+
+    const job = await ptcp.jobs()
+      .where('study_id', study.id)
+      .whereInPivot('status_id', [1, 2])
+      .withPivot(['status_id'])
+      .with('variables.dtype')
+      .orderBy('pivot_status_id', 'desc')
+      .orderBy('order', 'asc')
+      .first()
+
+    if (job === null) {
+      return response.notFound({
+        message: `There are no jobs available for participant with identifier ${identifier}.`
+      })
+    }
+
+    // Set status of job from pending to started
+    if (job.pivot_status_id === 1) {
+      await ptcp.jobs().pivotQuery()
+        .where('job_id', job.id)
+        .update({ status_id: 2 })
+    }
+
+    return transform.item(job, 'JobTransformer')
   }
 
   /**
   * @swagger
-  * /participants/{identifier}/jobindex:
+  * /participants/{identifier}/{studyID}/jobindex:
   *   get:
   *     tags:
   *       - Jobs
@@ -398,6 +445,11 @@ class ParticipantController {
   *         description: the identifier code of the participant transmitted by its chip.
   *         required: true
   *         type: string
+  *       - in: path
+  *         name: studyID
+  *         description: the study ID from which to fetch a job.
+  *         required: true
+  *         type: integer
   *     responses:
   *       200:
   *         description: Sends the current job index in line
@@ -415,10 +467,25 @@ class ParticipantController {
   *                   description: The position of the job in the jobs table of the study
   *                   example: 33
   *       404:
-  *         description: The participant with the specified identifier was not found.
+  *         description: The participant with the specified identifier was not found or there is no
+  *                      job in line for the participant.
+  *       412:
+  *         description: The specified participant is marked as inactive.
   */
-  fetchJobIndex ({ params, request }) {
-    return { message: `Called currentJobIndex with identifier ${params.identifier}` }
+  async fetchJobIndex ({ params, response }) {
+    const { identifier, studyID } = params
+    const ptcp = await Participant.findByOrFail('identifier', identifier)
+
+    if (!ptcp.active) {
+      return response.preconditionFailed({ message: 'Participant is not active' })
+    }
+
+    const study = ptcp.studies().where('id', studyID).first()
+    if (study === null) {
+      return response.notFound({ message: `The study with ${studyID} could not be found` })
+    }
+
+    return { message: `Called fetchJobIndex with identifier ${params.identifier}` }
   }
 }
 

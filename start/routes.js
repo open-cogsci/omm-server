@@ -38,8 +38,8 @@ Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
 
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
-  Route.get('/participants/:identifier/fetchjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
-  Route.get('/participants/:identifier/jobindex', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
+  Route.get('/participants/:identifier/:studyID/fetchjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
+  Route.get('/participants/:identifier/:studyID/jobindex', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
 
   Route.post('/jobs/result', 'JobController.processResult').as('jobs.submit_result')
 

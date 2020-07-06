@@ -17,7 +17,7 @@ class VariableTransformer extends BumblebeeTransformer {
     return {
       id: model.id,
       name: model.name,
-      value: model.$relations.pivot.value,
+      value: model.pivot_value,
       created_at: model.created_at,
       updated_at: model.updated_at
     }

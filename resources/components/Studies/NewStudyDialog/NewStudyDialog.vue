@@ -33,15 +33,24 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          class="success"
+          text
+          @click="cancel"
+        >
+          <v-icon left>
+            mdi-cancel
+          </v-icon> Cancel
+        </v-btn>
+        <v-btn
+          text
+          color="success"
           :disabled="!formValid"
           :loading="saving"
           @click="save"
         >
+          <v-icon left>
+            mdi-check
+          </v-icon>
           Save
-        </v-btn>
-        <v-btn class="cancel" @click="cancel">
-          Cancel
         </v-btn>
       </v-card-actions>
     </v-card>

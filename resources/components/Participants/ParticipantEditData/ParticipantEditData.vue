@@ -52,7 +52,7 @@
         text
         color="success"
         :disabled="!validates"
-        :saving="saving"
+        :loading="saving"
         @click="save"
       >
         <v-icon left>
