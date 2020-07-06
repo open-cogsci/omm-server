@@ -386,7 +386,7 @@ class ParticipantController {
   *         schema:
   *           properties:
   *             data:
-  *               $ref: '#/definitions/Job'
+  *               $ref: '#/definitions/JobWithRelations'
   *       404:
   *         description: The participant with the specified identifier was not found or there is no
   *                      job in line for the participant.
@@ -480,12 +480,32 @@ class ParticipantController {
       return response.preconditionFailed({ message: 'Participant is not active' })
     }
 
-    const study = ptcp.studies().where('id', studyID).first()
+    const study = await ptcp.studies().where('studies.id', studyID).first()
     if (study === null) {
       return response.notFound({ message: `The study with ${studyID} could not be found` })
     }
 
-    return { message: `Called fetchJobIndex with identifier ${params.identifier}` }
+    const job = await ptcp.jobs()
+      .where('study_id', study.id)
+      .whereInPivot('status_id', [1, 2])
+      .withPivot(['status_id'])
+      .with('variables.dtype')
+      .orderBy('pivot_status_id', 'desc')
+      .orderBy('order', 'asc')
+      .first()
+
+    if (job === null) {
+      return response.notFound({
+        message: `There are no jobs available for participant with identifier ${identifier}.`
+      })
+    }
+
+    return {
+      data: {
+        study_id: job.study_id,
+        current_job_index: job.order
+      }
+    }
   }
 }
 
