@@ -11,7 +11,7 @@
       <v-col cols="12" xl="8" offset-xl="2">
         <v-row>
           <v-col cols="12">
-            <h1 class="display-1 font-weight-light">
+            <h1 class="text-h5 text-md-h4 font-weight-light">
               Participants
             </h1>
           </v-col>

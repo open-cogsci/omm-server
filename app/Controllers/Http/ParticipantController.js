@@ -1,6 +1,5 @@
 'use strict'
 
-const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */

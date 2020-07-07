@@ -99,9 +99,9 @@
         </v-list>
       </v-menu>
     </v-app-bar>
-    <v-content>
+    <v-main>
       <nuxt />
-    </v-content>
+    </v-main>
     <v-footer :fixed="false" app>
       <span>&copy; 2019</span>
     </v-footer>

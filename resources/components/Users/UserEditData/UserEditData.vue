@@ -8,7 +8,7 @@
     <v-card-text>
       <v-form ref="form" v-model="validates" @submit.prevent="save">
         <v-text-field
-          v-model="ptcp.name"
+          v-model="userData.name"
           :rules="validation.name"
           :counter="maxNameLength"
           :error-messages="errors.name"
@@ -16,14 +16,14 @@
           @input="removeErrors('name')"
         />
         <v-text-field
-          v-model="ptcp.identifier"
-          :rules="validation.identifier"
-          :error-messages="errors.identifier"
-          label="Identifier"
-          @input="removeErrors('identifier')"
+          v-model="userData.email"
+          :rules="validation.email"
+          :error-messages="errors.email"
+          label="Email address"
+          @input="removeErrors('email')"
         />
         <v-switch
-          v-model="ptcp.active"
+          v-model="userData.active"
           label="Active"
         />
       </v-form>
@@ -51,12 +51,12 @@
 </template>
 
 <script>
-import { isEmpty, isLength } from 'validator'
+import { isEmpty, isLength, isEmail } from 'validator'
 import { isEqual } from 'lodash'
 
 const EMPTY_VALUES = {
   name: '',
-  identifier: '',
+  email: '',
   active: true
 }
 
@@ -65,7 +65,7 @@ export default {
     UnsavedChangesDialog: () => import('@/components/Common/UnsavedChangesDialog')
   },
   props: {
-    participant: {
+    user: {
       type: Object,
       default: () => ({ ...EMPTY_VALUES })
     },
@@ -82,7 +82,7 @@ export default {
     return {
       dialog: false,
       validates: true,
-      ptcp: { ...this.participant },
+      userData: { ...this.user },
       maxNameLength: 50,
       validation: {
         name: [
@@ -90,22 +90,23 @@ export default {
           v => isLength(v, { max: this.maxNameLength }) ||
           `This field has a maximum of ${this.maxNameLength} characters`
         ],
-        identifier: [
-          v => !isEmpty(v) || 'identifier cannot be empty'
+        email: [
+          v => !isEmpty(v) || 'email cannot be empty',
+          v => !isEmail(v) || 'Invalid email address'
         ]
       }
     }
   },
   methods: {
     dataChanged () {
-      const newData = JSON.parse(JSON.stringify(this.ptcp))
-      const originalData = JSON.parse(JSON.stringify(this.participant))
+      const newData = JSON.parse(JSON.stringify(this.userData))
+      const originalData = JSON.parse(JSON.stringify(this.user))
       return !isEqual(originalData, newData)
     },
     save () {
       if (this.$refs.form.validate()) {
         if (this.dataChanged()) {
-          this.$emit('clicked-save', this.ptcp)
+          this.$emit('clicked-save', this.userData)
         } else {
           this.stopEdit()
         }
@@ -119,10 +120,10 @@ export default {
       }
     },
     stopEdit () {
-      this.$emit('clicked-cancel', this.participant.id)
+      this.$emit('clicked-cancel', this.user.id)
     },
     clear () {
-      this.ptcp = { ...EMPTY_VALUES }
+      this.userData = { ...EMPTY_VALUES }
     },
     resetValidation () {
       this.$refs.form.resetValidation()

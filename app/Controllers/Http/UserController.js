@@ -4,6 +4,52 @@ const Hash = use('Hash')
 
 class UserController {
   /**
+  * @swagger
+  * /users:
+  *   get:
+  *     tags:
+  *       - USers
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Retrieves a list of all users currently present in the database.
+  *     parameters:
+  *       - in: query
+  *         name: active
+  *         required: false
+  *         type: boolean
+  *         description: Whether to retrieve active or archived studies.
+  *     responses:
+  *       200:
+  *         description: An array of users
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/USer'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
+   * Show a list of all users.
+   * GET users
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async index ({ transform }) {
+    const users = await User
+      .query()
+      .withCount('studies')
+      .orderBy('name', 'asc')
+      .fetch()
+    return transform.collection(users, 'UserTransformer.withStudiesCount')
+  }
+
+  /**
    * Create a new user
    * POST store
    *

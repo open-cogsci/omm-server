@@ -1,10 +1,10 @@
 <template>
   <v-expansion-panels v-model="panel" popout>
-    <v-expansion-panel v-for="ptcp in participants" :key="ptcp.id">
+    <v-expansion-panel v-for="user in users" :key="user.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
           <v-col cols="12" sm="4" class="text-truncate" :class="{'h2': open}">
-            {{ ptcp.name }}
+            {{ user.name }}
           </v-col>
           <v-col
             sm="8"
@@ -17,19 +17,7 @@
                 style="width: 100%"
               >
                 <v-col cols="5">
-                  <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-icon
-                        small
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        mdi-tag
-                      </v-icon>
-                    </template>
-                    Identifier
-                  </v-tooltip>
-                  {{ ptcp.identifier }}
+                  {{ user.email }}
                 </v-col>
                 <v-col cols="5">
                   <v-tooltip left>
@@ -42,19 +30,19 @@
                         mdi-flask
                       </v-icon>
                     </template>
-                    Participations
-                  </v-tooltip>{{ ptcp.studies_count }}
+                    Studies
+                  </v-tooltip>{{ user.studies_count }}
                 </v-col>
                 <v-col cols="2" class="text-center">
                   <v-tooltip left>
                     <template v-slot:activator="{ on, attrs }">
                       <span
                         class="font-weight-light"
-                        :class="ptcp.active ? 'green--text':'red--text'"
+                        :class="user.active ? 'green--text':'red--text'"
                         v-bind="attrs"
                         v-on="on"
                       >
-                        {{ ptcp.active ? 'active':'inactive' }}
+                        {{ user.active ? 'active':'inactive' }}
                       </span>
                     </template>
                     Status
@@ -74,22 +62,22 @@
               </v-card-title>
               <div class="mt-5">
                 <v-fade-transition mode="out-in">
-                  <participant-edit-data
-                    v-if="editing === ptcp.id"
-                    :participant="ptcp"
+                  <user-edit-data
+                    v-if="editing === user.id"
+                    :user="user"
                     :saving="saving"
                     :errors="errors"
                     @clicked-cancel="editing = null"
-                    @clicked-save="$emit('update-participant', $event)"
+                    @clicked-save="$emit('update-user', $event)"
                     @update:errors="$emit('update:errors', $event)"
                   />
-                  <participant-view-data
+                  <user-view-data
                     v-else
-                    :participant="ptcp"
+                    :user="user"
                     :deleting="deleting"
                     style="width: 100%"
                     @clicked-edit="(id) => editing = id"
-                    @clicked-delete="$emit('delete-participant', $event)"
+                    @clicked-delete="$emit('delete-user', $event)"
                   />
                 </v-fade-transition>
               </div>
@@ -98,7 +86,7 @@
           <v-col cols="12" md="6">
             <v-card outlined class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Participations
+                Studies
               </v-card-title>
               <v-card-text />
             </v-card>
@@ -112,11 +100,11 @@
 <script>
 export default {
   components: {
-    ParticipantViewData: () => import('@/components/Participants/ParticipantViewData'),
-    ParticipantEditData: () => import('@/components/Participants/ParticipantEditData')
+    UserViewData: () => import('@/components/Users/UserViewData'),
+    UserEditData: () => import('@/components/Users/UserEditData')
   },
   props: {
-    participants: {
+    users: {
       type: Array,
       default: () => []
     },

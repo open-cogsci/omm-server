@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    <!-- <new-participant-dialog
+    <new-user-dialog
       ref="dialog"
       v-model="dialog"
       :saving="saving"
       :errors.sync="errors"
-      @save-participant="saveParticipant"
-    /> -->
+      @save-user="saveUser"
+    />
     <v-row>
       <v-col cols="12" xl="8" offset-xl="2">
         <v-row>
@@ -22,15 +22,15 @@
               :loading="loading"
               type="table-row-divider@10"
             >
-              <!-- <participants-list
+              <users-list
                 ref="list"
-                :participants="participants"
+                :users="users"
                 :saving="saving"
                 :deleting="deleting"
                 :errors.sync="errors"
-                @update-participant="saveParticipant"
-                @delete-participant="deleteParticipant"
-              /> -->
+                @update-user="saveUser"
+                @delete-user="deleteUser"
+              />
             </v-skeleton-loader>
           </v-col>
         </v-row>
@@ -60,14 +60,14 @@ import { mapActions } from 'vuex'
 import { pick } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
-import Participant from '@/models/Participant'
+import User from '@/models/User'
 
 export default {
   inject: ['theme'],
-  // components: {
-  //   ParticipantsList: () => import('@/components/Participants/ParticipantsList'),
-  //   newParticipantDialog: () => import('@/components/Participants/NewParticipantDialog')
-  // },
+  components: {
+    UsersList: () => import('@/components/Users/UsersList'),
+    newUserDialog: () => import('@/components/Users/NewUserDialog')
+  },
   data () {
     return {
       dialog: false,
@@ -79,15 +79,15 @@ export default {
     }
   },
   computed: {
-    participants () {
-      return Participant.query()
+    users () {
+      return User.query()
         .orderBy('name', 'asc')
         .get()
     }
   },
   created () {
     this.clearErrors(false)
-    this.loadParticipants()
+    this.loadUsers()
   },
   mounted () {
     this.fabVisible = true
@@ -95,12 +95,12 @@ export default {
   methods: {
     ...mapActions('notifications', ['notify']),
     /*
-    * Fetch participants from server
+    * Fetch users from server
     */
-    async loadParticipants () {
+    async loadUsers () {
       this.loading = true
       try {
-        await Participant.fetch()
+        await User.fetch()
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -108,13 +108,13 @@ export default {
       }
     },
     /**
-     *  Save a participant
+     *  Save a user
      */
-    async saveParticipant (ptcpData) {
+    async saveUser (ptcpData) {
       this.saving = true
       try {
-        await Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
-        this.notify({ message: 'Participant has been saved', color: 'success' })
+        await User.persist(pick(ptcpData, ['$id', 'id', 'name', 'email', 'active']))
+        this.notify({ message: 'User has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()
         } else {
@@ -130,11 +130,11 @@ export default {
     /*
     *
     */
-    async deleteParticipant (ptcpID) {
+    async deleteUser (ptcpID) {
       this.deleting = true
       try {
-        await Participant.destroy(ptcpID)
-        this.notify({ message: 'Participant has been deleted', color: 'success' })
+        await User.destroy(ptcpID)
+        this.notify({ message: 'User has been deleted', color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       } finally {
@@ -146,7 +146,7 @@ export default {
      */
     clearErrors (val) {
       if (!val) {
-        this.errors = { name: '', identifier: '' }
+        this.errors = { name: '', email: '' }
       }
     }
   },
