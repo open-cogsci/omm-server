@@ -113,7 +113,8 @@ export default {
     async saveUser (ptcpData) {
       this.saving = true
       try {
-        await User.persist(pick(ptcpData, ['$id', 'id', 'name', 'email', 'active']))
+        await User.persist(pick(ptcpData,
+          ['$id', 'id', 'name', 'email', 'password', 'user_type_id', 'active']))
         this.notify({ message: 'User has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()

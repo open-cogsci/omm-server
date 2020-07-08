@@ -1,6 +1,11 @@
 'use strict'
+
+const capitalize = require('lodash/capitalize')
 const User = use('App/Models/User')
+const UserType = use('App/Models/UserType')
 const Hash = use('Hash')
+
+const isEmpty = require('validator').isEmpty
 
 class UserController {
   /**
@@ -44,6 +49,7 @@ class UserController {
     const users = await User
       .query()
       .withCount('studies')
+      .with('userType')
       .orderBy('name', 'asc')
       .fetch()
     return transform.collection(users, 'UserTransformer.withStudiesCount')
@@ -58,11 +64,12 @@ class UserController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-    const userData = request.only(['name', 'username', 'email', 'password'])
+    const userData = request.only(['name', 'email', 'password', 'user_type_id', 'active'])
 
     try {
       // save user to database
       const user = await User.create(userData)
+      await user.reload()
 
       return response.json({
         status: 'success',
@@ -70,10 +77,48 @@ class UserController {
       })
     } catch (error) {
       return response.status(400).json({
-        status: 'error',
         message: 'There was a problem creating the user, please try again later.'
       })
     }
+  }
+
+  /**
+   * Update user details.
+   * PUT or PATCH users/:id
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async update ({ params, request, response, auth, transform }) {
+    const user = await User.findOrFail(params.id)
+    const data = request.only(['name', 'email', 'active', 'user_type_id', 'password'])
+    if (isEmpty(data.password)) {
+      delete data.password
+    }
+
+    if (auth.current.user.id === params.id) {
+      if (!data.active) {
+        return response.status(400).json({
+          message: 'You cannot deactivate yourself'
+        })
+      }
+      if (data.user_type_id !== user.user_type_id) {
+        return response.status(400).json({
+          message: 'You cannot change your own user type'
+        })
+      }
+    }
+
+    user.merge(data)
+    try {
+      await user.save()
+    } catch (e) {
+      return response.status(400).json({
+        message: 'There was a problem updating the user, please try again later.'
+      })
+    }
+    return transform.item(user, 'UserTransformer')
   }
 
   /**
@@ -100,7 +145,6 @@ class UserController {
       })
     } catch (error) {
       response.status(400).json({
-        status: 'error',
         message: 'Invalid email/password'
       })
     }
@@ -123,12 +167,10 @@ class UserController {
         .where('token', token)
         .update({ is_revoked: true })
       response.json({
-        status: 'success',
         message: 'User logged out.'
       })
     } catch (error) {
       response.status(400).json({
-        status: 'error',
         message: 'Unable to logout user'
       })
     }
@@ -156,7 +198,6 @@ class UserController {
     // display appropriate message
     if (!verifyPassword) {
       return response.status(400).json({
-        status: 'error',
         message: 'Current password is incorrect.',
         errors: { password: 'Incorrect password' }
       })
@@ -167,7 +208,6 @@ class UserController {
     await user.save()
 
     return response.json({
-      status: 'success',
       message: 'Password updated!'
     })
   }
@@ -192,10 +232,24 @@ class UserController {
       })
     } catch (error) {
       return response.status(404).json({
-        status: 'error',
         message: 'User not found'
       })
     }
+  }
+
+  async destroy ({ params, response, auth }) {
+    if (auth.current.user.id === params.id) {
+      return response.status(400).json({ message: 'You cannot delete yourself' })
+    }
+    const user = await User.findOrFail(params.id)
+    try {
+      await user.delete()
+    } catch (e) {
+      response.status(400).json({
+        message: 'The user could not be removed'
+      })
+    }
+    return response.noContent()
   }
 
   /**
@@ -213,7 +267,6 @@ class UserController {
       .firstOrFail()
 
     return response.json({
-      status: 'success',
       data: { user }
     })
   }
@@ -239,15 +292,33 @@ class UserController {
       await user.save()
 
       return response.json({
-        status: 'success',
         message: 'Profile updated!',
         data: user
       })
     } catch (error) {
       return response.status(400).json({
-        status: 'error',
         message: 'There was a problem updating profile, please try again later.'
       })
+    }
+  }
+
+  /**
+   * Get a list of possible user types
+   * PUT or PATCH update_me
+   *
+   * @param {object} ctx
+   * @param {Response} ctx.response
+   */
+  async userTypes ({ response }) {
+    try {
+      const idsAndNames = await UserType.pair('id', 'name')
+      const data = Object.entries(idsAndNames).map(([id, name]) => ({
+        value: parseInt(id),
+        text: capitalize(name)
+      }))
+      return { data }
+    } catch (e) {
+      return response.status(400).json({ message: 'Could not fetch user types' })
     }
   }
 }

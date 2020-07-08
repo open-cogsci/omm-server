@@ -1,4 +1,5 @@
 import { Model } from '@vuex-orm/core'
+import UserType from './UserType'
 import { USERS } from '@/assets/js/endpoints'
 
 export default class User extends Model {
@@ -6,6 +7,12 @@ export default class User extends Model {
 
   static apiConfig = {
     baseURL: USERS
+  }
+
+  static state () {
+    return {
+      types: []
+    }
   }
 
   static fetch (config) {
@@ -33,13 +40,14 @@ export default class User extends Model {
       user_type_id: this.number(null),
       name: this.string(''),
       email: this.string(''),
+      password: this.string(''),
       active: this.boolean(null),
+      admin: this.boolean(null),
       studies_count: this.number(null),
       created_at: this.attr(''),
       updated_at: this.attr(''),
-      deleted_at: this.attr('')
-
-      // user_type: this.belongsTo(UserType, 'user_type_id')
+      deleted_at: this.attr(''),
+      userType: this.belongsTo(UserType, 'user_type_id')
     }
   }
 }

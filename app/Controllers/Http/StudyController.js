@@ -292,7 +292,11 @@ class StudyController {
       response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
       return
     }
-    study.delete()
+    try {
+      study.delete()
+    } catch (e) {
+      response.status(500).json({ message: 'The study could not be removed' })
+    }
     return response.noContent()
   }
 

@@ -19,7 +19,10 @@
                 <v-col cols="5">
                   {{ user.email }}
                 </v-col>
-                <v-col cols="5">
+                <v-col cols="3">
+                  Admin
+                </v-col>
+                <v-col cols="2">
                   <v-tooltip left>
                     <template v-slot:activator="{ on, attrs }">
                       <v-icon

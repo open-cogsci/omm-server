@@ -22,9 +22,24 @@
           label="Email address"
           @input="removeErrors('email')"
         />
+        <v-text-field
+          v-model="userData.password"
+          :error-messages="errors.password"
+          label="Password"
+          :disabled="user.id === $auth.user.id"
+          @input="removeErrors('email')"
+        />
+        <v-select
+          v-model="userData.user_type_id"
+          label="User type"
+          :error-messages="errors.user_type_id"
+          :items="types"
+          :disabled="user.id === $auth.user.id"
+        />
         <v-switch
           v-model="userData.active"
           label="Active"
+          :disabled="user.id === $auth.user.id"
         />
       </v-form>
     </v-card-text>
@@ -52,11 +67,14 @@
 
 <script>
 import { isEmpty, isLength, isEmail } from 'validator'
-import { isEqual } from 'lodash'
+import { isEqual, omit } from 'lodash'
+import { mapState } from 'vuex'
 
 const EMPTY_VALUES = {
   name: '',
   email: '',
+  password: Math.random().toString(20).substr(2, 10),
+  user_type_id: 2,
   active: true
 }
 
@@ -92,20 +110,23 @@ export default {
         ],
         email: [
           v => !isEmpty(v) || 'email cannot be empty',
-          v => !isEmail(v) || 'Invalid email address'
+          v => isEmail(v) || 'Invalid email address'
         ]
       }
     }
   },
+  computed: {
+    ...mapState('entities/users', ['types'])
+  },
   methods: {
     dataChanged () {
-      const newData = JSON.parse(JSON.stringify(this.userData))
-      const originalData = JSON.parse(JSON.stringify(this.user))
+      const newData = JSON.parse(JSON.stringify(omit(this.userData, 'password')))
+      const originalData = JSON.parse(JSON.stringify(omit(this.user, 'password')))
       return !isEqual(originalData, newData)
     },
     save () {
       if (this.$refs.form.validate()) {
-        if (this.dataChanged()) {
+        if (this.dataChanged() || !isEmpty(this.userData.password)) {
           this.$emit('clicked-save', this.userData)
         } else {
           this.stopEdit()
@@ -120,10 +141,13 @@ export default {
       }
     },
     stopEdit () {
+      this.clear()
       this.$emit('clicked-cancel', this.user.id)
     },
     clear () {
       this.userData = { ...EMPTY_VALUES }
+      this.userData.password = Math.random().toString(20).substr(2, 10)
+      this.resetValidation()
     },
     resetValidation () {
       this.$refs.form.resetValidation()

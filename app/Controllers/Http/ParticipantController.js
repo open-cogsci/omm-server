@@ -246,11 +246,17 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, transform }) {
+  async update ({ params, request, response, transform }) {
     const ptcp = await Participant.findOrFail(params.id)
     const data = request.only(['name', 'identifier', 'active'])
     ptcp.merge(data)
-    await ptcp.save()
+    try {
+      await ptcp.save()
+    } catch (e) {
+      return response.status(400).json({
+        message: 'There was a problem updating the participant, please try again later.'
+      })
+    }
     return transform.item(ptcp, 'ParticipantTransformer')
   }
 
@@ -291,7 +297,11 @@ class ParticipantController {
    */
   async destroy ({ params, response }) {
     const ptcp = await Participant.findOrFail(params.id)
-    ptcp.delete()
+    try {
+      await ptcp.delete()
+    } catch (e) {
+      response.status(500).json({ message: 'The participant could not be removed' })
+    }
     return response.noContent()
   }
 

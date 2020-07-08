@@ -110,6 +110,11 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import { USERS } from '@/assets/js/endpoints'
+import { processErrors } from '@/assets/js/errorhandling'
+import User from '@/models/User'
+
 export default {
   components: {
     NotificationBox: () => import('@/components/NotificationBox')
@@ -145,7 +150,19 @@ export default {
       title: 'OpenMonkeyMind'
     }
   },
+  async created () {
+    // Perform some bootstrapping. These requests are made only once when the app is loaded.
+
+    // Get possible user types
+    try {
+      const response = await this.$axios.get(`${USERS}/types`)
+      User.commit((state) => { state.types = response.data.data })
+    } catch (e) {
+      processErrors(e, this.notify)
+    }
+  },
   methods: {
+    ...mapActions('notifications', ['notify']),
     async logout () {
       try {
         await this.$auth.logout()

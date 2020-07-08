@@ -8,9 +8,11 @@
     @input="pop"
   >
     {{ current.message }}
-    <v-btn text @click.native="pop">
-      {{ current.closeText }}
-    </v-btn>
+    <template v-slot:action="{ attrs }">
+      <v-btn text v-bind="attrs" @click.native="pop">
+        {{ current.closeText }}
+      </v-btn>
+    </template>
   </v-snackbar>
 </template>
 

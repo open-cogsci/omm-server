@@ -17,9 +17,15 @@ const Route = use('Route')
 const API_PREFIX = '/api/v1'
 
 Route.group(() => {
+  Route.get('/users/types', 'UserController.userTypes')
   Route.resource('users', 'UserController').apiOnly()
+    .validator(new Map([
+      [['users.store'], ['SaveUser']],
+      [['users.update'], ['SaveUser']]
+    ]))
   Route.get('/auth/user', 'UserController.me').as('users.me')
   Route.put('/auth/user', 'UserController.updateMe').as('users.update_me')
+    .validator('SaveUser')
   Route.put('/auth/user/change_password', 'UserController.changePassword').as('users.password')
   Route.resource('jobs', 'JobController').apiOnly()
   Route.resource('participants', 'ParticipantController').apiOnly()

@@ -3,6 +3,7 @@ import VuexORM from '@vuex-orm/core'
 import VuexORMAxios from '@vuex-orm/plugin-axios'
 
 import User from '@/models/User'
+import UserType from '@/models/UserType'
 import Study from '@/models/Study'
 import Participant from '@/models/Participant'
 
@@ -12,6 +13,7 @@ VuexORM.use(VuexORMAxios, {
 
 const database = new VuexORM.Database()
 database.register(User)
+database.register(UserType)
 database.register(Study)
 database.register(Participant)
 

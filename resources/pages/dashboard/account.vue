@@ -25,16 +25,20 @@
                       <v-text-field
                         v-model="user.name"
                         :rules="validation.name"
+                        :error-messages="errors.name"
                         label="Name"
                         validate-on-blur
+                        @input="errors.name = ''"
                       />
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
                         v-model="user.email"
                         :rules="validation.email"
+                        :error-messages="errors.email"
                         label="Email"
                         validate-on-blur
+                        @input="errors.email = ''"
                       />
                     </v-col>
                   </v-row>
@@ -120,7 +124,8 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { emailRule } from '~/assets/js/validationrules'
+import { isEmail } from 'validator'
+import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   data () {
@@ -135,7 +140,7 @@ export default {
         name: [v => !!v || 'Name cannot be empty'],
         email: [
           v => !!v || 'Email cannot be empty',
-          v => emailRule(v) || 'Invalid email address'
+          v => isEmail(v) || 'Invalid email address'
         ],
         password: [
           v => !!v || 'Please provide your current password'
@@ -169,10 +174,7 @@ export default {
         })
         await this.$auth.fetchUser()
       } catch (e) {
-        this.notify({
-          message: `Error saving data: ${e}`,
-          color: 'danger'
-        })
+        this.errors = processErrors(e, this.notify)
       }
       this.savingDetails = false
     },
@@ -189,13 +191,7 @@ export default {
         })
         this.$refs.pwForm.reset()
       } catch (e) {
-        if (e.response.data.errors) {
-          this.errors = { ...e.response.data.errors }
-        }
-        this.notify({
-          message: `Error saving password: ${e.response.data.message}`,
-          color: 'error'
-        })
+        this.errors = processErrors(e, this.notify)
       }
       this.savingPassword = false
     }

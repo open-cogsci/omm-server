@@ -9,8 +9,12 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
  * @constructor
  */
 class UserTransformer extends BumblebeeTransformer {
+  static get defaultInclude () {
+    return ['userType']
+  }
+
   static get availableInclude () {
-    return ['userType', 'studies']
+    return ['studies']
   }
 
   /**

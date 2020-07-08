@@ -17,7 +17,7 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-tooltip v-if="user.studies_count > 0" bottom>
+      <v-tooltip v-if="user.studies_count > 0 || user.id === $auth.user.id" bottom>
         <template v-slot:activator="{ on, attrs }">
           <div
             v-bind="attrs"
@@ -75,7 +75,7 @@ export default {
     }
   },
   methods: {
-    listable: ptcp => pick(ptcp, ['name', 'email', 'active', 'created_at', 'updated_at'])
+    listable: ptcp => pick(ptcp, ['name', 'email', 'user_type', 'active', 'created_at', 'updated_at'])
   }
 }
 </script>
