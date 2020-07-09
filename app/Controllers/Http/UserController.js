@@ -40,8 +40,13 @@ class UserController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
+   * @param {Auth} ctx.auth
    */
-  async index ({ transform }) {
+  async index ({ response, transform, auth }) {
+    if (!auth.current.user.isAdmin) {
+      return response.status(401).json({ message: 'Permission denied' })
+    }
+
     const users = await User
       .query()
       .withCount('studies')
