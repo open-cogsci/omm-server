@@ -22,7 +22,7 @@ class SaveUser {
       return true
     }
     // Only allow admins to add or change user data
-    if (!this.ctx.auth.current.user.getAdmin()) {
+    if (!this.ctx.auth.current.user.isAdmin) {
       this.ctx.response.unauthorized('Not authorized')
       return false
     }

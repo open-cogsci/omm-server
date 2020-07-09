@@ -15,7 +15,7 @@
         </v-col>
       </v-row>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions v-if="$auth.user.user_type_id === 1">
       <v-spacer />
       <v-tooltip v-if="participant.studies_count > 0" bottom>
         <template v-slot:activator="{ on, attrs }">

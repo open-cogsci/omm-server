@@ -39,20 +39,22 @@
           </v-list-item-content>
         </v-list-item>
         <v-divider />
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="localePath(item.to)"
-          router
-          exact
-        >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
-        </v-list-item>
+        <template v-for="(item, i) in items">
+          <v-list-item
+            v-if="!item.admin || (item.admin && $auth.user.user_type_id === 1 )"
+            :key="i"
+            :to="localePath(item.to)"
+            router
+            exact
+          >
+            <v-list-item-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.title" />
+            </v-list-item-content>
+          </v-list-item>
+        </template>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar
@@ -116,6 +118,7 @@ import { processErrors } from '@/assets/js/errorhandling'
 import User from '@/models/User'
 
 export default {
+  name: 'DefaultLayout',
   components: {
     NotificationBox: () => import('@/components/NotificationBox')
   },
@@ -143,7 +146,8 @@ export default {
         {
           icon: 'mdi-account-group',
           title: 'Users',
-          to: '/dashboard/users'
+          to: '/dashboard/users',
+          admin: true
         }
       ],
       miniVariant: false,

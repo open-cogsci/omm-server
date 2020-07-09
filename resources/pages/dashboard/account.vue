@@ -184,7 +184,7 @@ export default {
       this.errors = {}
       this.savingPassword = true
       try {
-        await this.$axios.$put('/api/v1/auth/user/change_password', data)
+        await this.$axios.$put('/api/v1/auth/password', data)
         this.notify({
           message: 'Password saved',
           color: 'success'

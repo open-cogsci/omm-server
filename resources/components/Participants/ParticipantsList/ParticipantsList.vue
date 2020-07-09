@@ -3,7 +3,7 @@
     <v-expansion-panel v-for="ptcp in participants" :key="ptcp.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
-          <v-col cols="12" sm="4" class="text-truncate" :class="{'h2': open}">
+          <v-col cols="12" sm="4" class="text-truncate text-body-2" :class="{'font-weight-bold': open}">
             {{ ptcp.name }}
           </v-col>
           <v-col
@@ -15,6 +15,7 @@
                 v-if="!open"
                 no-gutters
                 style="width: 100%"
+                class="text-caption text-md-body-2"
               >
                 <v-col cols="5">
                   <v-tooltip left>

@@ -63,6 +63,7 @@ import { processErrors } from '@/assets/js/errorhandling'
 import User from '@/models/User'
 
 export default {
+  name: 'UsersPage',
   inject: ['theme'],
   components: {
     UsersList: () => import('@/components/Users/UsersList'),
@@ -81,6 +82,7 @@ export default {
   computed: {
     users () {
       return User.query()
+        .with('user_type')
         .orderBy('name', 'asc')
         .get()
     }

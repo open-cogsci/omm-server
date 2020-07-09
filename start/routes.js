@@ -23,10 +23,13 @@ Route.group(() => {
       [['users.store'], ['SaveUser']],
       [['users.update'], ['SaveUser']]
     ]))
+
   Route.get('/auth/user', 'UserController.me').as('users.me')
   Route.put('/auth/user', 'UserController.updateMe').as('users.update_me')
     .validator('SaveUser')
-  Route.put('/auth/user/change_password', 'UserController.changePassword').as('users.password')
+  Route.put('/auth/password', 'UserController.changePassword').as('users.password')
+  Route.post('/auth/logout', 'UserController.logout').as('logout')
+
   Route.resource('jobs', 'JobController').apiOnly()
   Route.resource('participants', 'ParticipantController').apiOnly()
     .validator(new Map([

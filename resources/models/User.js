@@ -34,20 +34,23 @@ export default class User extends Model {
     return this.api().delete(`/${id}`, { delete: id, ...config })
   }
 
+  get isAdmin () {
+    return this.user_type_id === 1
+  }
+
   static fields () {
     return {
-      id: this.number(null),
-      user_type_id: this.number(null),
+      id: this.attr(null),
+      user_type_id: this.attr(null),
+      user_type: this.belongsTo(UserType, 'user_type_id'),
       name: this.string(''),
       email: this.string(''),
       password: this.string(''),
       active: this.boolean(null),
-      admin: this.boolean(null),
       studies_count: this.number(null),
       created_at: this.attr(''),
       updated_at: this.attr(''),
-      deleted_at: this.attr(''),
-      userType: this.belongsTo(UserType, 'user_type_id')
+      deleted_at: this.attr('')
     }
   }
 }

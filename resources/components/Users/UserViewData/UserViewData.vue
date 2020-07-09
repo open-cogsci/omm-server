@@ -11,7 +11,7 @@
           {{ field | label }}:
         </v-col>
         <v-col cols="6" md="8">
-          {{ value | convertBools }}
+          {{ value | convertIfNecessary }}
         </v-col>
       </v-row>
     </v-card-text>
@@ -58,14 +58,19 @@
 </template>
 
 <script>
-import { upperFirst, lowerCase, pick } from 'lodash'
+import { upperFirst, lowerCase, pick, isObject } from 'lodash'
 
 export default {
   filters: {
     label: val => upperFirst(lowerCase(val)),
-    convertBools: (val) => {
-      if (typeof val !== 'boolean') { return val }
-      return val ? 'Yes' : 'No'
+    convertIfNecessary: (val) => {
+      if (typeof val === 'boolean') {
+        return val ? 'Yes' : 'No'
+      }
+      if (isObject(val)) {
+        return val.name
+      }
+      return val
     }
   },
   props: {
