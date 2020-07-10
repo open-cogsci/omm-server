@@ -1,5 +1,9 @@
 <template>
-  <v-expansion-panels v-model="panel" popout>
+  <v-expansion-panels
+    v-model="panel"
+    popout
+    hover
+  >
     <v-expansion-panel v-for="user in users" :key="user.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
@@ -88,11 +92,35 @@
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
-            <v-card outlined class="fill-height">
+            <v-card outlined>
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Studies
               </v-card-title>
-              <v-card-text />
+              <v-card-text class="pa-0">
+                <v-virtual-scroll
+                  v-if="user.studies.length"
+                  :items="user.studies"
+                  :item-height="65"
+                  height="392"
+                >
+                  <template v-slot="{ item }">
+                    <v-list-item>
+                      <v-list-item-content class="px-3">
+                        <v-list-item-title v-text="item.name" />
+                        <v-list-item-subtitle v-text="item.description" />
+                      </v-list-item-content>
+                      <v-list-item-action>
+                        <v-list-item-action-text class="info--text">
+                          <v-icon color="info">
+                            mdi-baby-face
+                          </v-icon> <span>{{ item.participants_count }}</span>
+                        </v-list-item-action-text>
+                      </v-list-item-action>
+                    </v-list-item>
+                    <v-divider :key="`divider-${item.id}`" />
+                  </template>
+                </v-virtual-scroll>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -102,6 +130,8 @@
 </template>
 
 <script>
+import { isNumber } from 'lodash'
+
 export default {
   components: {
     UserViewData: () => import('@/components/Users/UserViewData'),
@@ -127,8 +157,15 @@ export default {
   },
   data () {
     return {
-      panel: [],
+      panel: null,
       editing: null
+    }
+  },
+  watch: {
+    panel (val) {
+      if (isNumber(val)) {
+        this.$emit('load-user', this.users[val].id)
+      }
     }
   },
   methods: {

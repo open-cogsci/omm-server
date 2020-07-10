@@ -344,16 +344,16 @@ class ParticipantController {
       return response.preconditionFailed({ message: 'Participant is not active' })
     }
 
-    // First find studies that are in progress, then select pending studies.
-    const study = await ptcp.studies()
-      .whereInPivot('status_id', [1, 2])
-      .orderBy('status_id', 'asc')
-      .orderBy('created_at', 'asc')
-      .withPivot(['status_id'])
-      .first()
-
-    // If there are none, find a pending study.
-    if (study === null) {
+    let study
+    try {
+      // First find studies that are in progress, then select pending studies.
+      study = await ptcp.studies()
+        .whereInPivot('status_id', [1, 2])
+        .orderBy('status_id', 'asc')
+        .orderBy('created_at', 'asc')
+        .withPivot(['status_id'])
+        .firstOrFail()
+    } catch (e) {
       return response.notFound({
         message: `No study available to perform for participant with identifier ${identifier}`
       })
@@ -361,47 +361,18 @@ class ParticipantController {
 
     // Set studies status from pending to in progress
     if (study.status_id === 1) {
-      await ptcp.studies().pivotQuery()
-        .where('study_id', study.id)
-        .update({ status_id: 2 })
+      try {
+        await ptcp.studies().pivotQuery()
+          .where('study_id', study.id)
+          .update({ status_id: 2 })
+      } catch (e) {
+        return response.internalServerError({ message: 'Could not update study status' })
+      }
     }
 
     return transform.item(study, 'StudyTransformer')
   }
 
-  /**
-  * @swagger
-  * /participants/{identifier}/{studyID}/fetchjob:
-  *   get:
-  *     tags:
-  *       - Jobs
-  *     summary: >
-  *         The client asks for a job, and the server replies by sending job data. The current job is always
-  *         the first job in the table with a ready state.
-  *     parameters:
-  *       - in: path
-  *         name: identifier
-  *         description: the identifier code of the participant transmitted by its chip.
-  *         required: true
-  *         type: string
-  *       - in: path
-  *         name: studyID
-  *         description: the study ID from which to fetch a job.
-  *         required: true
-  *         type: integer
-  *     responses:
-  *       200:
-  *         description: Sends the current job in line for the participant with the specified identifier.
-  *         schema:
-  *           properties:
-  *             data:
-  *               $ref: '#/definitions/JobWithRelations'
-  *       404:
-  *         description: The participant with the specified identifier was not found or there is no
-  *                      job in line for the participant.
-  *       412:
-  *         description: The specified participant is marked as inactive.
-  */
   async fetchJob ({ params, transform, response }) {
     const { identifier, studyID } = params
     const ptcp = await Participant.findByOrFail('identifier', identifier)

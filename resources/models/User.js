@@ -1,5 +1,7 @@
 import { Model } from '@vuex-orm/core'
 import UserType from './UserType'
+import Study from './Study'
+import StudyUser from './StudyUser'
 import { USERS } from '@/assets/js/endpoints'
 
 export default class User extends Model {
@@ -20,7 +22,7 @@ export default class User extends Model {
   }
 
   static fetchById (id, config) {
-    return this.api().get(id, config)
+    return this.api().get(`/${id}`, config)
   }
 
   static persist (data, config) {
@@ -47,10 +49,11 @@ export default class User extends Model {
       email: this.string(''),
       password: this.string(''),
       active: this.boolean(null),
-      studies_count: this.number(null),
       created_at: this.attr(''),
       updated_at: this.attr(''),
-      deleted_at: this.attr('')
+      deleted_at: this.attr(''),
+      studies_count: this.number(null),
+      studies: this.belongsToMany(Study, StudyUser, 'user_id', 'study_id')
     }
   }
 }

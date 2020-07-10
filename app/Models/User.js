@@ -120,7 +120,7 @@ class User extends Model {
     return this
       .belongsToMany('App/Models/Study')
       .pivotModel('App/Models/StudyUser')
-      .withPivot(['is_owner'])
+      .withPivot(['is_owner', 'access_permission_id'])
   }
 }
 

@@ -30,6 +30,7 @@
                 :errors.sync="errors"
                 @update-user="saveUser"
                 @delete-user="deleteUser"
+                @load-user="loadUser"
               />
             </v-skeleton-loader>
           </v-col>
@@ -74,6 +75,7 @@ export default {
       dialog: false,
       saving: false,
       loading: false,
+      loadingUser: 0,
       deleting: false,
       fabVisible: false,
       errors: {}
@@ -83,6 +85,7 @@ export default {
     users () {
       return User.query()
         .with('user_type')
+        .with('studies')
         .orderBy('name', 'asc')
         .get()
     }
@@ -108,6 +111,16 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    /** Load a single user */
+    async loadUser (id) {
+      this.loadingUser = id
+      try {
+        await User.fetchById(id)
+      } catch (e) {
+        this.errors = processErrors(e, this.notify)
+      }
+      this.loadingUser = id
     },
     /**
      *  Save a user

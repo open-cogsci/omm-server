@@ -279,16 +279,23 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, response }) {
+  async show ({ params, response, auth, transform }) {
+    if (!auth.current.user.isAdmin) {
+      return response.status(401).json({ message: 'Permission denied' })
+    }
     try {
       const user = await User.query()
-        .where('username', params.username)
+        .where('id', params.id)
+        .with('studies', (builder) => {
+          builder
+            .wherePivot('is_owner', true)
+            .withCount('participants')
+            // Somehowe, the pivot fields below are also included after the withCount() call
+            // Remove them here to tidy up the response.
+            .setHidden(['access_permission_id', 'is_owner', 'study_id', 'user_id'])
+        })
         .firstOrFail()
-
-      return response.json({
-        status: 'success',
-        data: user
-      })
+      return transform.include('studies.participants_count').item(user, 'UserTransformer')
     } catch (error) {
       return response.status(404).json({
         message: 'User not found'

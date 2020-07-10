@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels v-model="panel" popout>
+  <v-expansion-panels v-model="panel" popout hover>
     <v-expansion-panel v-for="ptcp in participants" :key="ptcp.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>

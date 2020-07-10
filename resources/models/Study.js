@@ -1,4 +1,8 @@
 import { Model } from '@vuex-orm/core'
+
+import User from './User'
+import StudyUser from './StudyUser'
+
 import { STUDIES } from '@/assets/js/endpoints'
 
 export default class Study extends Model {
@@ -28,8 +32,9 @@ export default class Study extends Model {
       active: this.boolean(true),
       created_at: this.attr(''),
       updated_at: this.attr(''),
-      deleted_at: this.attr('')
-      // user_type: this.belongsTo(UserType, 'user_type_id')
+      deleted_at: this.attr(''),
+      participants_count: this.number(0),
+      users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id')
     }
   }
 }

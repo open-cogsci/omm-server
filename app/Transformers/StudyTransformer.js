@@ -10,11 +10,19 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
  */
 class StudyTransformer extends BumblebeeTransformer {
   static get availableInclude () {
-    return ['jobs', 'variables', 'participants']
+    return ['users', 'jobs', 'variables', 'participants', 'participants_count']
   }
 
   transform (model) {
-    return { ...model.toObject() }
+    const data = { ...model.toObject() }
+    if (model?.$relations?.pivot) {
+      data.pivot = { ...model?.$relations?.pivot.toObject() }
+    }
+    return data
+  }
+
+  includeUsers (study) {
+    return this.collection(study.getRelated('users'), 'UserTransformer')
   }
 
   includeJobs (study) {
@@ -27,6 +35,10 @@ class StudyTransformer extends BumblebeeTransformer {
 
   includeParticipants (study) {
     return this.collection(study.getRelated('participants'), 'ParticipantTransformer')
+  }
+
+  includeParticipantsCount (study) {
+    return study.$sideLoaded.participants_count
   }
 }
 

@@ -51,7 +51,7 @@ class Study extends Model {
     return this
       .belongsToMany('App/Models/User')
       .pivotModel('App/Models/StudyUser')
-      .withPivot(['is_owner'])
+      .withPivot(['is_owner', 'access_permission_id'])
   }
 
   /**

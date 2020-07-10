@@ -7,10 +7,10 @@
         :dense="$vuetify.breakpoint.xsOnly"
         class="body-1"
       >
-        <v-col cols="6" md="4" class="font-weight-medium">
+        <v-col cols="5" md="4" class="font-weight-medium">
           {{ field | label }}:
         </v-col>
-        <v-col cols="6" md="8">
+        <v-col cols="7" md="8" class="text-truncate">
           {{ value | convertIfNecessary }}
         </v-col>
       </v-row>

@@ -20,10 +20,12 @@ class UserTransformer extends BumblebeeTransformer {
   /**
    * This method is used to transform the data.
    */
-  transform (user) {
-    return {
-      ...user.toObject()
+  transform (model) {
+    const data = { ...model.toObject() }
+    if (model?.$relations?.pivot) {
+      data.pivot = { ...model?.$relations?.pivot.toObject() }
     }
+    return data
   }
 
   transformWithStudiesCount (participant) {
@@ -35,6 +37,10 @@ class UserTransformer extends BumblebeeTransformer {
 
   includeStudies (user) {
     return this.collection(user.getRelated('studies'), 'StudyTransformer')
+  }
+
+  includeStudiesWithParticipantCount (user) {
+    return this.collection(user.getRelated('studies'), 'StudyTransformer.withParticipantsCount')
   }
 
   includeUserType (user) {
