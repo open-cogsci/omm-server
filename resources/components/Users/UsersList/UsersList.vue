@@ -92,7 +92,7 @@
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
-            <v-card outlined>
+            <v-card outlined class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Studies
               </v-card-title>
