@@ -71,7 +71,8 @@ module.exports = {
     uid: 'email',
     password: 'password',
     options: {
-      secret: appKey
+      secret: appKey,
+      expiresIn: '2 days'
     }
   }
 }

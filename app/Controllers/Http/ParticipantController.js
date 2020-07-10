@@ -501,12 +501,12 @@ class ParticipantController {
   *         name: identifier
   *         required: true
   *         type: string
-  *         description: The identifier of the participant for which the result is submitted
+  *         description: The identifier of the participant for which the result is submitted.
   *       - in: path
   *         name: id
   *         required: true
   *         type: integer
-  *         description: The ID of the job for which te results are posted
+  *         description: The ID of the job which the results belong to.
   *       - in: body
   *         name: job data
   *         required: true

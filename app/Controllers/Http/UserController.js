@@ -509,7 +509,7 @@ class UserController {
     try {
       // validate the user credentials and generate a JWT token
       const token = await auth
-        // .withRefreshToken()
+        .withRefreshToken()
         .attempt(
           request.input('email'),
           request.input('password')

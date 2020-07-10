@@ -7,7 +7,12 @@
     <v-expansion-panel v-for="user in users" :key="user.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
-          <v-col cols="12" sm="4" class="text-truncate text-body-2" :class="{'font-weight-bold': open}">
+          <v-col
+            cols="12"
+            sm="4"
+            class="text-truncate text-body-2 text-md-body-1"
+            :class="{'font-weight-bold': open}"
+          >
             {{ user.name }}
           </v-col>
           <v-col
@@ -97,29 +102,38 @@
                 Studies
               </v-card-title>
               <v-card-text class="pa-0">
-                <v-virtual-scroll
-                  v-if="user.studies.length"
-                  :items="user.studies"
-                  :item-height="65"
-                  height="392"
+                <v-skeleton-loader
+                  :loading="loadingUser === user.id"
+                  type="divided-list-item@5"
+                  :types="{'divided-list-item': 'list-item-two-line, divider'}"
                 >
-                  <template v-slot="{ item }">
-                    <v-list-item>
-                      <v-list-item-content class="px-3">
-                        <v-list-item-title v-text="item.name" />
-                        <v-list-item-subtitle v-text="item.description" />
-                      </v-list-item-content>
-                      <v-list-item-action>
-                        <v-list-item-action-text class="info--text">
-                          <v-icon color="info">
-                            mdi-baby-face
-                          </v-icon> <span>{{ item.participants_count }}</span>
-                        </v-list-item-action-text>
-                      </v-list-item-action>
-                    </v-list-item>
-                    <v-divider :key="`divider-${item.id}`" />
-                  </template>
-                </v-virtual-scroll>
+                  <!-- With only a virtual scroll here, the skeleton loader never leaves the
+                  loading state. Therefore there also is an empty div -->
+                  <div />
+                  <v-virtual-scroll
+                    v-if="user.studies.length"
+                    :items="user.studies"
+                    :item-height="65"
+                    height="392"
+                  >
+                    <template v-slot="{ item }">
+                      <v-list-item>
+                        <v-list-item-content class="px-3">
+                          <v-list-item-title v-text="item.name" />
+                          <v-list-item-subtitle v-text="item.description" />
+                        </v-list-item-content>
+                        <v-list-item-action>
+                          <v-list-item-action-text class="info--text">
+                            <v-icon color="info">
+                              mdi-baby-face
+                            </v-icon> <span>{{ item.participants_count }}</span>
+                          </v-list-item-action-text>
+                        </v-list-item-action>
+                      </v-list-item>
+                      <v-divider :key="`divider-${item.id}`" />
+                    </template>
+                  </v-virtual-scroll>
+                </v-skeleton-loader>
               </v-card-text>
             </v-card>
           </v-col>
@@ -149,6 +163,10 @@ export default {
     deleting: {
       type: Boolean,
       default: false
+    },
+    loadingUser: {
+      type: Number,
+      default: 0
     },
     errors: {
       type: Object,

@@ -2,26 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <v-skeleton-loader
-          :loading="loading"
-          type="heading"
-          transition="fade-transition"
-          height="294"
-        >
-          <div v-if="study">
-            <p class="display-1 font-weight-light" v-text="study.name" />
-            <h2
-              v-if="study.description"
-              class="title font-weight-light grey--text"
-              v-text="study.description"
-            />
-          </div>
-          <div v-else>
-            <p class="display-1 font-weight-light red--text">
-              Study could not be found.
-            </p>
-          </div>
-        </v-skeleton-loader>
+        <study-title :study="study" :loading="loading" />
       </v-col>
     </v-row>
   </v-container>
@@ -34,6 +15,9 @@ import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   name: 'Study',
+  components: {
+    StudyTitle: () => import('@/components/Studies/page/StudyTitle')
+  },
   data () {
     return {
       loading: false

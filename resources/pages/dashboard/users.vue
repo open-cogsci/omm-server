@@ -25,6 +25,7 @@
               <users-list
                 ref="list"
                 :users="users"
+                :loading-user="loadingUser"
                 :saving="saving"
                 :deleting="deleting"
                 :errors.sync="errors"
@@ -120,7 +121,7 @@ export default {
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       }
-      this.loadingUser = id
+      this.loadingUser = 0
     },
     /**
      *  Save a user
