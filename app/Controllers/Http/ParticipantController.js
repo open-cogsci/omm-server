@@ -487,6 +487,79 @@ class ParticipantController {
       }
     }
   }
+
+  /**
+  * @swagger
+  * /participants/{identifier}/{id}/result:
+  *   patch:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Once a job has been completed, the client sends the resulting data to the server.
+  *     parameters:
+  *       - in: path
+  *         name: identifier
+  *         required: true
+  *         type: string
+  *         description: The identifier of the participant for which the result is submitted
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: integer
+  *         description: The ID of the job for which te results are posted
+  *       - in: body
+  *         name: job data
+  *         required: true
+  *         description: The job result data
+  *         schema:
+  *           type: object
+  *           properties:
+  *             data:
+  *               type: string
+  *               description: The result data to store for the job as a valid json string.
+  *               example: {"correct": false, "rt": 200}
+  *     responses:
+  *       204:
+  *         description: The job has been updated sucessfully
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       404:
+  *         description: The job with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+  async processJobResult ({ params, request, response }) {
+    const { jobID, identifier } = params
+
+    let ptcp
+    try {
+      ptcp = await Participant.findByOrFail('identifier', identifier)
+    } catch (e) {
+      return response.notFound({ message: `Could not find participant with identifier ${identifier}` })
+    }
+
+    let data = request.input('data')
+
+    // Try to convert the data to json string
+    try {
+      data = JSON.stringify(data)
+    } catch (e) {
+      return response.unprocessableEntity({ message: 'Data cannot be converted to JSON' })
+    }
+
+    try {
+      await ptcp.jobs().pivotQuery()
+        .where('job_id', jobID)
+        .update({ data, status_id: 3 })
+    } catch (e) {
+      return response.badRequest({ message: 'Unable to persist data' })
+    }
+    return response.noContent()
+  }
 }
 
 module.exports = ParticipantController

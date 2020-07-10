@@ -1,8 +1,9 @@
 'use strict'
-
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
+
+const Job = use('App/Models/Job')
 
 /**
  * Resourceful controller for interacting with jobs
@@ -63,26 +64,6 @@ class JobController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, request, response }) {
-  }
-
-  /**
-  * @swagger
-  * /jobs/result:
-  *   post:
-  *     tags:
-  *       - Jobs
-  *     summary: >
-  *         Once a job has been completed, the client sends the resulting data to the server.
-  *     responses:
-  *       200:
-  *         description: Sends the current job in line
-  *         example:
-  *           message: Hello Guess
-  *       404:
-  *         description: The participant with the specified identifier was not found.
-  */
-  async processResults ({ params }) {
-
   }
 }
 

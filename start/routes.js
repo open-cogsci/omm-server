@@ -50,7 +50,7 @@ Route.group(() => {
   Route.get('/participants/:identifier/:studyID/fetchjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
   Route.get('/participants/:identifier/:studyID/jobindex', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
 
-  Route.post('/jobs/result', 'JobController.processResult').as('jobs.submit_result')
+  Route.patch('/participants/:identifier/:jobID/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
 
   /* Public job CRUD actions */
 
