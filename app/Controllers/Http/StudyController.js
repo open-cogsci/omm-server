@@ -4,6 +4,9 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
+const isArray = require('lodash/isArray')
+const isNan = require('lodash/isNan')
+
 /**
  * Resourceful controller for interacting with studies
  */
@@ -340,16 +343,32 @@ class StudyController {
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  insertJobs ({ params, request }) {
-    const studyID = params.id
+  async insertJobs ({ auth, params, request, response }) {
+    const { id } = params
     const index = parseInt(request.input('at'))
     const jobs = request.input('jobs', [])
-    let message = `Called fetchJobs with studyID ${studyID}. Insert `
-    if (index) {
-      message += `at index ${index} `
+
+    if (isNan(index)) {
+      return response.badRequest({ message: 'Invalid specification of start index' })
     }
 
-    return { message, jobs }
+    if (!isArray(jobs) || jobs.length === 0) {
+      return response.badRequest({ message: 'Invalid specification of jobs' })
+    }
+
+    let study
+    try {
+      study = await auth.user.studies()
+        .with('jobs')
+        .firstOrFail(id)
+    } catch (e) {
+      return response.notFound({ message: `Could not find study with ID ${id}` })
+    }
+    try {
+      await study.jobs().where('order', '>', index).update('order', `order + ${jobs.length}`)
+    } catch (e) {
+      return response.badRequest('Unable to insert jobs: ' + e)
+    }
   }
 
   /**
