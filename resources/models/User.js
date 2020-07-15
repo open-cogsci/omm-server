@@ -11,12 +11,6 @@ export default class User extends Model {
     baseURL: USERS
   }
 
-  static state () {
-    return {
-      types: []
-    }
-  }
-
   static fetch (config) {
     return this.api().get('', config)
   }

@@ -113,9 +113,8 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { USERS } from '@/assets/js/endpoints'
 import { processErrors } from '@/assets/js/errorhandling'
-import User from '@/models/User'
+import UserType from '@/models/UserType'
 
 export default {
   name: 'DefaultLayout',
@@ -159,8 +158,7 @@ export default {
 
     // Get possible user types
     try {
-      const response = await this.$axios.get(`${USERS}/types`)
-      User.commit((state) => { state.types = response.data.data })
+      await UserType.fetch()
     } catch (e) {
       processErrors(e, this.notify)
     }

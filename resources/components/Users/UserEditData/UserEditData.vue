@@ -32,6 +32,8 @@
         <v-select
           v-model="userData.user_type_id"
           label="User type"
+          item-text="name"
+          item-value="id"
           :error-messages="errors.user_type_id"
           :items="types"
           :disabled="user.id === $auth.user.id"
@@ -68,7 +70,7 @@
 <script>
 import { isEmpty, isLength, isEmail } from 'validator'
 import { isEqual, omit } from 'lodash'
-import { mapState } from 'vuex'
+import UserType from '@/models/UserType'
 
 const EMPTY_VALUES = {
   name: '',
@@ -116,7 +118,9 @@ export default {
     }
   },
   computed: {
-    ...mapState('entities/users', ['types'])
+    types () {
+      return UserType.all()
+    }
   },
   methods: {
     dataChanged () {

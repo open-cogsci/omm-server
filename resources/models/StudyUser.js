@@ -1,7 +1,7 @@
 import { Model } from '@vuex-orm/core'
 
 export default class StudyUser extends Model {
-  static entity = 'studyUser'
+  static entity = 'study_user'
 
   static primaryKey = ['study_id', 'user_id']
 
