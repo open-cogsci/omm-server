@@ -7,7 +7,11 @@
 
 <script>
 import { mapActions } from 'vuex'
+
 import Study from '@/models/Study'
+import User from '@/models/User'
+
+import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   components: {
@@ -21,26 +25,33 @@ export default {
   computed: {
     studies () {
       return Study.query()
+        .whereHas('users', (q) => {
+          q.where('id', this.$auth.user.id)
+        })
         .where('active', false)
         .orderBy('created_at', 'desc')
         .get()
     }
   },
   created () {
-    this.fetch()
+    this.loadStudies()
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async fetch () {
+    async loadStudies () {
       this.loading = true
       try {
-        await Study.fetch({ params: { active: false } })
-      } catch (e) {
-        const msg = e?.response?.data?.error?.message || e?.response?.data
-        this.notify({
-          message: msg || 'Unspecified error',
-          color: 'error'
+        const response = await Study.fetch({ params: { active: false } })
+        // Attach studies to local representation of logged in user.
+        User.insertOrUpdate({
+          where: this.$auth.user.id,
+          data: {
+            id: this.$auth.user.id,
+            studies: response.entities.studies
+          }
         })
+      } catch (e) {
+        processErrors(e, this.notify)
       }
       this.loading = false
     }

@@ -22,6 +22,7 @@ import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
 import Study from '@/models/Study'
+import User from '@/models/User'
 
 export default {
   components: {
@@ -39,20 +40,31 @@ export default {
   computed: {
     studies () {
       return Study.query()
+        .whereHas('users', (q) => {
+          q.where('id', this.$auth.user.id)
+        })
         .where('active', true)
         .orderBy('created_at', 'desc')
         .get()
     }
   },
   created () {
-    this.loadStudies()
+    return this.loadStudies()
   },
   methods: {
     ...mapActions('notifications', ['notify']),
     async loadStudies () {
       this.loading = true
       try {
-        await Study.fetch()
+        const response = await Study.fetch()
+        // Attach studies to local representation of logged in user.
+        User.insertOrUpdate({
+          where: this.$auth.user.id,
+          data: {
+            id: this.$auth.user.id,
+            studies: response.entities.studies
+          }
+        })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {

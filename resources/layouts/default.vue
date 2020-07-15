@@ -114,6 +114,7 @@
 <script>
 import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
+import User from '@/models/User'
 import UserType from '@/models/UserType'
 
 export default {
@@ -159,6 +160,7 @@ export default {
     // Get possible user types
     try {
       await UserType.fetch()
+      User.insertOrUpdate({ data: this.$auth.user })
     } catch (e) {
       processErrors(e, this.notify)
     }
