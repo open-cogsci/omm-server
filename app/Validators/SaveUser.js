@@ -2,7 +2,14 @@
 
 class SaveUser {
   get rules () {
-    const id = this.ctx.params.id || this.ctx.auth.current.user.id
+    let id = this.ctx.params.id
+
+    // Don't check for uniqueness of email address if a user updates
+    // his or her own profile
+    if (!id && this.ctx.request.url().includes('/auth/user')) {
+      id = this.ctx.auth.current.user.id
+    }
+
     return {
       name: 'required|max:50',
       email: `required|email|unique:users,email,id,${id}`,

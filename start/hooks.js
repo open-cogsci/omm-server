@@ -14,8 +14,17 @@ hooks.before.providersBooted(() => {
       return
     }
 
-    const [table, column] = args
-    const row = await Database.table(table).where(column, value).first()
+    // Check if the value 'column' exists in 'table'.
+    // Only where 'constraintField' has 'constraintValue' (if indicated)
+
+    const [table, column, constraintField, constraintValue] = args
+    const query = Database.table(table).where(column, value)
+
+    if (!!constraintField && !!constraintValue) {
+      query.where(constraintField, constraintValue)
+    }
+
+    const row = await query.first()
 
     if (!row) {
       throw message

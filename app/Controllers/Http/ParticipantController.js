@@ -338,7 +338,12 @@ class ParticipantController {
   */
   async announce ({ params, transform, response }) {
     const { identifier } = params
-    const ptcp = await Participant.findByOrFail('identifier', identifier)
+    let ptcp
+    try {
+      ptcp = await Participant.findByOrFail('identifier', identifier)
+    } catch (e) {
+      return response.notFound({ message: `No participant found for identifier ${identifier}.` })
+    }
 
     if (!ptcp.active) {
       return response.preconditionFailed({ message: 'Participant is not active' })
@@ -354,7 +359,7 @@ class ParticipantController {
         .withPivot(['status_id'])
         .firstOrFail()
     } catch (e) {
-      return response.notFound({
+      return response.requestedRangeNotSatisfiable({
         message: `No study available to perform for participant with identifier ${identifier}`
       })
     }
@@ -375,37 +380,51 @@ class ParticipantController {
 
   async fetchJob ({ params, transform, response }) {
     const { identifier, studyID } = params
-    const ptcp = await Participant.findByOrFail('identifier', identifier)
+    let ptcp
+    try {
+      ptcp = await Participant.findByOrFail('identifier', identifier)
+    } catch (e) {
+      return response.notFound({ message: `No participant found for identifier ${identifier}.` })
+    }
 
     if (!ptcp.active) {
-      return response.preconditionFailed({ message: 'Participant is not active' })
+      return response.preconditionFailed({ message: 'Participant is not active.' })
     }
 
-    const study = await ptcp.studies().where('studies.id', studyID).first()
-    if (study === null) {
-      return response.notFound({ message: `The study with ${studyID} could not be found` })
+    let study
+    try {
+      study = await ptcp.studies().where('studies.id', studyID).firstOrFail()
+    } catch (e) {
+      return response.notFound({ message: `The study with ${studyID} could not be found.` })
     }
 
-    const job = await ptcp.jobs()
-      .where('study_id', study.id)
-      .whereInPivot('status_id', [1, 2])
-      .withPivot(['status_id'])
-      .with('variables.dtype')
-      .orderBy('pivot_status_id', 'desc')
-      .orderBy('order', 'asc')
-      .first()
-
-    if (job === null) {
-      return response.notFound({
-        message: `There are no jobs available for participant with identifier ${identifier}.`
+    let job
+    try {
+      job = await ptcp.jobs()
+        .where('study_id', study.id)
+        .whereInPivot('status_id', [1, 2])
+        .withPivot(['status_id'])
+        .with('variables.dtype')
+        .orderBy('pivot_status_id', 'desc')
+        .orderBy('order', 'asc')
+        .firstOrFail()
+    } catch (e) {
+      return response.requestedRangeNotSatisfiable({
+        message: `No job could be fetched for participant with identifier ${identifier}.`
       })
     }
 
-    // Set status of job from pending to started
+    // Change the status of the job from pending to started
     if (job.pivot_status_id === 1) {
-      await ptcp.jobs().pivotQuery()
-        .where('job_id', job.id)
-        .update({ status_id: 2 })
+      try {
+        await ptcp.jobs().pivotQuery()
+          .where('job_id', job.id)
+          .update({ status_id: 2 })
+      } catch (e) {
+        return response.internalServerError({
+          message: 'Could not update status of the job.'
+        })
+      }
     }
 
     return transform.item(job, 'JobTransformer')

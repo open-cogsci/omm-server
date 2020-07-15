@@ -4,12 +4,12 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
-const isArray = require('lodash/isArray')
-const isNan = require('lodash/isNan')
-
 /**
  * Resourceful controller for interacting with studies
  */
+
+const Study = use('App/Models/Study')
+
 class StudyController {
   /**
   * @swagger
@@ -338,37 +338,103 @@ class StudyController {
   // }
 
   /**
+  * @swagger
+  * /studies/{id}/jobs:
+  *   post:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Inserts new jobs at the specified position in the job table.
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         type: integer
+  *         required: true
+  *         description: The ID of the study to insert the jobs for.
+  *       - in: body
+  *         name: data
+  *         description: The jobs data to persist
+  *         schema:
+  *           type: object
+  *           properties:
+  *             at:
+  *               type: integer
+  *               minimum: 1
+  *               description: The position in the table to insert the jobs at.
+  *               example: 4
+  *             jobs:
+  *               type: array
+  *               items:
+  *                 type: object
+  *                 properties:
+  *                   field:
+  *                     type: string
+  *                     description: The variable field name (must exist in the variables table for the current study).
+  *                     example: distractor
+  *                   value:
+  *                     type: string
+  *                     description: The value of the variable for the current job.
+  *                     example: present
+  *     responses:
+  *       201:
+  *         description: OK
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/Job'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * CREATE jobs (insert)
    *
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  async insertJobs ({ auth, params, request, response }) {
+  async insertJobs ({ auth, params, request, response, transform }) {
     const { id } = params
     const index = parseInt(request.input('at'))
-    const jobs = request.input('jobs', [])
+    const jobs = request.input('jobs')
 
-    if (isNan(index)) {
-      return response.badRequest({ message: 'Invalid specification of start index' })
-    }
-
-    if (!isArray(jobs) || jobs.length === 0) {
-      return response.badRequest({ message: 'Invalid specification of jobs' })
-    }
-
-    let study
+    // Determine if the study exists and fetch it.
+    let study, variables, jobRecords
     try {
-      study = await auth.user.studies()
-        .with('jobs')
-        .firstOrFail(id)
+      study = await Study.query().with('jobs').firstOrFail(id)
     } catch (e) {
       return response.notFound({ message: `Could not find study with ID ${id}` })
     }
+
     try {
-      await study.jobs().where('order', '>', index).update('order', `order + ${jobs.length}`)
+      variables = await study.variables().pair('name', 'id')
     } catch (e) {
-      return response.badRequest('Unable to insert jobs: ' + e)
+      return response.internalServerError({ message: 'Failed to fetch study variables' })
     }
+
+    // Move over the old jobs, by incrementing their order value with the new jobs' length.
+    try {
+      await study.jobs().where('order', '>=', index).increment('order', jobs.length)
+    } catch (e) {
+      return response.badRequest('Unable to move previous jobs to new index: ' + e)
+    }
+
+    try {
+      jobRecords = await study.jobs().createAll(jobs)
+    } catch (e) {
+      return response.internalServerError({ message: 'Unable to save jobs' })
+    }
+
+    return transform.collection(jobRecords, 'JobTransformer')
   }
 
   /**

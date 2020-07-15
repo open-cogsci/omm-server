@@ -56,7 +56,9 @@ Route.group(() => {
 
   // CREATE:
   // The client inserts a list of jobs into the job table of the server.
-  Route.post('/studies/:id/jobs', 'StudyController.insertJobs').as('jobs.insert_sequence')
+  Route.post('/studies/:id/jobs', 'StudyController.insertJobs')
+    .as('jobs.insert_sequence')
+    .validator('InsertJobs')
 
   // READ:
   // The client gets a list of jobs from the server. This is not for running the jobs. Rather, it allows

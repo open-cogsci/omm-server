@@ -114,6 +114,7 @@ class UserController {
         data: user
       })
     } catch (error) {
+      console.log(error)
       return response.status(400).json({
         message: 'There was a problem creating the user, please try again later.'
       })
@@ -691,11 +692,7 @@ class UserController {
    */
   async userTypes ({ response }) {
     try {
-      const idsAndNames = await UserType.pair('id', 'name')
-      const data = Object.entries(idsAndNames).map(([id, name]) => ({
-        value: parseInt(id),
-        text: capitalize(name)
-      }))
+      const data = await UserType.all()
       return { data }
     } catch (e) {
       return response.status(400).json({ message: 'Could not fetch user types' })
