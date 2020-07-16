@@ -2,6 +2,8 @@
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
+const Job = use('App/Models/Job')
+
 /**
 *  @swagger
 *  definitions:
@@ -90,6 +92,41 @@ class Study extends Model {
     return this
       .belongsToMany('App/Models/Participant')
       .pivotModel('App/Models/Participation')
+  }
+
+  /**
+   * Walks through the list of jobs specified as a collection of key:value pairs in an object
+   * and transform them so that they can easily be stored in the
+   * database. Additionally check if the supplied variable name exists for this study.
+   *
+   * @param {Array} jobsData The jobs to transform
+   * @returns {Array}
+   * @memberof Job
+   */
+  async saveJobsFromInput (jobsData) {
+    // Obtain the list of variables that are used for this study.
+    const variables = await this.variables().pair('name', 'id')
+    const varsList = Object.keys(variables)
+
+    // TODO: this procedure can undoubtedly be optimized by using a database transaction. This allows us
+    // to create the job at the start of the map() function, and enable us to implement everything
+    // in a single loop, instead of two.
+    const jobs = await Promise.all(jobsData.map(async (jobData) => {
+      // Check if all variables exists for this study
+      for (const varName of Object.keys(jobData)) {
+        if (!varsList.includes(varName)) {
+          throw new Error(`Variable '${varName}' does not exist for this study.`)
+        }
+      }
+      // Create the job
+      const job = await this.jobs().create({})
+      // Attach the job to the variables using the specified values
+      for (const [varName, varValue] of Object.entries(jobData)) {
+        await job.variables().attach(variables[varName], (row) => { row.value = varValue })
+      }
+      return job
+    }))
+    return jobs
   }
 }
 

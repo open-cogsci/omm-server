@@ -66,7 +66,9 @@ Route.group(() => {
   // By default, the endpoint returns all the jobs of the current study. With optional from and to
   // query params (e.g. GET /studies/2/jobs?from=5&to=10) this can be limited to a subset of the jobs.
   // The id parameter is the study ID to retrieve the jobs from.
-  Route.get('/studies/:id/jobs', 'StudyController.fetchJobs').as('jobs.get_sequence')
+  Route.get('/studies/:id/jobs', 'StudyController.fetchJobs')
+    .as('jobs.get_sequence')
+    .validator('FetchJobs')
 
   // UPDATE:
   // The client changes the state of a list of jobs on the server. This is convenience operation which
