@@ -20,7 +20,7 @@
     "@adonisjs/fold": "^4.0.5",
     "@adonisjs/framework": "^4.0.27",
     "@adonisjs/ignitor": "^1.0.14",
-    "@adonisjs/lucid": "^5.0.4",
+    "@adonisjs/lucid": "^6.2.0",
     "@adonisjs/session": "^1.0.19",
     "@adonisjs/shield": "^1.0.4",
     "@adonisjs/validator": "^5.0.6",
@@ -61,8 +61,8 @@
     "jest-serializer-vue": "^2.0.2",
     "jest-transform-stub": "^2.0.0",
     "nodemon": "^2.0.4",
-    "ts-jest": "^26.1.2",
-    "typescript": "^3.9.6",
+    "ts-jest": "^26.1.3",
+    "typescript": "^3.9.7",
     "vue-jest": "^3.0.6"
   }
 }
