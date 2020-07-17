@@ -378,6 +378,38 @@ class ParticipantController {
     return transform.item(study, 'StudyTransformer')
   }
 
+  /**
+  * @swagger
+  * /participants/{identifier}/{studyID}/fetchjob:
+  *   get:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         The client asks the server the next job in line.
+  *     parameters:
+  *       - in: path
+  *         name: identifier
+  *         description: the identifier code of the participant.
+  *         required: true
+  *         type: string
+  *       - in: path
+  *         name: studyID
+  *         description: the study ID from which to fetch a job.
+  *         required: true
+  *         type: integer
+  *     responses:
+  *       200:
+  *         description: The current job in line
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/JobWithRelations'
+  *       404:
+  *         description: The participant with the specified identifier was not found or there is no
+  *                      job in line for the participant.
+  *       412:
+  *         description: The specified participant is marked as inactive.
+  */
   async fetchJob ({ params, transform, response }) {
     const { identifier, studyID } = params
     let ptcp
@@ -406,7 +438,7 @@ class ParticipantController {
         .withPivot(['status_id'])
         .with('variables.dtype')
         .orderBy('pivot_status_id', 'desc')
-        .orderBy('order', 'asc')
+        .orderBy('position', 'asc')
         .firstOrFail()
     } catch (e) {
       return response.requestedRangeNotSatisfiable({
@@ -490,7 +522,7 @@ class ParticipantController {
       .withPivot(['status_id'])
       .with('variables.dtype')
       .orderBy('pivot_status_id', 'desc')
-      .orderBy('order', 'asc')
+      .orderBy('position', 'asc')
       .first()
 
     if (job === null) {

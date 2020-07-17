@@ -2,7 +2,6 @@
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
-const Job = use('App/Models/Job')
 
 /**
 *  @swagger
@@ -101,7 +100,7 @@ class Study extends Model {
    *
    * @param {Array} jobsData The jobs to transform
    * @returns {Array}
-   * @memberof Job
+   * @memberof Study
    */
   async saveJobsFromInput (jobsData) {
     // Obtain the list of variables that are used for this study.

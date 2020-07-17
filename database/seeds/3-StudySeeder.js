@@ -22,7 +22,7 @@ async function createCaptureJobs (study) {
 
   for (const [key, value] of Object.entries(['present', 'absent'])) {
     const job = await study.jobs().create({
-      order: parseInt(key) + 1
+      position: parseInt(key) + 1
     })
 
     await job.variables().attach([distractorVariable.id], (row) => {

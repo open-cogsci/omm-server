@@ -114,7 +114,6 @@ class UserController {
         data: user
       })
     } catch (error) {
-      console.log(error)
       return response.status(400).json({
         message: 'There was a problem creating the user, please try again later.'
       })
@@ -507,21 +506,26 @@ class UserController {
    * @param {Response} ctx.response
    */
   async login ({ request, auth, response }) {
+    const { email, password } = request.only(['email', 'password'])
+
+    const user = User.findBy('email', email)
+    if (user && !user.active) {
+      response.unauthorized({
+        message: 'Your account has been suspended. Please contact your administrator'
+      })
+    }
+
     try {
       // validate the user credentials and generate a JWT token
       const token = await auth
         .withRefreshToken()
-        .attempt(
-          request.input('email'),
-          request.input('password')
-        )
+        .attempt(email, password)
 
-      return response.json({
-        status: 'success',
+      return response.status(202).json({
         data: token
       })
     } catch (error) {
-      response.status(400).json({
+      response.badRequest({
         message: 'Invalid email/password'
       })
     }

@@ -5,7 +5,6 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Study = use('App/Models/Study')
-const isInteger = require('lodash/isInteger')
 
 /**
  * Resourceful controller for interacting with studies
@@ -160,18 +159,18 @@ class StudyController {
   async show ({ params, auth, response, transform }) {
     let study
     try {
-      study = await auth.user.studies()
+      study = await auth.user
+        .studies()
         .where('id', params.id)
         .with('jobs.variables.dtype')
         .with('participants')
         .firstOrFail()
     } catch (e) {
-      response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
-      return
+      return response.notFound({ message: `Study with ID:${params.id} could not be found` })
     }
 
     return transform
-      .include('jobs')
+      .include('jobs,participants')
       .item(study, 'StudyTransformer')
   }
 
@@ -434,7 +433,7 @@ class StudyController {
 
     // Move the old jobs to new positions, by incrementing their order value with the new jobs' length.
     try {
-      await study.jobs().where('order', '>=', index).increment('order', jobsData.length)
+      await study.jobs().where('position', '>=', index).increment('position', jobsData.length)
     } catch (e) {
       return response.internalServerError('Unable to move previous jobs to new index: ' + e)
     }
@@ -519,12 +518,12 @@ class StudyController {
 
     const query = Study.query().where('id', id).with('participants').with('jobs', (query) => {
       if (from) {
-        query.where('order', '>=', from)
+        query.where('position', '>=', from)
       }
       if (to) {
-        query.where('order', '<', to)
+        query.where('position', '<', to)
       }
-      query.orderBy('order', 'asc')
+      query.orderBy('position', 'asc')
       query.with('variables')
     })
 

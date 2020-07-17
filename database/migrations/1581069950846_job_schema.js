@@ -8,7 +8,7 @@ class JobSchema extends Schema {
     this.create('jobs', (table) => {
       table.increments()
       table.integer('study_id').unsigned().notNullable()
-      table.integer('order').unsigned()
+      table.integer('position').unsigned()
       table.timestamps()
 
       table.foreign('study_id').references('id').inTable('studies')
