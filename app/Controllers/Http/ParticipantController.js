@@ -354,7 +354,7 @@ class ParticipantController {
       // First find studies that are in progress, then select pending studies.
       study = await ptcp.studies()
         .whereInPivot('status_id', [1, 2])
-        .orderBy('status_id', 'asc')
+        .orderBy('status_id', 'desc')
         .orderBy('created_at', 'asc')
         .withPivot(['status_id'])
         .firstOrFail()
@@ -365,7 +365,7 @@ class ParticipantController {
     }
 
     // Set studies status from pending to in progress
-    if (study.status_id === 1) {
+    if (study.pivot_status_id === 1) {
       try {
         await ptcp.studies().pivotQuery()
           .where('study_id', study.id)
@@ -534,7 +534,7 @@ class ParticipantController {
     return {
       data: {
         study_id: job.study_id,
-        current_job_index: job.order
+        current_job_index: job.position
       }
     }
   }
