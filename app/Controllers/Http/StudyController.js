@@ -4,7 +4,11 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
+const Database = use('Database')
 const Study = use('App/Models/Study')
+const Participant = use('App/Models/Participant')
+
+const isInteger = require('lodash/isInteger')
 
 /**
  * Resourceful controller for interacting with studies
@@ -423,32 +427,38 @@ class StudyController {
       })
     }
 
-    // Walk through the list of jobs and transform them so that they can easily be stored in the
-    // database. Additionally check if the supplied variable name exists for this study.
     try {
-      jobs = await study.saveJobsFromInput(jobsData)
-    } catch (e) {
-      return response.badRequest({ message: e.toString() })
-    }
+      await Database.transaction(async (trx) => {
+        // Walk through the list of jobs and transform them so that they can easily be stored in the
+        // database. Additionally check if the supplied variable name exists for this study.
+        jobs = await study.saveJobsFromInput(jobsData, trx)
 
-    // Move the old jobs to new positions, by incrementing their order value with the new jobs' length.
-    try {
-      await study.jobs().where('position', '>=', index).increment('position', jobsData.length)
-    } catch (e) {
-      return response.internalServerError('Unable to move previous jobs to new index: ' + e)
-    }
-    // Get a list of IDS of participants associated with the study to associate these participants
-    // with the new jobs too in the next step.
-    const ptcpIDs = study.getRelated('participants').rows.map(ptcp => ptcp.id)
+        // Move the old jobs to new positions, by incrementing their order value with the new jobs' length.
+        // await study.jobs().where('position', '>=', index).increment('position', jobsData.length)
+        await trx.table('jobs')
+          .where('study_id', id)
+          .where('position', '>=', index)
+          .increment('position', jobsData.length)
+        // Get a list of IDS of participants associated with the study to associate these participants
+        // with the new jobs too in the next step.
+        const ptcpIDs = study.getRelated('participants').rows.map(ptcp => ptcp.id)
 
-    // Assign positions to jobs and assign them to participants of study too.
-    for (const [pos, job] of jobs.entries()) {
-      job.order = index + pos
-      if (ptcpIDs.length > 0) {
-        job.participants().attach(ptcpIDs)
+        // Assign positions to jobs and assign them to participants of study too.
+        for (const [pos, job] of jobs.entries()) {
+          job.position = index + pos
+          if (ptcpIDs.length > 0) {
+            await job.participants().attach(ptcpIDs, null, trx)
+          }
+        }
+        await study.jobs().saveMany(jobs, trx)
+      })
+    } catch (e) {
+      let code = 500
+      if (['ReferenceError'].includes(e.name)) {
+        code = 400 // BadRequest
       }
+      return response.status(code).json({ message: e.toString() })
     }
-    await study.jobs().saveMany(jobs)
 
     return transform.collection(jobs, 'JobTransformer')
   }
@@ -524,7 +534,7 @@ class StudyController {
         query.where('position', '<', to)
       }
       query.orderBy('position', 'asc')
-      query.with('variables')
+      query.with('variables.dtype')
     })
 
     let study
@@ -539,16 +549,140 @@ class StudyController {
   }
 
   /**
-   * UPDATE jobs
+  * @swagger
+  * /studies/{id}/jobs/state:
+  *   put:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Sets the state of the specified studies
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         type: integer
+  *         required: true
+  *         description: The ID of the study to which the jobs belong
+  *       - in: body
+  *         name: data
+  *         description: >
+  *           The range of jobs to change the state for. The 'from'
+  *           and 'to' properties specify the range (i.e. positions) of jobs to change the state for,
+  *           and start counting at 1 (e.g. positions are 1-indexed).
+  *         schema:
+  *           type: object
+  *           properties:
+  *             from:
+  *               type: integer
+  *               minimum: 1
+  *               description: The start position of the job range.
+  *               example: 1
+  *               required: true
+  *             to:
+  *               type: integer
+  *               minimum: 2
+  *               description: The end position of the job range (not inclusive).
+  *               example: 3
+  *               required: true
+  *             state:
+  *               type: integer
+  *               description: The state to set where 1=pending, 2=started, and 3=finished.
+  *               example: 2
+  *               required: true
+  *             participant:
+  *               type: string
+  *               description: The participant identifier to change the states for
+  *               example: zxc123
+  *     responses:
+  *       200:
+  *         description: The jobs states have been updated
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
+   * Set job states
    *
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  updateJobs ({ params, request }) {
-    const message = `Called updateJobs with studyID ${params.id}`
-    const jobs = request.input('jobs', [])
-    return { message, jobs }
+  async setJobStates ({ params, request, response }) {
+    const { id } = params
+    const { from, to, state, participant } = request.all()
+
+    if (to && from && to <= from) {
+      return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
+    }
+
+    try {
+      await Participant.findByOrFail('identifier', participant)
+    } catch (e) {
+      return response.notFound({ message: `No participant found with identifier ${participant}` })
+    }
+
+    let rowsUpdated = 0
+    try {
+      await Database.transaction(async (trx) => {
+        const query = trx.table('job_states')
+          .leftJoin('jobs', 'job_states.job_id', 'jobs.id')
+          .leftJoin('studies', 'jobs.study_id', 'studies.id')
+          .where('studies.id', id)
+          .whereBetween('jobs.position', [from, (to - 1)])
+        if (participant) {
+          query.leftJoin('participants', 'job_states.participant_id', 'participants.id')
+          query.where('participants.identifier', participant)
+        }
+        rowsUpdated = await query.update({ status_id: state })
+      })
+    } catch (e) {
+      return response.badRequest(e.toString())
+    }
+    return response.json({
+      data: { jobs_updated: rowsUpdated }
+    })
   }
+
+  /**
+  * @swagger
+  * /studies/{id}/jobs/{from}/{to}:
+  *   delete:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Sets the state of the specified studies
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         type: integer
+  *         required: true
+  *         description: The ID of the study to which the jobs belong
+  *       - in: path
+  *         name: from
+  *         type: integer
+  *         required: true
+  *         description: The start position of the range of jobs to delete
+  *       - in: path
+  *         name: to
+  *         type: integer
+  *         required: true
+  *         description: The end position of the range of jobs to delete (not inclusive)
+  *     responses:
+  *       200:
+  *         description: The jobs states have been updated
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *       default:
+  *         description: Unexpected error
+  */
 
   /**
    * DELETE jobs
@@ -556,14 +690,30 @@ class StudyController {
    * @param {*} { params, request, response }
    * @memberof StudyController
    */
-  deleteJobs ({ params, request }) {
-    const studyID = params.id
-    const jobStart = params.from
-    const jobEnd = params.to
+  async deleteJobs ({ params, response }) {
+    const { id } = params
+    const from = parseInt(params.from)
+    const to = parseInt(params.to)
 
-    let message = `Called deleteJobs with studyID ${studyID}`
-    message += ` with jobindex from ${jobStart} to ${jobEnd}`
-    return { message }
+    if (!isInteger(from) || !isInteger(to) || from <= 0 || to <= 0) {
+      return response.badRequest({
+        message: 'Provide from and to parameters as integers above 0'
+      })
+    }
+
+    if (to <= from) {
+      return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
+    }
+
+    const study = await Study.findOrFail(id)
+    const rowsDeleted = await study.jobs().whereBetween('position', [from, (to - 1)]).delete()
+
+    // Shift the positions of any studies above the deleted range down the number of deleted items.
+    await study.jobs().where('position', '>=', to).decrement('position', rowsDeleted)
+
+    return {
+      data: { jobs_deleted: rowsDeleted }
+    }
   }
 }
 

@@ -4,14 +4,14 @@ class FetchJobs {
   get rules () {
     return {
       from: 'integer|above:0',
-      to: 'integer|above:1'
+      to: 'integer|above:0'
     }
   }
 
   get messages () {
     return {
       'from.integer': 'From parameter is not an integer',
-      'from.above': 'From parameter cannot be lower than 0',
+      'from.above': 'From parameter cannot be lower than 1',
       'to.integer': 'To parameter is not an integer',
       'to.above': 'To parameter cannot be lower than 1'
     }

@@ -47,8 +47,8 @@ Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
 
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
-  Route.get('/participants/:identifier/:studyID/fetchjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
-  Route.get('/participants/:identifier/:studyID/jobindex', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
+  Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
+  Route.get('/participants/:identifier/:studyID/currentjob_idx', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
 
   Route.patch('/participants/:identifier/:jobID/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
 
@@ -73,7 +73,9 @@ Route.group(() => {
   // UPDATE:
   // The client changes the state of a list of jobs on the server. This is convenience operation which
   // could also be done by getting jobs, changing them, removing them, and finally inserting them again.
-  Route.patch('/studies/:id/jobs', 'StudyController.updateJobs').as('jobs.update_sequence')
+  Route.put('/studies/:id/jobs/state', 'StudyController.setJobStates')
+    .as('jobs.set_states')
+    .validator('SetJobStates')
 
   // DELETE:
   // The client deletes a list of jobs in the job table of the server. The index parameters are specified

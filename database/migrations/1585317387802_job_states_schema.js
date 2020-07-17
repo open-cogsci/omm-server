@@ -12,8 +12,8 @@ class JobStatesSchema extends Schema {
       table.specificType('data', 'json')
       table.timestamps()
 
-      table.foreign('participant_id').references('id').inTable('participants')
-      table.foreign('job_id').references('id').inTable('jobs')
+      table.foreign('participant_id').references('id').inTable('participants').onDelete('cascade')
+      table.foreign('job_id').references('id').inTable('jobs').onDelete('cascade')
       table.foreign('status_id').references('id').inTable('job_statuses')
 
       table.primary(['participant_id', 'job_id'])

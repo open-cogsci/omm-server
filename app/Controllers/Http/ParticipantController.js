@@ -380,7 +380,7 @@ class ParticipantController {
 
   /**
   * @swagger
-  * /participants/{identifier}/{studyID}/fetchjob:
+  * /participants/{identifier}/{studyID}/currentjob:
   *   get:
   *     tags:
   *       - Jobs
@@ -464,7 +464,7 @@ class ParticipantController {
 
   /**
   * @swagger
-  * /participants/{identifier}/{studyID}/jobindex:
+  * /participants/{identifier}/{studyID}/currentjob_idx:
   *   get:
   *     tags:
   *       - Jobs

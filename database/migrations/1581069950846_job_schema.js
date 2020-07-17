@@ -12,6 +12,7 @@ class JobSchema extends Schema {
       table.timestamps()
 
       table.foreign('study_id').references('id').inTable('studies')
+      table.unique(['study_id', 'position'])
     })
   }
 

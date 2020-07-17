@@ -11,8 +11,8 @@ class JobFieldValuesSchema extends Schema {
       table.text('value')
       table.timestamps()
 
-      table.foreign('variable_id').references('id').inTable('variables')
-      table.foreign('job_id').references('id').inTable('jobs')
+      table.foreign('variable_id').references('id').inTable('variables').onDelete('cascade')
+      table.foreign('job_id').references('id').inTable('jobs').onDelete('cascade')
       table.primary(['variable_id', 'job_id'])
     })
   }

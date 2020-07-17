@@ -12,8 +12,8 @@ class StudyUserSchema extends Schema {
       table.boolean('is_owner').notNullable().defaultTo(false)
       table.timestamps()
 
-      table.foreign('user_id').references('id').inTable('users')
-      table.foreign('study_id').references('id').inTable('studies')
+      table.foreign('user_id').references('id').inTable('users').onDelete('cascade')
+      table.foreign('study_id').references('id').inTable('studies').onDelete('cascade')
       table.foreign('access_permission_id').references('id').inTable('access_permissions')
 
       table.primary(['user_id', 'study_id'])

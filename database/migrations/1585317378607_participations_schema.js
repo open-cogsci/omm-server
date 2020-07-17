@@ -12,8 +12,8 @@ class ParticipationsSchema extends Schema {
       table.integer('status_id').unsigned().notNullable().defaultTo(1)
       table.timestamps()
 
-      table.foreign('participant_id').references('id').inTable('participants')
-      table.foreign('study_id').references('id').inTable('studies')
+      table.foreign('participant_id').references('id').inTable('participants').onDelete('cascade')
+      table.foreign('study_id').references('id').inTable('studies').onDelete('cascade')
       table.foreign('status_id').references('id').inTable('participation_statuses')
     })
   }
