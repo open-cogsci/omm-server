@@ -28,9 +28,11 @@
                 :loading-user="loadingUser"
                 :saving="saving"
                 :deleting="deleting"
+                :resending="resending"
                 :errors.sync="errors"
                 @update-user="saveUser"
                 @delete-user="deleteUser"
+                @resend-email="resendAccountEmail"
                 @load-user="loadUser"
               />
             </v-skeleton-loader>
@@ -78,6 +80,7 @@ export default {
       loading: false,
       loadingUser: 0,
       deleting: false,
+      resending: false,
       fabVisible: false,
       errors: {}
     }
@@ -126,13 +129,13 @@ export default {
     /**
      *  Save a user
      */
-    async saveUser (ptcpData) {
+    async saveUser (userData) {
       this.saving = true
       try {
-        await User.persist(pick(ptcpData,
-          ['$id', 'id', 'name', 'email', 'password', 'user_type_id', 'active']))
+        await User.persist(pick(userData,
+          ['$id', 'id', 'name', 'email', 'password', 'user_type_id', 'account_status']))
         this.notify({ message: 'User has been saved', color: 'success' })
-        if (ptcpData.id) {
+        if (userData.id) {
           this.$refs.list.clearEditing()
         } else {
           this.dialog = false
@@ -145,17 +148,31 @@ export default {
       }
     },
     /*
-    *
+    * Delete a user
     */
-    async deleteUser (ptcpID) {
+    async deleteUser (id) {
       this.deleting = true
       try {
-        await User.destroy(ptcpID)
+        await User.destroy(id)
         this.notify({ message: 'User has been deleted', color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       } finally {
         this.deleting = false
+      }
+    },
+    /**
+     * Resend email containing user password
+     */
+    async resendAccountEmail (userId) {
+      this.resending = true
+      try {
+        await User.resendAccountEmail(userId)
+        this.notify({ message: 'Account info e-mail has been resent', color: 'success' })
+      } catch (e) {
+        this.errors = processErrors(e, this.notify)
+      } finally {
+        this.resending = false
       }
     },
     /**

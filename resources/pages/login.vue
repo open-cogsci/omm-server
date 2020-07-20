@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title>
+    <v-card-title class="justify-center">
       <v-img
         :src="require('@/assets/img/cogsci.png')"
         max-height="40"
@@ -11,36 +11,37 @@
       <span class="display-1 font-weight-light">Open Monkey Mind</span>
     </v-card-title>
     <v-card-text>
-      <h1 class="text-center subtitle-1">
+      <p class="text-center">
         {{ $t('login.signin') }}
-      </h1>
+      </p>
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-row>
           <v-col cols="12">
             <v-text-field
               v-model="email"
               :rules="validation.email"
+              :error-messages="errors.uid"
               validate-on-blur
               :label="$t('login.fields.email.label')"
+              @input="removeErrors('uid')"
             />
           </v-col>
           <v-col cols="12">
             <v-text-field
               v-model="password"
-              :rules="validation.password"
               type="password"
+              :rules="validation.password"
+              :error-messages="errors.password"
               :label="$t('login.fields.password.label')"
+              @input="removeErrors('password')"
             />
           </v-col>
         </v-row>
       </v-form>
-      <v-alert v-if="error" type="error">
-        {{ error }}
-      </v-alert>
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn :to="localePath({name : 'password'})" nuxt v-text="$t('login.buttons.recover')" />
+      <v-btn :to="localePath({name : 'password-recover'})" nuxt v-text="$t('login.buttons.recover')" />
       <v-btn
         :disabled="!valid"
         :loading="authenticating"
@@ -58,6 +59,7 @@
 
 <script>
 import { isEmpty, isEmail } from 'validator'
+import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   layout: 'guest',
@@ -69,7 +71,7 @@ export default {
       email: '',
       password: '',
       valid: true,
-      error: '',
+      errors: {},
       validation: {
         email: [
           v => !isEmpty(v) || this.$t('login.fields.email.validation.empty'),
@@ -99,14 +101,20 @@ export default {
       try {
         await this.$auth.loginWith('local', {
           data: {
-            email: this.email,
+            uid: this.email,
             password: this.password
           }
         })
       } catch (e) {
-        this.error = e.response?.data?.message || e + ''
+        this.errors = processErrors(e)
       }
       this.authenticating = false
+    },
+    removeErrors (field) {
+      this.errors = {
+        ...this.errors,
+        [field]: ''
+      }
     }
   },
   head () {

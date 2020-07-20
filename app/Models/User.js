@@ -1,6 +1,7 @@
 'use strict'
 
 const Model = use('Model')
+
 /**
 *  @swagger
 *  definitions:

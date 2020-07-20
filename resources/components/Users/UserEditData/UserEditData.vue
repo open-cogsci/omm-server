@@ -22,13 +22,6 @@
           label="Email address"
           @input="removeErrors('email')"
         />
-        <v-text-field
-          v-model="userData.password"
-          :error-messages="errors.password"
-          label="Password"
-          :disabled="user.id === $auth.user.id"
-          @input="removeErrors('email')"
-        />
         <v-select
           v-model="userData.user_type_id"
           label="User type"
@@ -38,11 +31,30 @@
           :items="types"
           :disabled="user.id === $auth.user.id"
         />
-        <v-switch
-          v-model="userData.active"
-          label="Active"
-          :disabled="user.id === $auth.user.id"
-        />
+
+        <v-row no-gutters>
+          <v-col cols="12" sm="4" md="12" lg="4">
+            <v-switch
+              v-model="userData.account_status"
+              class="mt-0"
+              :label="userData.account_status | upperFirst"
+              false-value="inactive"
+              true-value="active"
+              :disabled="user.id === $auth.user.id || user.account_status === 'pending'"
+            />
+          </v-col>
+          <v-col v-if="user.account_status === 'pending'" cols="12" sm="8" md="12" lg="8">
+            <v-btn
+              color="primary"
+              :disabled="userData.email !== user.email"
+              @click="$emit('clicked-resend-email', user.id)"
+            >
+              <v-icon left>
+                mdi-email
+              </v-icon> Resend account email
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-form>
     </v-card-text>
     <v-card-actions>
@@ -69,7 +81,7 @@
 
 <script>
 import { isEmpty, isLength, isEmail } from 'validator'
-import { isEqual, omit } from 'lodash'
+import { upperFirst, isEqual, omit } from 'lodash'
 import UserType from '@/models/UserType'
 
 const EMPTY_VALUES = {
@@ -77,12 +89,17 @@ const EMPTY_VALUES = {
   email: '',
   password: Math.random().toString(20).substr(2, 10),
   user_type_id: 2,
-  active: true
+  account_status: 'active'
 }
 
 export default {
   components: {
     UnsavedChangesDialog: () => import('@/components/Common/UnsavedChangesDialog')
+  },
+  filters: {
+    upperFirst (val) {
+      return upperFirst(val)
+    }
   },
   props: {
     user: {

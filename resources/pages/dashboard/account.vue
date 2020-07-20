@@ -68,52 +68,12 @@
               </v-col>
             </v-card-title>
             <v-card-text>
-              <v-form ref="pwForm" v-model="pwFormValid" lazy-validation>
-                <v-container fluid>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="password.password"
-                        :rules="validation.password"
-                        label="Old password"
-                        :error-messages="errors.password"
-                        type="password"
-                        @input="errors.password = ''"
-                      />
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="password.newPassword"
-                        :rules="validation.newPassword"
-                        label="New password"
-                        validate-on-blur
-                        type="password"
-                      />
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="password.newPassword2"
-                        :rules="validation.newPassword2"
-                        label="Repeat new password"
-                        type="password"
-                        validate-on-blur
-                      />
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" class="text-right">
-                      <v-btn
-                        :disabled="!pwFormValid"
-                        :loading="savingPassword"
-                        class="success"
-                        @click="savePassword"
-                      >
-                        Change password
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-form>
+              <reset-password-form
+                ref="pwForm"
+                :errors.sync="errors"
+                :saving="savingPassword"
+                @clicked-save="savePassword"
+              />
             </v-card-text>
           </v-card>
         </v-col>
@@ -126,36 +86,26 @@
 import { mapActions } from 'vuex'
 import { isEmail } from 'validator'
 import { processErrors } from '@/assets/js/errorhandling'
+import { UPDATE_PASSWORD, UPDATE_ACCOUNT } from '@/assets/js/endpoints'
+
+import User from '@/models/User'
 
 export default {
+  components: {
+    ResetPasswordForm: () => import('@/components/Users/ResetPasswordForm')
+  },
   data () {
     return {
       user: { ...this.$auth.user },
-      password: {
-        password: '',
-        newPassword: '',
-        newPassword2: ''
-      },
       validation: {
         name: [v => !!v || 'Name cannot be empty'],
         email: [
           v => !!v || 'Email cannot be empty',
           v => isEmail(v) || 'Invalid email address'
-        ],
-        password: [
-          v => !!v || 'Please provide your current password'
-        ],
-        newPassword: [
-          v => !!v || 'Please provide a new password'
-        ],
-        newPassword2: [
-          v => !!v || 'Please repeat your new password',
-          v => v === this.password.newPassword || 'Does not match with first new password'
         ]
       },
       errors: {},
       detailsFormValid: true,
-      pwFormValid: true,
       savingDetails: false,
       savingPassword: false
     }
@@ -164,27 +114,26 @@ export default {
     ...mapActions('notifications', ['notify']),
     async saveDetails () {
       if (!this.$refs.detailsForm.validate()) { return }
-      const data = { ...this.user }
       this.savingDetails = true
       try {
-        const response = await this.$axios.$put('/api/v1/auth/user', data)
+        await this.$axios.put(UPDATE_ACCOUNT, this.user)
         this.notify({
-          message: response.message,
+          message: 'Information change success',
           color: 'success'
         })
         await this.$auth.fetchUser()
+        User.insertOrUpdate({ data: this.$auth.user })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       }
       this.savingDetails = false
     },
-    async savePassword () {
+    async savePassword (data) {
       if (!this.$refs.pwForm.validate()) { return }
-      const data = { ...this.password }
       this.errors = {}
       this.savingPassword = true
       try {
-        await this.$axios.$put('/api/v1/auth/password', data)
+        await this.$axios.put(UPDATE_PASSWORD, data)
         this.notify({
           message: 'Password saved',
           color: 'success'

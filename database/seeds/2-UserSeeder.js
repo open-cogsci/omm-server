@@ -17,13 +17,15 @@ const users = [
     user_type_id: 1,
     name: 'Daniel Schreij',
     email: 'dschreij@gmail.com',
-    password: 'daniel'
+    password: 'daniel',
+    account_status: 'active'
   },
   {
     user_type_id: 1,
     name: 'Sebastiaan Mathôt',
     email: 's.mathot@cogsci.nl',
-    password: 'sebastiaan'
+    password: 'sebastiaan',
+    account_status: 'active'
   }
 ]
 

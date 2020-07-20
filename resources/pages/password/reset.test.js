@@ -1,6 +1,6 @@
 import Vuetify from 'vuetify'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import Password from './password.vue'
+import Password from './reset.vue'
 
 const localVue = createLocalVue()
 

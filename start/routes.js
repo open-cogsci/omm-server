@@ -45,6 +45,10 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
+  Route.post('/auth/password/recover', 'UserController.forgotPassword').as('users.forgot_password')
+  Route.post('/auth/password/reset/:token', 'UserController.updatePasswordByToken').as('users.reset_password')
+
+  Route.post('/users/resend_account_email', 'UserController.resendAccountEmail').as('users.resend_account_email')
 
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
   Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob').as('participants.fetch_job')

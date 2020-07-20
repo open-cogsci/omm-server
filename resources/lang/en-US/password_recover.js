@@ -12,5 +12,8 @@ export default {
   buttons: {
     signin: 'Sign in',
     email: 'Send email'
+  },
+  messages: {
+    received: 'Request received. Check your email for a reset link.'
   }
 }

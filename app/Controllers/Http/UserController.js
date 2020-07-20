@@ -1,9 +1,8 @@
 'use strict'
 
-const capitalize = require('lodash/capitalize')
 const User = use('App/Models/User')
 const UserType = use('App/Models/UserType')
-const Hash = use('Hash')
+const Persona = use('Persona')
 
 const isEmpty = require('validator').isEmpty
 
@@ -101,23 +100,14 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
-    const userData = request.only(['name', 'email', 'password', 'user_type_id', 'active'])
+  async store ({ request, transform }) {
+    const userData = request.only(['name', 'email', 'password', 'user_type_id'])
+    // Spoof the password confirmation for Persona
+    userData.password_confirmation = userData.password
+    // save user to database
+    const user = await Persona.register(userData)
 
-    try {
-      // save user to database
-      const user = await User.create(userData)
-      await user.reload()
-
-      return response.json({
-        status: 'success',
-        data: user
-      })
-    } catch (error) {
-      return response.status(400).json({
-        message: 'There was a problem creating the user, please try again later.'
-      })
-    }
+    return transform.item(user, 'UserTransformer')
   }
 
   /**
@@ -209,13 +199,13 @@ class UserController {
    */
   async update ({ params, request, response, auth, transform }) {
     const user = await User.findOrFail(params.id)
-    const data = request.only(['name', 'email', 'active', 'user_type_id', 'password'])
+    const data = request.only(['name', 'email', 'account_status', 'user_type_id', 'password'])
     if (isEmpty(data.password)) {
       delete data.password
     }
 
     if (auth.current.user.id === params.id) {
-      if (!data.active) {
+      if (!data.account_status === 'inactive') {
         return response.status(400).json({
           message: 'You cannot deactivate yourself'
         })
@@ -283,24 +273,19 @@ class UserController {
     if (!auth.current.user.isAdmin) {
       return response.status(401).json({ message: 'Permission denied' })
     }
-    try {
-      const user = await User.query()
-        .where('id', params.id)
-        .with('studies', (builder) => {
-          builder
-            .wherePivot('is_owner', true)
-            .withCount('participants')
-            // Somehowe, the pivot fields below are also included after the withCount() call
-            // Remove them here to tidy up the response.
-            .setHidden(['access_permission_id', 'is_owner', 'study_id', 'user_id'])
-        })
-        .firstOrFail()
-      return transform.include('studies.participants_count').item(user, 'UserTransformer')
-    } catch (error) {
-      return response.status(404).json({
-        message: 'User not found'
+
+    const user = await User.query()
+      .where('id', params.id)
+      .with('studies', (builder) => {
+        builder
+          .wherePivot('is_owner', true)
+          .withCount('participants')
+          // Somehowe, the pivot fields below are also included after the withCount() call
+          // Remove them here to tidy up the response.
+          .setHidden(['access_permission_id', 'is_owner', 'study_id', 'user_id'])
       })
-    }
+      .firstOrFail()
+    return transform.include('studies.participants_count').item(user, 'UserTransformer')
   }
 
   /**
@@ -341,17 +326,11 @@ class UserController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, response, auth }) {
-    if (auth.current.user.id === params.id) {
+    if (auth.user.id === params.id) {
       return response.status(400).json({ message: 'You cannot delete yourself' })
     }
     const user = await User.findOrFail(params.id)
-    try {
-      await user.delete()
-    } catch (e) {
-      response.status(400).json({
-        message: 'The user could not be removed'
-      })
-    }
+    await user.delete()
     return response.noContent()
   }
 
@@ -436,26 +415,11 @@ class UserController {
    * @param {Auth} ctx.auth
    * @param {Response} ctx.response
    */
-  async updateMe ({ request, auth, response }) {
-    try {
-      // get currently authenticated user
-      const user = auth.current.user
-
-      // update with new data entered
-      user.name = request.input('name')
-      user.email = request.input('email')
-
-      await user.save()
-
-      return response.json({
-        message: 'Profile updated!',
-        data: user
-      })
-    } catch (error) {
-      return response.status(400).json({
-        message: 'There was a problem updating profile, please try again later.'
-      })
-    }
+  async updateMe ({ request, auth, response, transform }) {
+    const user = auth.user
+    const payload = request.only(['name', 'email'])
+    await Persona.updateProfile(user, payload)
+    return transform.item(user, 'UserTransformer')
   }
 
   /**
@@ -465,7 +429,7 @@ class UserController {
   *     tags:
   *       - Authentication
   *     summary: >
-  *         Updates the profile of the currently loggedin user.
+  *         Attempts to login a user with the specified credentials.
   *     parameters:
   *       - in: body
   *         name: user
@@ -506,29 +470,23 @@ class UserController {
    * @param {Response} ctx.response
    */
   async login ({ request, auth, response }) {
-    const { email, password } = request.only(['email', 'password'])
+    const payload = request.only(['uid', 'password'])
 
-    const user = User.findBy('email', email)
-    if (user && !user.active) {
+    const user = await Persona.verify(payload)
+    if (user.account_status === 'inactive') {
       response.unauthorized({
         message: 'Your account has been suspended. Please contact your administrator'
       })
     }
 
-    try {
-      // validate the user credentials and generate a JWT token
-      const token = await auth
-        .withRefreshToken()
-        .attempt(email, password)
+    // validate the user credentials and generate a JWT token
+    const token = await auth
+      .withRefreshToken()
+      .generate(user)
 
-      return response.status(202).json({
-        data: token
-      })
-    } catch (error) {
-      response.badRequest({
-        message: 'Invalid email/password'
-      })
-    }
+    return response.json({
+      data: token
+    })
   }
 
   /**
@@ -539,41 +497,28 @@ class UserController {
   *       - Authentication
   *     security:
   *       - JWT: []
-  *     summary: >
-  *         Logs out the current user.
+  *     summary: Logs out the current user, discarding his JWT refresh tokens.
   *     responses:
   *       204:
   *         description: The user has been logged out.
-  *       400:
-  *         description: Unable to logout.
   *       default:
   *         description: Unexpected error.
   */
 
   /**
-   * Logout the current user
+   * Log out the current user
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
    * @param {Auth} ctx.auth
    * @param {Response} ctx.response
    */
   async logout ({ auth, response }) {
-    try {
-      const user = await auth.getUser()
-      const token = auth.getAuthHeader()
-      await user
-        .tokens()
-        .where('token', token)
-        .update({ is_revoked: true })
-      response.status(204).json({
-        message: 'User logged out.'
-      })
-    } catch (error) {
-      response.status(400).json({
-        message: 'Unable to logout user'
-      })
-    }
+    const user = await auth.getUser()
+    await user.tokens()
+      .where('type', 'jwt_refresh_token')
+      .where('is_revoked', false)
+      .update({ is_revoked: true })
+    return response.noContent()
   }
 
   /**
@@ -589,68 +534,154 @@ class UserController {
   *     parameters:
   *       - in: body
   *         name: password info
-  *         description: The password information.
+  *         description: The old and new password information
   *         schema:
   *           type: object
   *           properties:
-  *             password:
-  *               description: The user's current password.
+  *             old_password:
+  *               description: The user's previous password.
   *               type: string
-  *             newPassword:
+  *             password:
   *               description: The user's new password.
   *               type: string
-  *             newPassword2:
+  *             password_confirmation:
   *               description: The user's new password repeated.
   *               type: string
   *     responses:
   *       204:
-  *         description: The password has been changed.
+  *         description: The user's password has been updated
+  *       400:
+  *         description: The login attempt failed with the supplied credentials.
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       default:
+  *         description: Unexpected error.
+  */
+  async changePassword ({ request, auth, response }) {
+    const payload = request.only(['old_password', 'password', 'password_confirmation'])
+    await Persona.updatePassword(auth.user, payload)
+    return response.json({ message: 'Password updated!' })
+  }
+
+  /**
+  * @swagger
+  * /auth/password/recover:
+  *   post:
+  *     tags:
+  *       - Authentication
+  *     summary: >
+  *         Sends a password reset link by email to the specified user
+  *     parameters:
+  *       - in: body
+  *         name: password info
+  *         description: The user email to which to send the reset link.
+  *         schema:
+  *           type: object
+  *           properties:
+  *             uid:
+  *               description: The user's email.
+  *               type: string
+  *               example: john@doe.com
+  *     responses:
+  *       204:
+  *         description: The rest link has been sent.
   *       400:
   *         description: The request was invalid (e.g. the passed data did not validate).
   *         schema:
   *           type: array
   *           items:
   *             $ref: '#/definitions/ValidationError'
-  *       401:
-  *         description: Unauthorized.
   *       default:
   *         description: Unexpected error.
   */
 
   /**
-   * Update current user's password.
-   * PUT or PATCH changePassword
+   * Send password reset link by email
+   * POST forgotPassword
    *
    * @param {object} ctx
    * @param {Request} ctx.request
-   * @param {Auth} ctx.auth
    * @param {Response} ctx.response
    */
-  async changePassword ({ request, auth, response }) {
-    // get currently authenticated user
-    const user = auth.current.user
+  async forgotPassword ({ request, response }) {
+    await Persona.forgotPassword(request.input('uid'))
+    return response.noContent()
+  }
 
-    // verify if current password matches
-    const verifyPassword = await Hash.verify(
-      request.input('password'),
-      user.password
-    )
+  /**
+  * @swagger
+  * /auth/password/reset/{token}:
+  *   post:
+  *     tags:
+  *       - Authentication
+  *     summary: >
+  *         Resets the password of the user linked to by the token.
+  *     parameters:
+  *       - in: path
+  *         name: token
+  *         description: >
+  *           The verification token to reset the password. This was received by email
+  *           by the user.
+  *       - in: body
+  *         name: password info
+  *         description: The new password and its confirmation.
+  *         schema:
+  *           type: object
+  *           properties:
+  *             password:
+  *               description: The user's new password.
+  *               type: string
+  *             password_confirmation:
+  *               description: The user's new password repeated.
+  *               type: string
+  *     responses:
+  *       204:
+  *         description: Password has been reset
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       default:
+  *         description: Unexpected error.
+  */
 
-    // display appropriate message
-    if (!verifyPassword) {
-      return response.status(400).json({
-        message: 'Current password is incorrect.',
-        errors: { password: 'Incorrect password' }
-      })
+  /**
+   * Resets the password of a user provided a valid token is passed.
+   * POST updatePasswordByToken
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Params} ctx.params
+   * @param {Response} ctx.response
+   */
+  async updatePasswordByToken ({ request, params, response }) {
+    const token = decodeURIComponent(params.token)
+    const payload = request.only(['password', 'password_confirmation'])
+    await Persona.updatePasswordByToken(token, payload)
+    return response.noContent()
+  }
+
+  /**
+   * Resends the e-mail with the users account info
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @returns
+   * @memberof UserController
+   */
+  async resendAccountEmail ({ request, response }) {
+    const id = request.input('id')
+    const user = await User.findOrFail(id)
+    if (user.account_status !== 'pending') {
+      return response.badRequest({ message: 'User has already been activated' })
     }
-
-    // hash and save new password
-    user.password = request.input('newPassword')
-    await user.save()
-
-    return response.json({
-      message: 'Password updated!'
-    })
+    console.log('emailing')
+    return response.noContent()
   }
 
   /**

@@ -80,7 +80,8 @@ export default {
     }
   },
   methods: {
-    listable: ptcp => pick(ptcp, ['name', 'email', 'user_type', 'active', 'created_at', 'updated_at'])
+    listable: ptcp => pick(ptcp,
+      ['name', 'email', 'user_type', 'account_status', 'created_at', 'updated_at'])
   }
 }
 </script>

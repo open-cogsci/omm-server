@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "serve:dev": "npm run dev",
-    "dev": "nodemon --watch app --watch bootstrap --watch config --watch .env -x node server.js",
+    "dev": "nodemon --watch app --watch bootstrap --watch config --watch .env --watch start -x node server.js",
     "build": "cross-env NODE_ENV=production node ./ace nuxtbuild",
     "start": "cross-env NODE_ENV=production node server.js",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
@@ -21,6 +21,8 @@
     "@adonisjs/framework": "^5.0.13",
     "@adonisjs/ignitor": "^2.0.8",
     "@adonisjs/lucid": "^6.2.0",
+    "@adonisjs/mail": "^3.0.10",
+    "@adonisjs/persona": "^1.0.5",
     "@adonisjs/session": "^1.0.19",
     "@adonisjs/shield": "^1.0.4",
     "@adonisjs/validator": "^5.0.6",

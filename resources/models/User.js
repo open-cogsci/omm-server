@@ -30,6 +30,10 @@ export default class User extends Model {
     return this.api().delete(`/${id}`, { delete: id, ...config })
   }
 
+  static resendAccountEmail (id, config) {
+    return this.api().post('/resend_account_email', { id }, { save: false, ...config })
+  }
+
   get isAdmin () {
     return this.user_type_id === 1
   }
@@ -42,7 +46,7 @@ export default class User extends Model {
       name: this.string(''),
       email: this.string(''),
       password: this.string(''),
-      active: this.boolean(null),
+      account_status: this.attr(''),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),

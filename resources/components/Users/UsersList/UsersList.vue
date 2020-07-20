@@ -51,11 +51,11 @@
                     <template v-slot:activator="{ on, attrs }">
                       <span
                         class="font-weight-light"
-                        :class="user.active ? 'green--text':'red--text'"
+                        :class="statusColor(user.account_status)"
                         v-bind="attrs"
                         v-on="on"
                       >
-                        {{ user.active ? 'active':'inactive' }}
+                        {{ user.account_status }}
                       </span>
                     </template>
                     Status
@@ -82,6 +82,7 @@
                     :errors="errors"
                     @clicked-cancel="editing = null"
                     @clicked-save="$emit('update-user', $event)"
+                    @clicked-resend-email="$emit('resend-email', $event)"
                     @update:errors="$emit('update:errors', $event)"
                   />
                   <user-view-data
@@ -189,6 +190,13 @@ export default {
   methods: {
     clearEditing () {
       this.editing = null
+    },
+    statusColor (status) {
+      return {
+        active: 'green--text',
+        pending: 'orange--text',
+        inactive: 'red--text'
+      }[status]
     }
   }
 }
