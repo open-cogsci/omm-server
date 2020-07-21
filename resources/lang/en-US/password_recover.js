@@ -4,8 +4,8 @@ export default {
     email: {
       label: 'Email address',
       validation: {
-        empty: 'Please provide your email address',
-        invalid: 'This e-mail address is invalid'
+        empty: 'Please provide your email address.',
+        invalid: 'This e-mail address is invalid.'
       }
     }
   },
@@ -14,6 +14,6 @@ export default {
     email: 'Send email'
   },
   messages: {
-    received: 'Request received. Check your email for a reset link.'
+    received: 'Check your email for a reset link.'
   }
 }

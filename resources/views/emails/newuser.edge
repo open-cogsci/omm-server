@@ -1,8 +1,14 @@
-<h2> Hello {{ user.name }} </h2>
+<p>Hello {{ user.name }}</p>
 <p>
   You now have an account at OpenMonkeyMind. Please follow the link below to complete your
   registration by setting a password:
 </p>
-<p><a href="{{ request.url() }}">Password link</a></p>
+<p>
+  <a href="{{ baseURL + '/password/reset?' + tokenString }}">
+    {{ baseURL + '/password/reset?' + tokenString }}
+  </a>
+</p>
+<p style="font-style:italic">This link is only valid for <strong>24 hours</strong>,
+  so please set a password within this period.</p>
 <p>After you have set a password, you can use it to log in to the system using this email address
-  as your username</p>
+  as your username.</p>

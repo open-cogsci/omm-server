@@ -38,6 +38,7 @@
     </v-row>
     <v-fab-transition>
       <v-btn
+        v-if="$auth.user.user_type_id === 1"
         v-show="fabVisible"
         class="mb-12"
         color="accent"

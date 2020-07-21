@@ -1,0 +1,12 @@
+<p>Hello {{ user.name }}</p>
+<p>
+  Your email address has changed at OpenMonkeyMind and needs to be verified. Please click the link
+  below to do so.
+</p>
+<p>
+  <a href="{{ baseURL + '/verify?' + tokenString }}">
+    {{ baseURL + '/verify?' + tokenString }}
+  </a>
+</p>
+<p style="font-style:italic">This link is only valid for <strong>24 hours</strong>,
+  so please verify your email address within this period.</p>

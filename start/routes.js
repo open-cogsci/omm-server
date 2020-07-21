@@ -18,6 +18,7 @@ const API_PREFIX = '/api/v1'
 
 Route.group(() => {
   Route.get('/users/types', 'UserController.userTypes')
+  Route.post('/users/resend_account_email', 'UserController.resendAccountEmail').as('users.resend_account_email')
   Route.resource('users', 'UserController').apiOnly()
     .validator(new Map([
       [['users.store'], ['SaveUser']],
@@ -25,10 +26,10 @@ Route.group(() => {
     ]))
 
   Route.get('/auth/user', 'UserController.me').as('users.me')
-  Route.put('/auth/user', 'UserController.updateMe').as('users.update_me')
-    .validator('SaveUser')
+  Route.put('/auth/user', 'UserController.updateMe').as('users.update_me').validator('SaveUser')
   Route.put('/auth/password', 'UserController.changePassword').as('users.password')
   Route.post('/auth/logout', 'UserController.logout').as('logout')
+  Route.post('/auth/email/resend', 'UserController.resendVerificationEmail').as('users.resend_verification_email')
 
   Route.resource('jobs', 'JobController').apiOnly()
   Route.resource('participants', 'ParticipantController').apiOnly()
@@ -47,8 +48,7 @@ Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
   Route.post('/auth/password/recover', 'UserController.forgotPassword').as('users.forgot_password')
   Route.post('/auth/password/reset/:token', 'UserController.updatePasswordByToken').as('users.reset_password')
-
-  Route.post('/users/resend_account_email', 'UserController.resendAccountEmail').as('users.resend_account_email')
+  Route.post('/auth/email/verify/:token', 'UserController.verifyEmailAddress').as('users.verify_email')
 
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
   Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob').as('participants.fetch_job')

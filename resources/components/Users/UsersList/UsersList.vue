@@ -79,6 +79,7 @@
                     v-if="editing === user.id"
                     :user="user"
                     :saving="saving"
+                    :resending="resending"
                     :errors="errors"
                     @clicked-cancel="editing = null"
                     @clicked-save="$emit('update-user', $event)"
@@ -168,6 +169,10 @@ export default {
     loadingUser: {
       type: Number,
       default: 0
+    },
+    resending: {
+      type: Boolean,
+      default: false
     },
     errors: {
       type: Object,

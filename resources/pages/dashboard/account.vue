@@ -39,11 +39,32 @@
                         label="Email"
                         validate-on-blur
                         @input="errors.email = ''"
-                      />
+                      >
+                        <template v-if="$auth.user.account_status === 'pending'" v-slot:append>
+                          <v-tooltip
+                            bottom
+                          >
+                            <template v-slot:activator="{ on }">
+                              <v-icon color="warning" v-on="on">
+                                mdi-alert
+                              </v-icon>
+                            </template>
+                            This email address has not yet been verified.<br>
+                            Please do so using the link that has been sent to it.
+                          </v-tooltip>
+                        </template>
+                      </v-text-field>
                     </v-col>
                   </v-row>
                   <v-row>
                     <v-col cols="12" class="text-right">
+                      <v-btn
+                        v-if="$auth.user.account_status === 'pending'"
+                        :loading="resending"
+                        @click="resendVerificationEmail"
+                      >
+                        Resend verification email
+                      </v-btn>
                       <v-btn
                         :disabled="!detailsFormValid"
                         :loading="savingDetails"
@@ -86,7 +107,7 @@
 import { mapActions } from 'vuex'
 import { isEmail } from 'validator'
 import { processErrors } from '@/assets/js/errorhandling'
-import { UPDATE_PASSWORD, UPDATE_ACCOUNT } from '@/assets/js/endpoints'
+import { UPDATE_PASSWORD, UPDATE_ACCOUNT, RESEND_VERIFICATION } from '@/assets/js/endpoints'
 
 import User from '@/models/User'
 
@@ -107,7 +128,13 @@ export default {
       errors: {},
       detailsFormValid: true,
       savingDetails: false,
-      savingPassword: false
+      savingPassword: false,
+      resending: false
+    }
+  },
+  computed: {
+    verified () {
+      return 'mdi-alert'
     }
   },
   methods: {
@@ -143,6 +170,19 @@ export default {
         this.errors = processErrors(e, this.notify)
       }
       this.savingPassword = false
+    },
+    async resendVerificationEmail () {
+      this.resending = true
+      try {
+        await this.$axios.post(RESEND_VERIFICATION)
+        this.notify({
+          message: 'E-mail sent. Please check your inbox',
+          color: 'success'
+        })
+      } catch (e) {
+        this.errors = processErrors(e, this.notify)
+      }
+      this.resending = false
     }
   },
   head () {

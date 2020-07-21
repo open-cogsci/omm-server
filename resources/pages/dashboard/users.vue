@@ -42,6 +42,7 @@
     </v-row>
     <v-fab-transition>
       <v-btn
+        v-if="$auth.user.user_type_id === 1"
         v-show="fabVisible"
         class="mb-12"
         color="accent"
@@ -164,11 +165,16 @@ export default {
     /**
      * Resend email containing user password
      */
-    async resendAccountEmail (userId) {
+    async resendAccountEmail (user) {
       this.resending = true
       try {
-        await User.resendAccountEmail(userId)
-        this.notify({ message: 'Account info e-mail has been resent', color: 'success' })
+        if (user.last_login) {
+          await User.resendActivationEmail(user.id)
+          this.notify({ message: 'Activation e-mail has been resent', color: 'success' })
+        } else {
+          await User.resendAccountEmail(user.id)
+          this.notify({ message: 'Account info e-mail has been resent', color: 'success' })
+        }
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       } finally {

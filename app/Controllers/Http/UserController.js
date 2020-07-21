@@ -3,8 +3,11 @@
 const User = use('App/Models/User')
 const UserType = use('App/Models/UserType')
 const Persona = use('Persona')
+const Event = use('Event')
 
-const isEmpty = require('validator').isEmpty
+const { isEmpty } = require('validator')
+const isInteger = require('lodash/isInteger')
+const formatISO = require('date-fns/formatISO9075')
 
 class UserController {
   /**
@@ -472,12 +475,22 @@ class UserController {
   async login ({ request, auth, response }) {
     const payload = request.only(['uid', 'password'])
 
-    const user = await Persona.verify(payload)
-    if (user.account_status === 'inactive') {
-      response.unauthorized({
-        message: 'Your account has been suspended. Please contact your administrator'
+    const user = await Persona.verify(payload, (user) => {
+      if (user.account_status === 'inactive') {
+        return response.unauthorized({
+          message: 'Your account has been suspended. Please contact your administrator'
+        })
+      }
+    })
+
+    if (user.account_status === 'pending') {
+      return response.unauthorized({
+        message: 'Please verify your email address using the email that has been sent to it.'
       })
     }
+
+    user.last_login = formatISO(Date.now())
+    await user.save()
 
     // validate the user credentials and generate a JWT token
     const token = await auth
@@ -662,6 +675,12 @@ class UserController {
     const token = decodeURIComponent(params.token)
     const payload = request.only(['password', 'password_confirmation'])
     await Persona.updatePasswordByToken(token, payload)
+
+    // E-mail verification can also be done in this step. Check if etoken is provided:
+    const etoken = request.input('etoken', null)
+    if (etoken !== null) {
+      await Persona.verifyEmail(decodeURIComponent(etoken))
+    }
     return response.noContent()
   }
 
@@ -680,7 +699,29 @@ class UserController {
     if (user.account_status !== 'pending') {
       return response.badRequest({ message: 'User has already been activated' })
     }
-    console.log('emailing')
+    const token = await Persona.generateToken(user, 'email')
+    Event.fire('user::created', { user, token })
+    return response.noContent()
+  }
+
+  async resendVerificationEmail ({ auth, request, response }) {
+    let user
+    const userID = request.input('id')
+    if (isInteger(userID) && auth.user.isAdmin) {
+      user = await User.findOrFail(userID)
+    } else {
+      user = auth.user
+    }
+    if (user.account_status !== 'pending') {
+      return response.badRequest({ message: 'User has already been verified' })
+    }
+    const token = await Persona.generateToken(user, 'email')
+    await Event.fire('email::changed', { user, token })
+    return response.noContent()
+  }
+
+  async verifyEmailAddress ({ params, response }) {
+    await Persona.verifyEmail(decodeURIComponent(params.token))
     return response.noContent()
   }
 

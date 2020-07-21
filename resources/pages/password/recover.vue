@@ -74,12 +74,17 @@ export default {
   },
   methods: {
     async send () {
+      if (!this.$refs.form.validate()) { return }
       try {
         await this.$axios.post(RECOVER_PASSWORD, { uid: this.email })
         this.status = { type: 'success', message: this.$t('password_recover.messages.received') }
       } catch (e) {
-        this.status = processErrors(e)
-        this.status.type = 'error'
+        processErrors(e, (notification) => {
+          this.status = {
+            message: notification.message,
+            type: notification.color
+          }
+        })
       }
     }
   }

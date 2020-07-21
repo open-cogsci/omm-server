@@ -33,26 +33,29 @@
         />
 
         <v-row no-gutters>
-          <v-col cols="12" sm="4" md="12" lg="4">
+          <v-col v-if="isFresh(user)" cols="12">
+            <v-btn
+              color="primary"
+              :disabled="userData.email !== user.email"
+              :loading="resending"
+              @click="$emit('clicked-resend-email', user)"
+            >
+              <v-icon left>
+                mdi-email
+              </v-icon>
+              <span v-if="user.last_login">Resend verification email</span>
+              <span v-else>Resend activation email</span>
+            </v-btn>
+          </v-col>
+          <v-col v-else-if="user.id" cols="12">
             <v-switch
               v-model="userData.account_status"
               class="mt-0"
               :label="userData.account_status | upperFirst"
               false-value="inactive"
               true-value="active"
-              :disabled="user.id === $auth.user.id || user.account_status === 'pending'"
+              :disabled="user.id === $auth.user.id"
             />
-          </v-col>
-          <v-col v-if="user.account_status === 'pending'" cols="12" sm="8" md="12" lg="8">
-            <v-btn
-              color="primary"
-              :disabled="userData.email !== user.email"
-              @click="$emit('clicked-resend-email', user.id)"
-            >
-              <v-icon left>
-                mdi-email
-              </v-icon> Resend account email
-            </v-btn>
           </v-col>
         </v-row>
       </v-form>
@@ -110,6 +113,10 @@ export default {
       type: Boolean,
       default: false
     },
+    resending: {
+      type: Boolean,
+      default: false
+    },
     errors: {
       type: Object,
       default: () => ({})
@@ -140,6 +147,9 @@ export default {
     }
   },
   methods: {
+    isFresh (user) {
+      return user.account_status === 'pending'
+    },
     dataChanged () {
       const newData = JSON.parse(JSON.stringify(omit(this.userData, 'password')))
       const originalData = JSON.parse(JSON.stringify(omit(this.user, 'password')))

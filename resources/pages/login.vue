@@ -38,6 +38,9 @@
           </v-col>
         </v-row>
       </v-form>
+      <v-alert v-if="status" :type="status.type">
+        {{ status.message }}
+      </v-alert>
     </v-card-text>
     <v-card-actions>
       <v-spacer />
@@ -68,6 +71,7 @@ export default {
   data () {
     return {
       authenticating: false,
+      status: null,
       email: '',
       password: '',
       valid: true,
@@ -106,7 +110,12 @@ export default {
           }
         })
       } catch (e) {
-        this.errors = processErrors(e)
+        this.errors = processErrors(e, (notification) => {
+          this.status = {
+            message: notification.message,
+            type: notification.color
+          }
+        })
       }
       this.authenticating = false
     },

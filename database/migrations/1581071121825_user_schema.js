@@ -12,6 +12,7 @@ class UserSchema extends Schema {
       table.string('email', 255).notNullable().unique()
       table.string('password', 60).notNullable()
       table.string('account_status').notNullable()
+      table.datetime('last_login')
       table.timestamps()
 
       table.foreign('user_type_id').references('id').inTable('user_types')

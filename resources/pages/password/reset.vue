@@ -20,17 +20,28 @@
         :saving="savingPassword"
         :validates.sync="pwFormValid"
         :errors.sync="errors"
+        :hide-button="passwordHasBeenReset"
         @clicked-save="savePassword"
       />
       <v-alert v-if="status" :type="status.type">
         {{ status.message }}
       </v-alert>
     </v-card-text>
+    <v-card-actions v-if="passwordHasBeenReset">
+      <v-spacer />
+      <v-btn
+        color="primary"
+        @click="$router.replace(localePath('login'))"
+      >
+        Proceed to login
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
 <script>
-import { RESET_PASSWORD } from '../../assets/js/endpoints'
+import { RESET_PASSWORD } from '@/assets/js/endpoints'
+import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   layout: 'guest',
@@ -43,33 +54,49 @@ export default {
       errors: {},
       pwFormValid: true,
       savingPassword: false,
-      status: null
+      status: null,
+      passwordHasBeenReset: false
     }
   },
   methods: {
     async savePassword (data) {
       if (!this.$refs.pwForm.validate()) { return }
-      const token = this.$route.query.token
       this.errors = {}
       this.savingPassword = true
+
+      const token = this.$route.query.token
+      let cfg = null
+      if (this.$route.query.etoken) {
+        cfg = { params: { etoken: this.$route.query.etoken } }
+      }
+
       try {
         const uri = `${RESET_PASSWORD}/${encodeURIComponent(token)}`
-        await this.$axios.post(uri, data)
+        await this.$axios.post(uri, data, cfg)
         this.status = {
-          message: 'Password reset. Please wait to be redirected.',
+          message: 'Your password has been reset.',
           type: 'success'
         }
         this.$refs.pwForm.reset()
-        setTimeout(() => { this.$router.replace(this.localePath('login')) }, 5000)
+        this.passwordHasBeenReset = true
       } catch (e) {
-        this.status = {
-          message: e?.response?.data?.error?.message || 'Unknown error',
-          type: 'error'
-        }
+        processErrors(e, (notification) => {
+          this.status = {
+            message: notification.message,
+            type: notification.color
+          }
+        })
       }
       this.savingPassword = false
     }
 
+  },
+  beforeRouteEnter (to, from, next) {
+    // If not token is provided in the query string, redirect to login
+    if (!to.query.token) {
+      next(vm => vm.$router.replace(vm.localePath({ name: 'login' })))
+    }
+    next()
   }
 }
 </script>

@@ -2,7 +2,7 @@ import { Model } from '@vuex-orm/core'
 import UserType from './UserType'
 import Study from './Study'
 import StudyUser from './StudyUser'
-import { USERS } from '@/assets/js/endpoints'
+import { USERS, API_PREFIX } from '@/assets/js/endpoints'
 
 export default class User extends Model {
   static entity = 'users'
@@ -34,6 +34,14 @@ export default class User extends Model {
     return this.api().post('/resend_account_email', { id }, { save: false, ...config })
   }
 
+  static resendActivationEmail (id, config) {
+    return this.api().post('/auth/email/resend', { id }, {
+      save: false,
+      baseURL: API_PREFIX,
+      ...config
+    })
+  }
+
   get isAdmin () {
     return this.user_type_id === 1
   }
@@ -47,6 +55,7 @@ export default class User extends Model {
       email: this.string(''),
       password: this.string(''),
       account_status: this.attr(''),
+      last_login: this.attr(''),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),

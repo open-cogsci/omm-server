@@ -1,19 +1,27 @@
 export default {
-  subheader: 'Reset your password',
+  subheader: 'Hello! Please set your password below:',
   fields: {
-    email: {
-      label: 'Email address',
+    old_password: {
+      label: 'Old password',
       validation: {
-        empty: 'Please provide your email address',
-        invalid: 'This e-mail address is invalid'
+        empty: 'Please provide your current password.'
+      }
+    },
+    password: {
+      label: 'New password',
+      validation: {
+        empty: 'Please provide a new password.'
+      }
+    },
+    password_confirmation: {
+      label: 'Repeat the password above',
+      validation: {
+        empty: 'Please confirm your password',
+        mismatch: 'Mismatch with password above.'
       }
     }
   },
   buttons: {
-    signin: 'Sign in',
-    email: 'Send email'
-  },
-  messages: {
-    received: 'Request received. Check your email for a reset link.'
+    change: 'Change password'
   }
 }

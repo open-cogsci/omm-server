@@ -10,3 +10,5 @@ export const RECOVER_PASSWORD = `${API_PREFIX}/auth/password/recover`
 export const RESET_PASSWORD = `${API_PREFIX}/auth/password/reset`
 export const UPDATE_ACCOUNT = `${API_PREFIX}/auth/user`
 export const UPDATE_PASSWORD = `${API_PREFIX}/auth/password`
+export const VERIFY_EMAIL = `${API_PREFIX}/auth/email/verify`
+export const RESEND_VERIFICATION = `${API_PREFIX}/auth/email/resend`
