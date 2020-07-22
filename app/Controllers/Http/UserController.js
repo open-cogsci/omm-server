@@ -5,6 +5,8 @@ const UserType = use('App/Models/UserType')
 const Persona = use('Persona')
 const Event = use('Event')
 
+const { validate } = use('Validator')
+
 const { isEmpty } = require('validator')
 const isInteger = require('lodash/isInteger')
 const formatISO = require('date-fns/formatISO9075')
@@ -588,15 +590,10 @@ class UserController {
   *         Sends a password reset link by email to the specified user
   *     parameters:
   *       - in: body
-  *         name: password info
+  *         name: uid
   *         description: The user email to which to send the reset link.
-  *         schema:
-  *           type: object
-  *           properties:
-  *             uid:
-  *               description: The user's email.
-  *               type: string
-  *               example: john@doe.com
+  *         type: string
+  *         example: john@doe.com
   *     responses:
   *       204:
   *         description: The rest link has been sent.
@@ -619,6 +616,10 @@ class UserController {
    * @param {Response} ctx.response
    */
   async forgotPassword ({ request, response }) {
+    const validation = await validate(request.all(), { uid: 'required|email' })
+    if (validation.fails()) {
+      return response.status(422).json(validation.messages())
+    }
     await Persona.forgotPassword(request.input('uid'))
     return response.noContent()
   }
@@ -637,6 +638,7 @@ class UserController {
   *         description: >
   *           The verification token to reset the password. This was received by email
   *           by the user.
+  *         required: true
   *       - in: body
   *         name: password info
   *         description: The new password and its confirmation.
@@ -685,7 +687,37 @@ class UserController {
   }
 
   /**
-   * Resends the e-mail with the users account info
+  * @swagger
+  * /users/resend_account_email:
+  *   post:
+  *     tags:
+  *       - Users
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Resends the email to a new user in which he/she is requested to set a password. This
+  *         happens automatically for the first time after a user is created.
+  *     parameters:
+  *       - in: body
+  *         name: id
+  *         description: The ID of the user
+  *         type: integer
+  *         example: 2
+  *         required: true
+  *     responses:
+  *       204:
+  *         description: The email has been resent
+  *       400:
+  *         description: The user's account has already been activated
+  *       404:
+  *         description: The user with the specified ID could not be found
+  *       default:
+  *         description: Unexpected error.
+  */
+
+  /**
+   * Resends the e-mail with the users account info so the user can set an initial password
+   * for their account.
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -704,6 +736,45 @@ class UserController {
     return response.noContent()
   }
 
+  /**
+  * @swagger
+  * /auth/email/resend:
+  *   post:
+  *     tags:
+  *       - Authentication
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Resends the email to a user to verify his/her email account by clicking on a link
+  *         embedded in the email
+  *     parameters:
+  *       - in: body
+  *         name: id
+  *         description: The ID of the user
+  *         type: integer
+  *         example: 2
+  *     responses:
+  *       204:
+  *         description: The email has been resent
+  *       400:
+  *         description: The user's account has already been activated
+  *       404:
+  *         description: The user with the specified ID could not be found (if ID was supplied)
+  *       default:
+  *         description: Unexpected error.
+  */
+
+  /**
+   * Resends the email verification email to the user. If no user ID is supplied, the email is sent
+   * to the currently logged in user.
+   *
+   * @param {object} ctx
+   * @param {Auth} ctx.auth
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   * @returns response
+   * @memberof UserController
+   */
   async resendVerificationEmail ({ auth, request, response }) {
     let user
     const userID = request.input('id')
@@ -720,6 +791,40 @@ class UserController {
     return response.noContent()
   }
 
+  /**
+  * @swagger
+  * /auth/email/verify/{token}:
+  *   post:
+  *     tags:
+  *       - Authentication
+  *     summary: >
+  *         Verifies a user's email address using the supplied token.
+  *     parameters:
+  *       - in: path
+  *         name: token
+  *         description: >
+  *           The verification token to reset the password. This was received by email
+  *           by the user.
+  *         required: true
+  *     responses:
+  *       204:
+  *         description: Email has been verified.
+  *       400:
+  *         description: The token could not be used to verify an email address.
+  *       default:
+  *         description: Unexpected error.
+  */
+
+  /**
+   * Verify a user's email address using the supplied token
+   *
+   * @param {object} ctx
+   * @param {Params} ctx.params
+   * @param {Response} ctx.response
+
+   * @returns response
+   * @memberof UserController
+   */
   async verifyEmailAddress ({ params, response }) {
     await Persona.verifyEmail(decodeURIComponent(params.token))
     return response.noContent()
