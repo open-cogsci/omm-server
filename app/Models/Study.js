@@ -94,6 +94,25 @@ class Study extends Model {
   }
 
   /**
+   * Checks if the passed user has sufficient privileges to edit this study
+   *
+   * @param {User} user
+   * @returns {Boolean}
+   * @memberof Study
+   */
+  async isEditableBy (user) {
+    const results = await this.users()
+      .where('id', user.id)
+      .where(function () {
+        this
+          .where('study_users.is_owner', true) // Either the user is the owner of the study
+          .orWhere('study_users.access_permission_id', 2) // Or has write permissions
+      })
+      .count('* as total')
+    return !!results[0].total
+  }
+
+  /**
    * Walks through the list of jobs specified as a collection of key:value pairs in an object
    * and transform them so that they can easily be stored in the
    * database. Additionally check if the supplied variable name exists for this study.

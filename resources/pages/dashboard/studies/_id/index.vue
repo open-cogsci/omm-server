@@ -1,8 +1,13 @@
 <template>
-  <v-container>
+  <v-container :key="(study && study.id) || 'not-initialized'">
     <v-row>
       <v-col cols="12">
-        <study-title :study="study" :loading="loading" />
+        <study-title
+          :study="study"
+          :loading="loading"
+          :errors.sync="errors.title"
+          @editted="saveTitleInfo"
+        />
       </v-col>
     </v-row>
   </v-container>
@@ -10,6 +15,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import { pick } from 'lodash'
 import Study from '@/models/Study'
 import { processErrors } from '@/assets/js/errorhandling'
 
@@ -20,6 +26,12 @@ export default {
   },
   data () {
     return {
+      saving: {
+        title: false
+      },
+      errors: {
+        title: {}
+      },
       loading: false
     }
   },
@@ -41,6 +53,21 @@ export default {
         processErrors(e, this.notify)
       } finally {
         this.loading = false
+      }
+    },
+    async saveTitleInfo (data) {
+      const payload = {
+        ...pick(this.study, ['id', 'name', 'description']),
+        ...data
+      }
+      this.saving.title = true
+      try {
+        await Study.persist(payload)
+        this.errors.title = {}
+      } catch (e) {
+        this.errors.title = processErrors(e, this.notify)
+      } finally {
+        this.saving.title = false
       }
     }
   },

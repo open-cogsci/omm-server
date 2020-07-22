@@ -105,6 +105,8 @@ class StudyController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
+   * @param {Auth} ctx.auth
+   * @param {Transform} ctx.transform
    */
   async store ({ request, response, auth, transform }) {
     const data = request.only(['name', 'description'])
@@ -157,21 +159,17 @@ class StudyController {
    * GET studies/:id
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
+   * @param {Params} ctx.params
+   * @param {Auth} ctx.auth
+   * @param {Transform} ctx.transform
    */
-  async show ({ params, auth, response, transform }) {
-    let study
-    try {
-      study = await auth.user
-        .studies()
-        .where('id', params.id)
-        .with('jobs.variables.dtype')
-        .with('participants')
-        .firstOrFail()
-    } catch (e) {
-      return response.notFound({ message: `Study with ID:${params.id} could not be found` })
-    }
+  async show ({ params, auth, transform }) {
+    const study = await auth.user
+      .studies()
+      .where('id', params.id)
+      .with('jobs.variables.dtype')
+      .with('participants')
+      .firstOrFail()
 
     return transform
       .include('jobs,participants')
@@ -258,10 +256,27 @@ class StudyController {
    * PUT or PATCH studies/:id
    *
    * @param {object} ctx
+   * @param {Params} ctx.params
+   * @param {Auth} ctx.auth
    * @param {Request} ctx.request
-   * @param {Response} ctx.response
+   * @param {Transform} ctx.transform
    */
-  async update ({ params, request }) {
+  async update ({ params, auth, request, response, transform }) {
+    const study = await auth.user
+      .studies()
+      .where('id', params.id)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({
+        message: 'You have insufficient priviliges to change this study'
+      })
+    }
+
+    study.merge(request.only(['name', 'description']))
+    study.save()
+
+    return transform.item(study, 'StudyTransformer')
   }
 
   /**

@@ -62,7 +62,7 @@ const EMPTY_VALUES = {
 
 export default {
   components: {
-    UnsavedChangesDialog: () => import('@/components/Common/UnsavedChangesDialog')
+    UnsavedChangesDialog: () => import('@/components/common/UnsavedChangesDialog')
   },
   props: {
     participant: {

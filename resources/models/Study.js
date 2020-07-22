@@ -21,6 +21,9 @@ export default class Study extends Model {
   }
 
   static persist (data, config) {
+    if (data.id) {
+      return this.api().patch(`/${data.id}`, data, config)
+    }
     return this.api().post('', data, config)
   }
 
