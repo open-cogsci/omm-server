@@ -57,6 +57,7 @@ import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   layout: 'guest',
+  middleware: ['auth'],
   auth: 'guest',
   data () {
     return {

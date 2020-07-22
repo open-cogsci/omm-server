@@ -31,6 +31,7 @@ import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   layout: 'guest',
+  middleware: ['auth'],
   auth: 'guest',
   data () {
     return {
@@ -43,8 +44,11 @@ export default {
   },
   methods: {
     async verify () {
-      this.verifing = true
       const token = this.$route.query.token
+      if (!token) {
+        return
+      }
+      this.verifing = true
       try {
         const uri = `${VERIFY_EMAIL}/${encodeURIComponent(token)}`
         await this.$axios.post(uri)
