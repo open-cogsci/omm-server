@@ -10,7 +10,7 @@
         <v-row no-gutters>
           <v-fade-transition mode="out-in">
             <v-col v-if="editing.name" key="editing" cols="12" lg="10" xl="8">
-              <v-form v-model="valid.name" @submit.prevent="saveName">
+              <v-form v-model="valid.name" @submit.prevent="save('name')">
                 <v-text-field
                   v-model="localStudy.name"
                   dense
@@ -19,11 +19,12 @@
                   :counter="maxLength.name"
                   :rules="validation.name"
                   :error-messages="errors.name"
+                  @keydown.esc="editing.name = false"
                 >
                   <template v-slot:append-outer>
                     <save-cancel-icon-buttons
                       :save-disabled="!valid.name"
-                      @clicked-save="saveName"
+                      @clicked-save="save('name')"
                       @clicked-cancel="editing.name = false"
                     />
                   </template>
@@ -49,7 +50,7 @@
         <v-row no-gutters>
           <v-fade-transition mode="out-in">
             <v-col v-if="editing.description" key="editing" cols="12" lg="10" xl="8">
-              <v-form v-model="valid.description" @submit.prevent="saveDescription">
+              <v-form v-model="valid.description" @submit.prevent="save('description')">
                 <v-text-field
                   v-model="localStudy.description"
                   dense
@@ -59,11 +60,12 @@
                   outlined
                   label="Description"
                   @input="removeErrors('description')"
+                  @keydown.esc="editing.description = false"
                 >
                   <template v-slot:append-outer>
                     <save-cancel-icon-buttons
                       :save-disabled="!valid.description"
-                      @clicked-save="$emit('editted', {description: localStudy.description}); editing.description=false"
+                      @clicked-save="save('description')"
                       @clicked-cancel="editing.description = false"
                     />
                   </template>
@@ -152,17 +154,13 @@ export default {
       this.localStudy.name = this.study.name
       this.editing.name = true
     },
-    saveName () {
-      this.$emit('editted', { name: this.localStudy.name })
-      this.editing.name = false
-    },
     editDescription () {
       this.localStudy.description = this.study.description
       this.editing.description = true
     },
-    saveDescription () {
-      this.$emit('editted', { description: this.localStudy.description })
-      this.editing.description = false
+    save (field) {
+      this.$emit('editted', { [field]: this.localStudy[field] })
+      this.editing[field] = false
     },
     removeErrors (field) {
       if (!this.errors[field]) { return }
