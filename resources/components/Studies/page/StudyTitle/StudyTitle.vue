@@ -10,7 +10,7 @@
         <v-row no-gutters>
           <v-fade-transition mode="out-in">
             <v-col v-if="editing.name" key="editing" cols="12" lg="10" xl="8">
-              <v-form v-model="valid.name">
+              <v-form v-model="valid.name" @submit.prevent="saveName">
                 <v-text-field
                   v-model="localStudy.name"
                   dense
@@ -23,7 +23,7 @@
                   <template v-slot:append-outer>
                     <save-cancel-icon-buttons
                       :save-disabled="!valid.name"
-                      @clicked-save="$emit('editted', {name: localStudy.name}); editing.name=false"
+                      @clicked-save="saveName"
                       @clicked-cancel="editing.name = false"
                     />
                   </template>
@@ -49,7 +49,7 @@
         <v-row no-gutters>
           <v-fade-transition mode="out-in">
             <v-col v-if="editing.description" key="editing" cols="12" lg="10" xl="8">
-              <v-form v-model="valid.description">
+              <v-form v-model="valid.description" @submit.prevent="saveDescription">
                 <v-text-field
                   v-model="localStudy.description"
                   dense
@@ -152,9 +152,17 @@ export default {
       this.localStudy.name = this.study.name
       this.editing.name = true
     },
+    saveName () {
+      this.$emit('editted', { name: this.localStudy.name })
+      this.editing.name = false
+    },
     editDescription () {
       this.localStudy.description = this.study.description
       this.editing.description = true
+    },
+    saveDescription () {
+      this.$emit('editted', { description: this.localStudy.description })
+      this.editing.description = false
     },
     removeErrors (field) {
       if (!this.errors[field]) { return }
