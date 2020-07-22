@@ -570,7 +570,7 @@ class StudyController {
   *     tags:
   *       - Jobs
   *     summary: >
-  *         Sets the state of the specified studies
+  *         Sets the state of jobs of the specified study.
   *     consumes:
   *       - application/json
   *     parameters:
@@ -578,7 +578,7 @@ class StudyController {
   *         name: id
   *         type: integer
   *         required: true
-  *         description: The ID of the study to which the jobs belong
+  *         description: The ID of the study to which the jobs belong.
   *       - in: body
   *         name: data
   *         description: >
@@ -671,7 +671,7 @@ class StudyController {
   *     tags:
   *       - Jobs
   *     summary: >
-  *         Sets the state of the specified studies
+  *         Deletes the jobs from the specified study.
   *     consumes:
   *       - application/json
   *     parameters:
