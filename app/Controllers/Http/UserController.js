@@ -516,6 +516,8 @@ class UserController {
   *     responses:
   *       204:
   *         description: The user has been logged out.
+  *       401:
+  *         description: Unauthorized.
   *       default:
   *         description: Unexpected error.
   */
@@ -571,6 +573,8 @@ class UserController {
   *           type: array
   *           items:
   *             $ref: '#/definitions/ValidationError'
+  *       401:
+  *         description: Unauthorized.
   *       default:
   *         description: Unexpected error.
   */
@@ -592,11 +596,17 @@ class UserController {
   *       - in: body
   *         name: uid
   *         description: The user email to which to send the reset link.
-  *         type: string
-  *         example: john@doe.com
+  *         schema:
+  *           type: object
+  *           properties:
+  *             uid:
+  *               description: The user's email address.
+  *               type: string
+  *               example: john@doe.com
+  *               required: true
   *     responses:
   *       204:
-  *         description: The rest link has been sent.
+  *         description: The reset link has been sent.
   *       400:
   *         description: The request was invalid (e.g. the passed data did not validate).
   *         schema:
@@ -701,14 +711,21 @@ class UserController {
   *       - in: body
   *         name: id
   *         description: The ID of the user
-  *         type: integer
-  *         example: 2
-  *         required: true
+  *         schema:
+  *           type: object
+  *           properties:
+  *             id:
+  *               description: The user's ID
+  *               type: integer
+  *               example: 2
+  *               required: true
   *     responses:
   *       204:
   *         description: The email has been resent
   *       400:
   *         description: The user's account has already been activated
+  *       401:
+  *         description: Unauthorized.
   *       404:
   *         description: The user with the specified ID could not be found
   *       default:
@@ -749,15 +766,22 @@ class UserController {
   *         embedded in the email
   *     parameters:
   *       - in: body
-  *         name: id
   *         description: The ID of the user
-  *         type: integer
-  *         example: 2
+  *         schema:
+  *           type: object
+  *           properties:
+  *             id:
+  *               description: The user's ID
+  *               type: integer
+  *               example: 2
+  *               required: true
   *     responses:
   *       204:
   *         description: The email has been resent
   *       400:
   *         description: The user's account has already been activated
+  *       401:
+  *         description: Unauthorized.
   *       404:
   *         description: The user with the specified ID could not be found (if ID was supplied)
   *       default:
@@ -850,11 +874,11 @@ class UserController {
   *               items:
   *                 type: object
   *                 properties:
-  *                   value:
+  *                   id:
   *                     description: The id of the user type
   *                     example: 2
   *                     type: integer
-  *                   text:
+  *                   name:
   *                     description: The label/name of the user type
   *                     example: standard
   *                     type: string
