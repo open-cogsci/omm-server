@@ -17,7 +17,7 @@ const Factory = use('Factory')
 
 Factory.blueprint('App/Models/Study', (faker) => {
   const experiment = sample(['attentional-capture', 'omm-entry-point', 'omm-template'])
-  const osexpPath = `/public/osexp/${experiment}.osexp`
+  const osexpPath = `/osexp/${experiment}.osexp`
 
   return {
     name: faker.sentence({ words: 5 }),

@@ -42,7 +42,7 @@ class StudySeeder {
     const captureStudy = await daniel.studies().create({
       name: 'Attentional Capture',
       description: 'Basic attentional capture experiment',
-      osexp_path: '/public/osexp/attentional-capture.osexp'
+      osexp_path: '/osexp/attentional-capture.osexp'
     }, (row) => {
       row.is_owner = true
     })
