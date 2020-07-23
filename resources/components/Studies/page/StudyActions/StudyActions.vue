@@ -9,7 +9,7 @@
           :color="osexpPresent?'default':'success'"
           @click="$emit('clicked-upload')"
         >
-          <v-icon left :color="jobsPresent?'black':'white'">
+          <v-icon left :color="osexpPresent?'black':'white'">
             mdi-upload
           </v-icon>
           <span class="d-none d-lg-inline">Upload&nbsp;</span>experiment
