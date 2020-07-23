@@ -1,15 +1,28 @@
 <template>
   <v-container :key="(study && study.id) || 'not-initialized'">
-    <v-row>
+    <v-row dense>
       <v-col cols="12">
         <study-title
           :study="study"
+          :saving="saving.title"
           :loading="loading"
           :errors.sync="errors.title"
           @editted="saveTitleInfo"
         />
       </v-col>
     </v-row>
+    <template v-if="study">
+      <v-row no-gutters>
+        <v-col cols="12" class="text-md-right">
+          <study-actions
+            :loading="loading"
+            :osexp-present="!!study.osexp_path"
+            @clicked-delete="deleteStudy"
+            @clicked-archive="archiveStudy"
+          />
+        </v-col>
+      </v-row>
+    </template>
   </v-container>
 </template>
 
@@ -22,7 +35,8 @@ import { processErrors } from '@/assets/js/errorhandling'
 export default {
   name: 'Study',
   components: {
-    StudyTitle: () => import('@/components/Studies/page/StudyTitle')
+    StudyTitle: () => import('@/components/Studies/page/StudyTitle'),
+    StudyActions: () => import('@/components/Studies/page/StudyActions')
   },
   data () {
     return {
@@ -30,7 +44,9 @@ export default {
         title: false
       },
       errors: {
-        title: {}
+        title: {
+          name: '', description: ''
+        }
       },
       loading: false
     }
@@ -69,6 +85,18 @@ export default {
       } finally {
         this.saving.title = false
       }
+    },
+    async deleteStudy () {
+      try {
+        await this.study.destroy()
+        this.notify({ message: 'Study deleted', color: 'success' })
+        this.$router.replace(this.localePath({ name: 'dashboard-studies' }))
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
+    },
+    async archiveStudy () {
+      await this.study.toggleArchived()
     }
   },
   validate ({ params }) {

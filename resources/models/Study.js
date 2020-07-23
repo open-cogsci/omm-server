@@ -27,12 +27,17 @@ export default class Study extends Model {
     return this.api().post('', data, config)
   }
 
+  destroy (config) {
+    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
+  }
+
   static fields () {
     return {
       id: this.number(null),
       name: this.string(''),
       description: this.string(''),
       active: this.boolean(true),
+      osexp_path: this.attr(''),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),

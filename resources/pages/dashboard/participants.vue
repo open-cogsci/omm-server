@@ -134,7 +134,7 @@ export default {
     async deleteParticipant (ptcpID) {
       this.deleting = true
       try {
-        await Participant.destroy(ptcpID)
+        await Participant.find(ptcpID).destroy()
         this.notify({ message: 'Participant has been deleted', color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)

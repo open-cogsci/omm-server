@@ -1,99 +1,39 @@
 <template>
   <v-skeleton-loader
     :loading="loading"
-    type="heading"
+    type="list-item-two-line"
     transition="fade-transition"
-    height="294"
+    height="115"
   >
-    <v-row v-if="study" no-gutters>
+    <v-row v-if="study" key="study" no-gutters>
       <v-col cols="12">
         <v-row no-gutters>
-          <v-fade-transition mode="out-in">
-            <v-col v-if="editing.name" key="editing" cols="12" lg="10" xl="8">
-              <v-form v-model="valid.name" @submit.prevent="save('name')">
-                <v-text-field
-                  v-model="localStudy.name"
-                  dense
-                  outlined
-                  label="Name"
-                  :counter="maxLength.name"
-                  :rules="validation.name"
-                  :error-messages="errors.name"
-                  @keydown.esc="editing.name = false"
-                >
-                  <template v-slot:append-outer>
-                    <save-cancel-icon-buttons
-                      :save-disabled="!valid.name"
-                      @clicked-save="save('name')"
-                      @clicked-cancel="editing.name = false"
-                    />
-                  </template>
-                </v-text-field>
-              </v-form>
-            </v-col>
-            <v-col v-else key="viewing" cols="12">
-              <v-hover v-slot:default="{ hover }">
-                <p class="text-h5 text-md-h4 font-weight-light">
-                  {{ study.name }}
-                  <v-fab-transition>
-                    <v-btn v-show="hover" icon @click="editName">
-                      <v-icon color="primary">
-                        mdi-pencil
-                      </v-icon>
-                    </v-btn>
-                  </v-fab-transition>
-                </p>
-              </v-hover>
-            </v-col>
-          </v-fade-transition>
+          <editable-text
+            label="Name"
+            :value="study.name"
+            :max-length="maxLength.name"
+            :rules="validation.name"
+            :errors="errors.name"
+            classes="text-h5 text-md-h4 font-weight-light mb-4"
+            @update:error="removeErrors('name')"
+            @save="(val) => $emit('editted', { name: val })"
+          />
         </v-row>
         <v-row no-gutters>
-          <v-fade-transition mode="out-in">
-            <v-col v-if="editing.description" key="editing" cols="12" lg="10" xl="8">
-              <v-form v-model="valid.description" @submit.prevent="save('description')">
-                <v-text-field
-                  v-model="localStudy.description"
-                  dense
-                  :counter="maxLength.description"
-                  :rules="validation.description"
-                  :error-messages="errors.description"
-                  outlined
-                  label="Description"
-                  @input="removeErrors('description')"
-                  @keydown.esc="editing.description = false"
-                >
-                  <template v-slot:append-outer>
-                    <save-cancel-icon-buttons
-                      :save-disabled="!valid.description"
-                      @clicked-save="save('description')"
-                      @clicked-cancel="editing.description = false"
-                    />
-                  </template>
-                </v-text-field>
-              </v-form>
-            </v-col>
-            <v-col v-else cols="12">
-              <v-hover v-slot:default="{ hover }">
-                <h2
-                  v-if="study.description"
-                  class="text-h6 text-md-h5 font-weight-light grey--text"
-                >
-                  {{ study.description }}
-                  <v-fab-transition>
-                    <v-btn v-show="hover" icon @click="editDescription">
-                      <v-icon color="primary">
-                        mdi-pencil
-                      </v-icon>
-                    </v-btn>
-                  </v-fab-transition>
-                </h2>
-              </v-hover>
-            </v-col>
-          </v-fade-transition>
+          <editable-text
+            label="Description"
+            :value="study.description"
+            :max-length="maxLength.description"
+            :rules="validation.description"
+            :errors.sync="errors.description"
+            classes="text-h6 text-md-h5 font-weight-light grey--text mb-6"
+            @update:error="removeErrors('description')"
+            @save="(val) => $emit('editted', { description: val })"
+          />
         </v-row>
       </v-col>
     </v-row>
-    <div v-else>
+    <div v-else key="no-study">
       <p class="display-1 font-weight-light red--text">
         Study could not be found.
       </p>
@@ -105,7 +45,7 @@
 import { isEmpty, isLength } from 'validator'
 export default {
   components: {
-    SaveCancelIconButtons: () => import('@/components/common/SaveCancelIconButtons')
+    EditableText: () => import('@/components/common/EditableText')
   },
   props: {
     study: {
@@ -123,7 +63,6 @@ export default {
   },
   data () {
     return {
-      localStudy: { ...this.study },
       editing: {
         name: false,
         description: false
@@ -157,10 +96,6 @@ export default {
     editDescription () {
       this.localStudy.description = this.study.description
       this.editing.description = true
-    },
-    save (field) {
-      this.$emit('editted', { [field]: this.localStudy[field] })
-      this.editing[field] = false
     },
     removeErrors (field) {
       if (!this.errors[field]) { return }

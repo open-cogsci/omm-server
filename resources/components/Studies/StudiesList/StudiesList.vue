@@ -17,26 +17,29 @@
 
     <transition name="fade" mode="out-in">
       <v-list v-if="loading" key="loading" three-line class="py-0">
-        <template v-for="i in 7">
-          <v-skeleton-loader
-            :key="i"
-            :loading="loading"
-            type="list-item-three-line"
-          />
-          <v-divider :key="`divider-${i}`" />
-        </template>
+        <v-skeleton-loader
+          :loading="loading"
+          type="list-item-three-line@8"
+        />
       </v-list>
-      <v-list v-else key="loaded" three-line class="py-0 fill-space">
-        <template v-for="study in studies">
-          <v-list-item :key="study.id" :to="`/dashboard/studies/${study.id}`" nuxt>
+      <v-virtual-scroll
+        v-else
+        key="loaded"
+        :items="studies"
+        :item-height="88"
+        height="calc(100vh - 268px)"
+        class="py-0 three-line"
+      >
+        <template v-slot="{ item }">
+          <v-list-item three-line :to="`/dashboard/studies/${item.id}`" nuxt>
             <v-list-item-content class="px-3">
-              <v-list-item-title v-text="study.name" />
-              <v-list-item-subtitle v-text="study.description" />
+              <v-list-item-title v-text="item.name" />
+              <v-list-item-subtitle v-text="item.description" />
             </v-list-item-content>
           </v-list-item>
-          <v-divider :key="`divider-${study.id}`" />
+          <v-divider />
         </template>
-      </v-list>
+      </v-virtual-scroll>
     </transition>
   </div>
 </template>

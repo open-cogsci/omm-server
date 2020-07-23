@@ -23,8 +23,8 @@ export default class Participant extends Model {
     return this.api().post('', data, config)
   }
 
-  static destroy (id, config) {
-    return this.api().delete(`/${id}`, { delete: id, ...config })
+  destroy (config) {
+    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
   }
 
   static fields () {
@@ -37,7 +37,6 @@ export default class Participant extends Model {
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr('')
-      // user_type: this.belongsTo(UserType, 'user_type_id')
     }
   }
 }

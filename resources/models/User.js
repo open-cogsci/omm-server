@@ -26,20 +26,23 @@ export default class User extends Model {
     return this.api().post('', data, config)
   }
 
-  static destroy (id, config) {
-    return this.api().delete(`/${id}`, { delete: id, ...config })
+  resendAccountEmail (config) {
+    return this.constructor.api().post('/resend_account_email', { id: this.id }, {
+      save: false,
+      ...config
+    })
   }
 
-  static resendAccountEmail (id, config) {
-    return this.api().post('/resend_account_email', { id }, { save: false, ...config })
-  }
-
-  static resendActivationEmail (id, config) {
-    return this.api().post('/auth/email/resend', { id }, {
+  resendActivationEmail (config) {
+    return this.constructor.api().post('/auth/email/resend', { id: this.id }, {
       save: false,
       baseURL: API_PREFIX,
       ...config
     })
+  }
+
+  destroy (config) {
+    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
   }
 
   get isAdmin () {

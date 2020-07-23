@@ -154,7 +154,7 @@ export default {
     async deleteUser (id) {
       this.deleting = true
       try {
-        await User.destroy(id)
+        await User.find(id).destroy()
         this.notify({ message: 'User has been deleted', color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
@@ -169,10 +169,10 @@ export default {
       this.resending = true
       try {
         if (user.last_login) {
-          await User.resendActivationEmail(user.id)
+          await User.find(user.id).resendActivationEmail()
           this.notify({ message: 'Activation e-mail has been resent', color: 'success' })
         } else {
-          await User.resendAccountEmail(user.id)
+          await User.find(user.id).resendAccountEmail()
           this.notify({ message: 'Account info e-mail has been resent', color: 'success' })
         }
       } catch (e) {

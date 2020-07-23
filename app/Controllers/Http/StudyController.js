@@ -315,20 +315,10 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, auth, response }) {
-    let study
-    try {
-      study = await await auth.user.studies()
-        .where('id', params.id)
-        .firstOrFail()
-    } catch (e) {
-      return response.notFound({ error: { message: `Study with ID:${params.id} could not be found` } })
-    }
-
-    try {
-      study.delete()
-    } catch (e) {
-      response.status(500).json({ message: 'The study could not be removed' })
-    }
+    const study = await await auth.user.studies()
+      .where('id', params.id)
+      .firstOrFail()
+    study.delete()
     return response.noContent()
   }
 

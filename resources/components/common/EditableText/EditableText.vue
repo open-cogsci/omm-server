@@ -1,22 +1,22 @@
 <template>
   <v-fade-transition mode="out-in">
     <v-col v-if="editing" key="editing" cols="12" lg="10" xl="8">
-      <v-form v-model="validates" @submit.prevent="save('name')">
+      <v-form v-model="validates" @submit.prevent="save">
         <v-text-field
-          :value="value"
+          v-model="localValue"
           dense
           outlined
-          label="Name"
-          :counter="maxLength.name"
+          :label="label"
+          :counter="maxLength"
           :rules="rules"
-          :error-messages="errorMessages"
+          :error-messages="errors"
           @keydown.esc="editing = false"
-          @input="$emit('input', $event)"
+          @input="errors = null"
         >
           <template v-slot:append-outer>
             <save-cancel-icon-buttons
               :save-disabled="!validates"
-              @clicked-save="save('name')"
+              @clicked-save="save"
               @clicked-cancel="editing = false"
             />
           </template>
@@ -25,16 +25,18 @@
     </v-col>
     <v-col v-else key="viewing" cols="12">
       <v-hover v-slot:default="{ hover }">
-        <p :class="classes">
-          {{ value }}
+        <div class="d-flex align-center" :class="classes">
+          <span class="py-1">
+            {{ value }}&nbsp;
+          </span>
           <v-fab-transition>
-            <v-btn v-show="hover" icon @click="editName">
+            <v-btn v-show="hover" icon @click="edit">
               <v-icon color="primary">
                 mdi-pencil
               </v-icon>
             </v-btn>
           </v-fab-transition>
-        </p>
+        </div>
       </v-hover>
     </v-col>
   </v-fade-transition>
@@ -42,8 +44,15 @@
 
 <script>
 export default {
-  sync: ['editing', 'validates', 'errorMessages'],
+  sync: ['errors'],
+  components: {
+    SaveCancelIconButtons: () => import('@/components/common/SaveCancelIconButtons')
+  },
   props: {
+    label: {
+      type: String,
+      default: ''
+    },
     value: {
       type: String,
       default: ''
@@ -55,8 +64,30 @@ export default {
     classes: {
       type: String,
       default: ''
+    },
+    maxLength: {
+      type: Number,
+      default: null
+    }
+  },
+  data () {
+    return {
+      editing: false,
+      validates: true,
+      localValue: this.value
+    }
+  },
+  methods: {
+    edit () {
+      this.localValue = this.value
+      this.editing = true
+    },
+    save () {
+      if (this.validates) {
+        this.$emit('save', this.localValue)
+        this.editing = false
+      }
     }
   }
-
 }
 </script>
