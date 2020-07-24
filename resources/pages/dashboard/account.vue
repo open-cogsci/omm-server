@@ -109,8 +109,6 @@ import { isEmail } from 'validator'
 import { processErrors } from '@/assets/js/errorhandling'
 import { UPDATE_PASSWORD, UPDATE_ACCOUNT, RESEND_VERIFICATION } from '@/assets/js/endpoints'
 
-import User from '@/models/User'
-
 export default {
   components: {
     ResetPasswordForm: () => import('@/components/Users/ResetPasswordForm')
@@ -133,6 +131,9 @@ export default {
     }
   },
   computed: {
+    User () {
+      return this.$store.$db().model('users')
+    },
     verified () {
       return 'mdi-alert'
     }
@@ -149,7 +150,7 @@ export default {
           color: 'success'
         })
         await this.$auth.fetchUser()
-        User.insertOrUpdate({ data: this.$auth.user })
+        this.User.insertOrUpdate({ data: this.$auth.user })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       }

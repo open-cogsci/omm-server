@@ -15,7 +15,7 @@
           <span class="d-none d-lg-inline">Upload&nbsp;</span>experiment
         </v-btn>
         <v-btn
-          :color="osexpPresent?'default':'success'"
+          :color="jobsPresent?'default':'success'"
           @click="$emit('clicked-upload')"
         >
           <v-icon left :color="jobsPresent?'black':'white'">
@@ -71,6 +71,10 @@ export default {
       default: false
     },
     osexpPresent: {
+      type: Boolean,
+      default: false
+    },
+    jobsPresent: {
       type: Boolean,
       default: false
     }

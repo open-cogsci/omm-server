@@ -17,6 +17,7 @@
           <study-actions
             :loading="loading"
             :osexp-present="!!study.osexp_path"
+            :jobs-present="!!study.jobs"
             @clicked-delete="deleteStudy"
             @clicked-archive="archiveStudy"
           />
@@ -29,7 +30,6 @@
 <script>
 import { mapActions } from 'vuex'
 import { pick } from 'lodash'
-import Study from '@/models/Study'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -52,8 +52,14 @@ export default {
     }
   },
   computed: {
+    Study () {
+      return this.$store.$db().model('studies')
+    },
     study () {
-      return Study.find(this.$route.params.id)
+      return this.Study.query()
+        .where('id', this.$route.params.id)
+        .with(['jobs.variables', 'participants'])
+        .first()
     }
   },
   mounted () {
@@ -64,7 +70,7 @@ export default {
     async fetchStudy (studyId) {
       this.loading = true
       try {
-        await Study.fetchById(studyId)
+        await this.Study.fetchById(studyId)
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -78,7 +84,7 @@ export default {
       }
       this.saving.title = true
       try {
-        await Study.persist(payload)
+        await this.Study.persist(payload)
         this.errors.title = {}
       } catch (e) {
         this.errors.title = processErrors(e, this.notify)

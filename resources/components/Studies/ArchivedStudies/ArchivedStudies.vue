@@ -8,9 +8,6 @@
 <script>
 import { mapActions } from 'vuex'
 
-import Study from '@/models/Study'
-import User from '@/models/User'
-
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -23,8 +20,14 @@ export default {
     }
   },
   computed: {
+    Study () {
+      return this.$store.$db().model('studies')
+    },
+    User () {
+      return this.$store.$db().model('users')
+    },
     studies () {
-      return Study.query()
+      return this.Study.query()
         .whereHas('users', (q) => {
           q.where('id', this.$auth.user.id)
         })
@@ -41,9 +44,9 @@ export default {
     async loadStudies () {
       this.loading = true
       try {
-        const response = await Study.fetch({ params: { active: false } })
+        const response = await this.Study.fetch({ params: { active: false } })
         // Attach studies to local representation of logged in user.
-        User.insertOrUpdate({
+        this.User.insertOrUpdate({
           where: this.$auth.user.id,
           data: {
             id: this.$auth.user.id,

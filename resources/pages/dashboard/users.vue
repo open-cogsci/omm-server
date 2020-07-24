@@ -65,8 +65,6 @@ import { mapActions } from 'vuex'
 import { pick } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
-import User from '@/models/User'
-
 export default {
   name: 'UsersPage',
   inject: ['theme'],
@@ -87,10 +85,12 @@ export default {
     }
   },
   computed: {
+    User () {
+      return this.$store.$db().model('users')
+    },
     users () {
-      return User.query()
-        .with('user_type')
-        .with('studies')
+      return this.User.query()
+        .with(['user_type', 'studies'])
         .orderBy('name', 'asc')
         .get()
     }
@@ -110,7 +110,7 @@ export default {
     async loadUsers () {
       this.loading = true
       try {
-        await User.fetch()
+        await this.User.fetch()
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -121,7 +121,7 @@ export default {
     async loadUser (id) {
       this.loadingUser = id
       try {
-        await User.fetchById(id)
+        await this.User.fetchById(id)
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       }
@@ -133,7 +133,7 @@ export default {
     async saveUser (userData) {
       this.saving = true
       try {
-        await User.persist(pick(userData,
+        await this.User.persist(pick(userData,
           ['$id', 'id', 'name', 'email', 'password', 'user_type_id', 'account_status']))
         this.notify({ message: 'User has been saved', color: 'success' })
         if (userData.id) {
@@ -154,7 +154,7 @@ export default {
     async deleteUser (id) {
       this.deleting = true
       try {
-        await User.find(id).destroy()
+        await this.User.find(id).destroy()
         this.notify({ message: 'User has been deleted', color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
@@ -169,10 +169,10 @@ export default {
       this.resending = true
       try {
         if (user.last_login) {
-          await User.find(user.id).resendActivationEmail()
+          await user.resendActivationEmail()
           this.notify({ message: 'Activation e-mail has been resent', color: 'success' })
         } else {
-          await User.find(user.id).resendAccountEmail()
+          await user.resendAccountEmail()
           this.notify({ message: 'Account info e-mail has been resent', color: 'success' })
         }
       } catch (e) {

@@ -61,8 +61,6 @@ import { mapActions } from 'vuex'
 import { pick } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
-import Participant from '@/models/Participant'
-
 export default {
   inject: ['theme'],
   components: {
@@ -80,8 +78,11 @@ export default {
     }
   },
   computed: {
+    Participant () {
+      return this.$store.$db().model('participants')
+    },
     participants () {
-      return Participant.query()
+      return this.Participant.query()
         .orderBy('name', 'asc')
         .get()
     }
@@ -101,7 +102,7 @@ export default {
     async loadParticipants () {
       this.loading = true
       try {
-        await Participant.fetch()
+        await this.Participant.fetch()
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -114,7 +115,7 @@ export default {
     async saveParticipant (ptcpData) {
       this.saving = true
       try {
-        await Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
+        await this.Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
         this.notify({ message: 'Participant has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()
@@ -134,7 +135,7 @@ export default {
     async deleteParticipant (ptcpID) {
       this.deleting = true
       try {
-        await Participant.find(ptcpID).destroy()
+        await this.Participant.find(ptcpID).destroy()
         this.notify({ message: 'Participant has been deleted', color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)

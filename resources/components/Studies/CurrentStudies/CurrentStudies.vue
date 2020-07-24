@@ -21,9 +21,6 @@
 import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
-import Study from '@/models/Study'
-import User from '@/models/User'
-
 export default {
   components: {
     StudiesList: () => import('../StudiesList'),
@@ -38,8 +35,14 @@ export default {
     }
   },
   computed: {
+    Study () {
+      return this.$store.$db().model('studies')
+    },
+    User () {
+      return this.$store.$db().model('users')
+    },
     studies () {
-      return Study.query()
+      return this.Study.query()
         .whereHas('users', (q) => {
           q.where('id', this.$auth.user.id)
         })
@@ -56,9 +59,9 @@ export default {
     async loadStudies () {
       this.loading = true
       try {
-        const response = await Study.fetch()
+        const response = await this.Study.fetch()
         // Attach studies to local representation of logged in user.
-        User.insertOrUpdate({
+        this.User.insertOrUpdate({
           where: this.$auth.user.id,
           data: {
             id: this.$auth.user.id,
@@ -77,7 +80,7 @@ export default {
     async saveNewStudy (newStudyData) {
       this.saving = true
       try {
-        await Study.persist({
+        await this.Study.persist({
           name: newStudyData.name,
           description: newStudyData.description
         })
