@@ -2,6 +2,8 @@ import { Model } from '@vuex-orm/core'
 
 import User from './User'
 import StudyUser from './StudyUser'
+import Job from './Job'
+import Variable from './Variable'
 
 import { STUDIES } from '@/assets/js/endpoints'
 
@@ -42,7 +44,9 @@ export default class Study extends Model {
       updated_at: this.attr(''),
       deleted_at: this.attr(''),
       participants_count: this.number(0),
-      users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id')
+      users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id'),
+      jobs: this.hasMany(Job, 'study_id'),
+      variables: this.hasMany(Variable, 'study_id')
     }
   }
 }

@@ -17,7 +17,7 @@
           <study-actions
             :loading="loading"
             :osexp-present="!!study.osexp_path"
-            :jobs-present="!!study.jobs"
+            :jobs-present="!!study.jobs.length"
             @clicked-delete="deleteStudy"
             @clicked-archive="archiveStudy"
           />
@@ -57,8 +57,8 @@ export default {
     },
     study () {
       return this.Study.query()
-        .where('id', this.$route.params.id)
-        .with(['jobs.variables', 'participants'])
+        .where('id', parseInt(this.$route.params.id))
+        .with(['jobs.variables.dtype', 'participants'])
         .first()
     }
   },
@@ -76,6 +76,7 @@ export default {
       } finally {
         this.loading = false
       }
+      console.log(this.study.jobs)
     },
     async saveTitleInfo (data) {
       const payload = {

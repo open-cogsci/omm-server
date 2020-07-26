@@ -484,7 +484,7 @@ class StudyController {
   *         name: id
   *         type: integer
   *         required: true
-  *         description: The ID of the study to insert the jobs for.
+  *         description: The ID of the study to retrieve the jobs from.
   *         example: 1
   *       - in: query
   *         name: from

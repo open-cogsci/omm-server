@@ -8,6 +8,8 @@ $ npm ci (or `npm install` if that fails)
 
 # Start a dev server and serve with hot reload at localhost:3000
 $ npm run dev
+# Or
+$ adonis serve
 
 # build for production and launch server
 $ npm run build
@@ -65,7 +67,7 @@ command. This will insert the data specified in the seed files under `database/s
 
 ## Running tests
 
-Tests are implemented on the frontend with [Jest](https://jestjs.io/) and for the backend using _TBD_.
+Tests are implemented on the frontend with [Jest](https://jestjs.io/) and for the backend using Adonis.
 Tests can be run with the command `npm test`.
 
 ## API documentation with swagger
