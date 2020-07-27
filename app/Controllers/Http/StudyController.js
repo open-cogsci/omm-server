@@ -169,10 +169,12 @@ class StudyController {
       .where('id', params.id)
       .with('jobs.variables.dtype')
       .with('participants')
+      .with('variables.dtype')
+      .with('users')
       .firstOrFail()
 
     return transform
-      .include('jobs,participants')
+      .include('jobs,participants,variables,users')
       .item(study, 'StudyTransformer')
   }
 

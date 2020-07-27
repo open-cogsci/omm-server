@@ -7,11 +7,15 @@ import JobVariable from './JobVariable'
 export default class Variable extends Model {
   static entity = 'variables'
 
+  value (jobID) {
+    return JobVariable.find([jobID, this.id])
+  }
+
   static fields () {
     return {
-      id: this.number(null),
+      id: this.attr(''),
       name: this.attr(''),
-      study_id: this.number(null),
+      study_id: this.attr(''),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),

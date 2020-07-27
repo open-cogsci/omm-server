@@ -58,8 +58,31 @@ export default {
     study () {
       return this.Study.query()
         .where('id', parseInt(this.$route.params.id))
-        .with(['jobs.variables.dtype', 'participants'])
+        .with(['variables', 'users', 'participants'])
+        .with(['jobs'], (query) => {
+          query.orderBy('position', 'asc')
+            .with('variables.dtype')
+        })
         .first()
+    },
+    table () {
+      // Temporary fix for nasty Vuex-ORM bug
+      const results = {}
+      if (this.study) {
+        for (const job of this.study.jobs) {
+          results[job.id] = pick(job, ['id', 'position'])
+          results[job.id].variables = {}
+          for (const variable of job.variables) {
+            const pivot = variable.value(job.id)
+            results[job.id].variables[variable.id] = {
+              name: variable.name,
+              value: pivot.value,
+              pivot
+            }
+          }
+        }
+      }
+      return results
     }
   },
   mounted () {
@@ -76,7 +99,6 @@ export default {
       } finally {
         this.loading = false
       }
-      console.log(this.study.jobs)
     },
     async saveTitleInfo (data) {
       const payload = {
