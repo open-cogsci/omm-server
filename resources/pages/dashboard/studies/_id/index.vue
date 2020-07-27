@@ -1,30 +1,62 @@
 <template>
-  <v-container :key="(study && study.id) || 'not-initialized'">
-    <v-row dense>
-      <v-col cols="12">
-        <study-title
-          :study="study"
-          :saving="saving.title"
-          :loading="loading"
-          :errors.sync="errors.title"
-          @editted="saveTitleInfo"
-        />
-      </v-col>
-    </v-row>
-    <template v-if="study">
-      <v-row no-gutters>
-        <v-col cols="12" class="text-md-right">
-          <study-actions
+  <fragment>
+    <upload-experiment-dialog v-model="dialog.uploadExp" />
+    <upload-jobs-dialog v-model="dialog.uploadJobs" />
+    <collaborators-dialog v-model="dialog.collaborators" />
+    <v-container :key="(study && study.id) || 'not-initialized'">
+      <v-row dense>
+        <v-col cols="12">
+          <study-title
+            :study="study"
+            :saving="saving.title"
             :loading="loading"
-            :osexp-present="!!study.osexp_path"
-            :jobs-present="!!study.jobs.length"
-            @clicked-delete="deleteStudy"
-            @clicked-archive="archiveStudy"
+            :errors.sync="errors.title"
+            @editted="saveTitleInfo"
           />
         </v-col>
       </v-row>
-    </template>
-  </v-container>
+      <template v-if="study">
+        <v-row no-gutters>
+          <v-col cols="12" lg="9" class="text-md-right">
+            <study-actions
+              :loading="loading"
+              :osexp-present="!!study.osexp_path"
+              :jobs-present="!!study.jobs.length"
+              @clicked-delete="deleteStudy"
+              @clicked-archive="archiveStudy"
+              @clicked-upload-exp="dialog.uploadExp = true"
+              @clicked-upload-jobs="dialog.uploadJobs = true"
+              @clicked-collaborators="dialog.collaborators = true"
+            />
+          </v-col>
+          <v-col cols="12" lg="3" order-lg="first">
+            <v-tabs v-model="tab">
+              <v-tab>Jobs</v-tab>
+              <v-tab>Participants</v-tab>
+            </v-tabs>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-tabs-items v-model="tab">
+              <v-tab-item>
+                <v-card flat>
+                  <v-card-text>
+                    <jobs-table :data="jobsTable" />
+                  </v-card-text>
+                </v-card>
+              </v-tab-item>
+              <v-tab-item>
+                <v-card flat>
+                  <v-card-text>Participants</v-card-text>
+                </v-card>
+              </v-tab-item>
+            </v-tabs-items>
+          </v-col>
+        </v-row>
+      </template>
+    </v-container>
+  </fragment>
 </template>
 
 <script>
@@ -36,7 +68,11 @@ export default {
   name: 'Study',
   components: {
     StudyTitle: () => import('@/components/Studies/page/StudyTitle'),
-    StudyActions: () => import('@/components/Studies/page/StudyActions')
+    StudyActions: () => import('@/components/Studies/page/StudyActions'),
+    JobsTable: () => import('@/components/Studies/page/JobsTable'),
+    UploadExperimentDialog: () => import('@/components/Studies/dialogs/UploadExperimentDialog'),
+    UploadJobsDialog: () => import('@/components/Studies/dialogs/UploadJobsDialog'),
+    CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog')
   },
   data () {
     return {
@@ -48,7 +84,13 @@ export default {
           name: '', description: ''
         }
       },
-      loading: false
+      loading: false,
+      tab: 0,
+      dialog: {
+        uploadExp: false,
+        uploadJobs: false,
+        collaborators: false
+      }
     }
   },
   computed: {
@@ -65,7 +107,7 @@ export default {
         })
         .first()
     },
-    table () {
+    jobsTable () {
       // Temporary fix for nasty Vuex-ORM bug
       const results = {}
       if (this.study) {

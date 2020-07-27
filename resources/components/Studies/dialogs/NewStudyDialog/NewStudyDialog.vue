@@ -59,8 +59,10 @@
 
 <script>
 import { isEmpty, isLength } from 'validator'
+import serverErrors from '@/mixins/servererrors'
 
 export default {
+  mixins: [serverErrors],
   props: {
     value: {
       type: Boolean,
@@ -117,13 +119,6 @@ export default {
       this.study.name = ''
       this.study.description = ''
       this.$refs.form.resetValidation()
-    },
-    removeErrors (field) {
-      const errors = {
-        ...this.errors,
-        [field]: ''
-      }
-      this.$emit('update:errors', errors)
     }
   }
 }

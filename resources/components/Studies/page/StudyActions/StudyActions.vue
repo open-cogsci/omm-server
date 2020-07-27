@@ -7,7 +7,7 @@
       <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
         <v-btn
           :color="osexpPresent?'default':'success'"
-          @click="$emit('clicked-upload')"
+          @click="$emit('clicked-upload-exp')"
         >
           <v-icon left :color="osexpPresent?'black':'white'">
             mdi-upload
@@ -16,7 +16,7 @@
         </v-btn>
         <v-btn
           :color="jobsPresent?'default':'success'"
-          @click="$emit('clicked-upload')"
+          @click="$emit('clicked-upload-jobs')"
         >
           <v-icon left :color="jobsPresent?'black':'white'">
             mdi-upload

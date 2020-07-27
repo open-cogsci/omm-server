@@ -24,7 +24,7 @@ import { processErrors } from '@/assets/js/errorhandling'
 export default {
   components: {
     StudiesList: () => import('../StudiesList'),
-    newStudyDialog: () => import('../NewStudyDialog')
+    newStudyDialog: () => import('../dialogs/NewStudyDialog')
   },
   data () {
     return {
