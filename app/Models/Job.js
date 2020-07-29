@@ -10,10 +10,13 @@ const Model = use('Model')
 *      properties:
 *        id:
 *          type: integer
+*          example: 24
 *        study_id:
 *          type: integer
-*        order:
+*          example: 42
+*        position:
 *          type: integer
+*          example: 1
 *        created_at:
 *          type: string
 *          format: date-time
@@ -21,6 +24,7 @@ const Model = use('Model')
 *          type: string
 *          format: date-time
 *      required:
+*        - id
 *        - study_id
 *        - order
 *    JobWithRelations:
@@ -33,7 +37,7 @@ const Model = use('Model')
 *             variables:
 *               type: array
 *               items:
-*                 $ref: '#/definitions/Variable'
+*                 $ref: '#/definitions/VariableWithRelations'
 */
 
 class Job extends Model {

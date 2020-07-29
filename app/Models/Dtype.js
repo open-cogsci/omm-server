@@ -10,8 +10,10 @@ const Model = use('Model')
 *      properties:
 *        id:
 *          type: integer
+*          example: 1
 *        name:
 *          type: string
+*          example: variable
 */
 class Dtype extends Model {
   variables () {

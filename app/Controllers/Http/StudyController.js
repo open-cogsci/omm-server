@@ -622,35 +622,38 @@ class StudyController {
    */
   async setJobStates ({ params, request, response }) {
     const { id } = params
-    const { from, to, state, participant } = request.all()
+    const { from, to, state, participant: ptcpID } = request.all()
 
     if (to && from && to <= from) {
       return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
     }
 
-    try {
-      await Participant.findByOrFail('identifier', participant)
-    } catch (e) {
-      return response.notFound({ message: `No participant found with identifier ${participant}` })
-    }
+    const participant = await Participant.findByOrFail('identifier', ptcpID)
 
     let rowsUpdated = 0
-    try {
+    // SQLite doesn't support inner joins, therefore we need this ugly way:
+    if (Database.connection().connectionClient === 'sqlite3') {
+      const jobIDs = await participant.jobs()
+        .where('study_id', id)
+        .whereBetween('jobs.position', [from, (to - 1)])
+        .ids()
+      rowsUpdated = await participant.jobs()
+        .pivotQuery()
+        .whereIn('job_id', jobIDs)
+        .update({ status_id: state })
+    } else {
       await Database.transaction(async (trx) => {
-        const query = trx.table('job_states')
+        rowsUpdated = await trx.table('job_states')
           .leftJoin('jobs', 'job_states.job_id', 'jobs.id')
           .leftJoin('studies', 'jobs.study_id', 'studies.id')
           .where('studies.id', id)
           .whereBetween('jobs.position', [from, (to - 1)])
-        if (participant) {
-          query.leftJoin('participants', 'job_states.participant_id', 'participants.id')
-          query.where('participants.identifier', participant)
-        }
-        rowsUpdated = await query.update({ status_id: state })
+          .leftJoin('participants', 'job_states.participant_id', 'participants.id')
+          .where('participants.identifier', participant)
+          .update({ status_id: state })
       })
-    } catch (e) {
-      return response.badRequest(e.toString())
     }
+
     return response.json({
       data: { jobs_updated: rowsUpdated }
     })

@@ -8,13 +8,16 @@ const Model = use('Model')
 *    Variable:
 *      type: object
 *      properties:
+*        id:
+*          type: integer
+*          example: 38
 *        study_id:
 *          type: integer
+*          example: 42
 *        dtype_id:
 *          type: integer
+*          example: 1
 *        name:
-*          type: string
-*        value:
 *          type: string
 *        created_at:
 *          type: string
@@ -23,6 +26,7 @@ const Model = use('Model')
 *          type: string
 *          format: date-time
 *      required:
+*        - id
 *        - study_id
 *        - dtype_id
 *        - name
@@ -34,9 +38,17 @@ const Model = use('Model')
 *           properties:
 *             dtype:
 *               $ref: '#/definitions/Dtype'
-*             study:
-*               $ref: '#/definitions/StudyWithRelations'
-*
+*             pivot:
+*               type: object
+*               properties:
+*                 value:
+*                   type: string
+*                 job_id:
+*                   type: integer
+*                   example: 24
+*                 variable_id:
+*                   type: integer
+*                   example: 38
 */
 class Variable extends Model {
   study () {
