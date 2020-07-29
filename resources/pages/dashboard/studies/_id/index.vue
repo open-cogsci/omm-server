@@ -167,7 +167,7 @@ export default {
       }
     },
     async archiveStudy () {
-      await this.study.toggleArchived()
+      // await this.study.toggleArchived()
     }
   },
   validate ({ params }) {

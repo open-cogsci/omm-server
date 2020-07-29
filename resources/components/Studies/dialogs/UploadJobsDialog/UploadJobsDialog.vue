@@ -18,7 +18,6 @@
         <v-spacer />
         <save-cancel-buttons
           :saving="saving"
-          :save-disabled="!formValid"
           @clicked-save="save"
           @clicked-cancel="cancel"
         />

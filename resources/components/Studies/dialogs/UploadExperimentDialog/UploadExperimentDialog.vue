@@ -16,26 +16,11 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          text
-          @click="cancel"
-        >
-          <v-icon left>
-            mdi-cancel
-          </v-icon> Cancel
-        </v-btn>
-        <v-btn
-          text
-          color="success"
-          :disabled="!formValid"
-          :loading="saving"
-          @click="save"
-        >
-          <v-icon left>
-            mdi-check
-          </v-icon>
-          Save
-        </v-btn>
+        <save-cancel-buttons
+          :saving="saving"
+          @clicked-save="save"
+          @clicked-cancel="cancel"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -43,6 +28,9 @@
 
 <script>
 export default {
+  components: {
+    SaveCancelButtons: () => import('@/components/common/SaveCancelButtons')
+  },
   props: {
     value: {
       type: Boolean,

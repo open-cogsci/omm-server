@@ -62,22 +62,12 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer />
-      <v-btn text @click="cancel">
-        <v-icon left>
-          mdi-cancel
-        </v-icon> Cancel
-      </v-btn>
-      <v-btn
-        text
-        color="success"
-        :disabled="!validates"
-        :loading="saving"
-        @click="save"
-      >
-        <v-icon left>
-          mdi-check
-        </v-icon> Save
-      </v-btn>
+      <save-cancel-buttons
+        :saving="saving"
+        :saving-disabled="!validates"
+        @clicked-save="save"
+        @clicked-cancel="cancel"
+      />
     </v-card-actions>
   </fragment>
 </template>
@@ -86,6 +76,7 @@
 import { isEmpty, isLength, isEmail } from 'validator'
 import { upperFirst, isEqual, omit } from 'lodash'
 import UserType from '@/models/UserType'
+import servererrors from '@/mixins/servererrors'
 
 const EMPTY_VALUES = {
   name: '',
@@ -97,13 +88,15 @@ const EMPTY_VALUES = {
 
 export default {
   components: {
-    UnsavedChangesDialog: () => import('@/components/common/UnsavedChangesDialog')
+    UnsavedChangesDialog: () => import('@/components/common/UnsavedChangesDialog'),
+    SaveCancelButtons: () => import('@/components/common/SaveCancelButtons')
   },
   filters: {
     upperFirst (val) {
       return upperFirst(val)
     }
   },
+  mixins: [servererrors],
   props: {
     user: {
       type: Object,
@@ -182,13 +175,6 @@ export default {
     },
     resetValidation () {
       this.$refs.form.resetValidation()
-    },
-    removeErrors (field) {
-      const errors = {
-        ...this.errors,
-        [field]: ''
-      }
-      this.$emit('update:errors', errors)
     }
   }
 }
