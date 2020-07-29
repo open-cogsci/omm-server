@@ -434,35 +434,53 @@ class StudyController {
       })
     }
 
-    try {
-      await Database.transaction(async (trx) => {
-        // Walk through the list of jobs and transform them so that they can easily be stored in the
-        // database. Additionally check if the supplied variable name exists for this study.
-        jobs = await study.saveJobsFromInput(jobsData, trx)
+    let trx = null
+    // SQLite engine hangs on transactions, so we need to work around this
+    if (Database.connection().connectionClient !== 'sqlite3') {
+      trx = await Database.beginTransaction()
+    }
 
-        // Move the old jobs to new positions, by incrementing their order value with the new jobs' length.
-        // await study.jobs().where('position', '>=', index).increment('position', jobsData.length)
-        await trx.table('jobs')
-          .where('study_id', id)
-          .where('position', '>=', index)
-          .increment('position', jobsData.length)
+    try {
+      // Walk through the list of jobs and transform them so that they can easily be stored in the
+      // database. Additionally check if the supplied variable name exists for this study.
+      jobs = await study.saveJobsFromInput(jobsData, trx)
+
+      // Move the old jobs to new positions, by incrementing their order value with the new jobs' length.
+      // await study.jobs().where('position', '>=', index).increment('position', jobsData.length)
+      // Create a placeholder var db to account for SQlite not sufficiently supporting transactions.
+      let db
+      if (trx) {
+        db = trx
+      } else {
+        db = Database
+      }
+
+      await db.table('jobs')
+        .where('study_id', id)
+        .where('position', '>=', index)
+        .increment('position', jobsData.length)
         // Get a list of IDS of participants associated with the study to associate these participants
         // with the new jobs too in the next step.
-        const ptcpIDs = study.getRelated('participants').rows.map(ptcp => ptcp.id)
+      const ptcpIDs = study.getRelated('participants').rows.map(ptcp => ptcp.id)
 
-        // Assign positions to jobs and assign them to participants of study too.
-        for (const [pos, job] of jobs.entries()) {
-          job.position = index + pos
-          if (ptcpIDs.length > 0) {
-            await job.participants().attach(ptcpIDs, null, trx)
-          }
+      // Assign positions to jobs and assign them to participants of study too.
+      for (const [pos, job] of jobs.entries()) {
+        job.position = index + pos
+        if (ptcpIDs.length > 0) {
+          await job.participants().attach(ptcpIDs, null, trx)
         }
-        await study.jobs().saveMany(jobs, trx)
-      })
+      }
+      await study.jobs().saveMany(jobs, trx)
+      if (trx) {
+        trx.commit()
+      }
     } catch (e) {
       let code = 500
       if (['ReferenceError'].includes(e.name)) {
         code = 400 // BadRequest
+      }
+      if (trx) {
+        trx.rollback()
       }
       return response.status(code).json({ message: e.toString() })
     }
@@ -649,7 +667,7 @@ class StudyController {
           .where('studies.id', id)
           .whereBetween('jobs.position', [from, (to - 1)])
           .leftJoin('participants', 'job_states.participant_id', 'participants.id')
-          .where('participants.identifier', participant)
+          .where('participants.identifier', ptcpID)
           .update({ status_id: state })
       })
     }

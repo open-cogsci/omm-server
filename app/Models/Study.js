@@ -125,22 +125,48 @@ class Study extends Model {
   async saveJobsFromInput (jobsData, trx) {
     // Obtain the list of variables that are used for this study.
     const variables = await this.variables().pair('name', 'id')
-    const varsList = Object.keys(variables)
 
     const jobs = await Promise.all(jobsData.map(async (jobData) => {
-      // Create the job
-      const job = await this.jobs().create({}, trx)
-
-      for (const [varName, varValue] of Object.entries(jobData)) {
-        // Check if all variables exists for this study
-        if (!varsList.includes(varName)) {
-          throw new ReferenceError(`Variable '${varName}' does not exist for this study.`)
-        }
-        await job.variables().attach(variables[varName], (row) => { row.value = varValue }, trx)
+      if (trx) {
+        return await this._trxSaveJobsFromInput(jobData, variables, trx)
+      } else {
+        return await this._noTrxSaveJobsFromInput(jobData, variables)
       }
-      return job
     }))
     return jobs
+  }
+
+  async _trxSaveJobsFromInput (jobData, variables, trx) {
+    const varsList = Object.keys(variables)
+    // Create the job
+    const job = await this.jobs().create({}, trx)
+
+    for (const [varName, varValue] of Object.entries(jobData)) {
+      // Check if all variables exists for this study
+      if (!varsList.includes(varName)) {
+        throw new ReferenceError(`Variable '${varName}' does not exist for this study.`)
+      }
+      await job.variables().attach(variables[varName], (row) => { row.value = varValue }, trx)
+    }
+    return job
+  }
+
+  async _noTrxSaveJobsFromInput (jobData, variables) {
+    const varsList = Object.keys(variables)
+
+    for (const varName of Object.keys(jobData)) {
+      // Check if all variables exists for this study
+      if (!varsList.includes(varName)) {
+        throw new ReferenceError(`Variable '${varName}' does not exist for this study.`)
+      }
+    }
+    // Create the job
+    const job = await this.jobs().create({})
+
+    for (const [varName, varValue] of Object.entries(jobData)) {
+      await job.variables().attach(variables[varName], (row) => { row.value = varValue })
+    }
+    return job
   }
 }
 
