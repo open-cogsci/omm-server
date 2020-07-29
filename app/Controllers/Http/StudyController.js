@@ -397,7 +397,7 @@ class StudyController {
   *             data:
   *               type: array
   *               items:
-  *                 $ref: '#/definitions/Job'
+  *                 $ref: '#/definitions/JobWithRelations'
   *       400:
   *         description: The request was invalid (e.g. the passed data did not validate).
   *         schema:
@@ -458,6 +458,7 @@ class StudyController {
       await db.table('jobs')
         .where('study_id', id)
         .where('position', '>=', index)
+        .orderBy('position', 'desc')
         .increment('position', jobsData.length)
         // Get a list of IDS of participants associated with the study to associate these participants
         // with the new jobs too in the next step.
@@ -472,7 +473,7 @@ class StudyController {
       }
       await study.jobs().saveMany(jobs, trx)
       if (trx) {
-        trx.commit()
+        await trx.commit()
       }
     } catch (e) {
       let code = 500
@@ -480,11 +481,10 @@ class StudyController {
         code = 400 // BadRequest
       }
       if (trx) {
-        trx.rollback()
+        await trx.rollback()
       }
       return response.status(code).json({ message: e.toString() })
     }
-
     return transform.collection(jobs, 'JobTransformer')
   }
 
