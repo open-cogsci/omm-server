@@ -13,12 +13,23 @@ class JobTransformer extends BumblebeeTransformer {
     return ['variables']
   }
 
+  static get availableInclude () {
+    return ['participants']
+  }
+
   transform (model) {
-    return { ...model.toObject() }
+    return {
+      ...model.toObject(),
+      pivot: model.getRelated('pivot').toJSON()
+    }
   }
 
   includeVariables (job) {
     return this.collection(job.getRelated('variables'), 'VariableTransformer')
+  }
+
+  includeParticipants (job) {
+    return this.collection(job.getRelated('participants'), 'ParticipantTransformer')
   }
 }
 

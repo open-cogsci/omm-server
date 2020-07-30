@@ -1,9 +1,9 @@
 <template>
-  <fragment>
+  <div :key="(study && study.id) || 'not-initialized'">
     <upload-experiment-dialog v-model="dialog.uploadExp" />
     <upload-jobs-dialog v-model="dialog.uploadJobs" />
     <collaborators-dialog v-model="dialog.collaborators" />
-    <v-container :key="(study && study.id) || 'not-initialized'">
+    <v-container>
       <v-row dense>
         <v-col cols="12">
           <study-title
@@ -56,7 +56,7 @@
         </v-row>
       </template>
     </v-container>
-  </fragment>
+  </div>
 </template>
 
 <script>

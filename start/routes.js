@@ -53,6 +53,7 @@ Route.group(() => {
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
   Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
   Route.get('/participants/:identifier/:studyID/currentjob_idx', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
+  Route.get('/participants/:identifier/:studyID/jobs', 'ParticipantController.fetchJobs').as('participants.fetch_jobs')
 
   Route.patch('/participants/:identifier/:jobID/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
 

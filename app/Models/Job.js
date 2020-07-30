@@ -38,6 +38,35 @@ const Model = use('Model')
 *               type: array
 *               items:
 *                 $ref: '#/definitions/VariableWithRelations'
+*    JobWithRelationsAndPivot:
+*      allOf:
+*         - $ref: '#/definitions/JobWithRelations'
+*         - type: object
+*           properties:
+*             pivot:
+*               type: object
+*               properties:
+*                 job_id:
+*                   type: integer
+*                   example: 24
+*                 participant_id:
+*                   type: integer
+*                   example: 3
+*                 data:
+*                   type: string
+*                   example: {"rt": 200, "correct": false}
+*                 status_id:
+*                   type: integer
+*                   example: 3
+*                 status:
+*                   type: object
+*                   properties:
+*                     id:
+*                       type: integer
+*                       example: 3
+*                     name:
+*                       type: string
+*                       example: finished
 */
 
 class Job extends Model {
@@ -56,6 +85,7 @@ class Job extends Model {
     return this
       .belongsToMany('App/Models/Participant')
       .pivotModel('App/Models/JobState')
+      .withPivot(['data', 'status_id'])
   }
 }
 

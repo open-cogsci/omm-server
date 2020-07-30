@@ -509,12 +509,12 @@ class StudyController {
   *       - in: query
   *         name: from
   *         type: integer
-  *         description: The start index position
+  *         description: The start index position.
   *         example: 3
   *       - in: query
   *         name: to
   *         type: integer
-  *         description: The end index position
+  *         description: The end index position.
   *         example: 6
   *     responses:
   *       200:
@@ -526,11 +526,7 @@ class StudyController {
   *               items:
   *                 $ref: '#/definitions/JobWithRelations'
   *       400:
-  *         description: The request was invalid (e.g. the passed data did not validate).
-  *         schema:
-  *           type: array
-  *           items:
-  *             $ref: '#/definitions/ValidationError'
+  *         description: The request was invalid (e.g. wrong parameters were passed).
   *       default:
   *         description: Unexpected error
   */
@@ -543,34 +539,30 @@ class StudyController {
    */
   async fetchJobs ({ params, request, response, transform }) {
     const { id } = params
-    const from = request.input('from')
-    const to = request.input('to')
-    // Fetch the study, or throw an error if it isn't found.
+    const { from, to } = request.all()
 
     if (to && from && to <= from) {
       return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
     }
 
-    const query = Study.query().where('id', id).with('participants').with('jobs', (query) => {
-      if (from) {
-        query.where('position', '>=', from)
-      }
-      if (to) {
-        query.where('position', '<', to)
-      }
-      query.orderBy('position', 'asc')
-      query.with('variables.dtype')
-    })
+    // Fetch the study, or throw an error if it isn't found.
+    const query = Study.query()
+      .where('id', id)
+      .with('jobs', (query) => {
+        if (from) {
+          query.where('position', '>=', from)
+        }
+        if (to) {
+          query.where('position', '<', to)
+        }
+        query.orderBy('position', 'asc')
+        query.with('variables.dtype')
+        query.with('participants')
+      })
 
-    let study
-    try {
-      study = await query.firstOrFail()
-    } catch (e) {
-      return response.notFound({ message: e.toString() })
-    }
-
+    const study = await query.firstOrFail()
     const jobs = study.getRelated('jobs')
-    return transform.collection(jobs, 'JobTransformer')
+    return transform.include('participants').collection(jobs, 'JobTransformer')
   }
 
   /**

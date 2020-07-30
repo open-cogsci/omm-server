@@ -12,8 +12,8 @@ class JobState extends Model {
     return this.belongsTo('App/Models/Participant')
   }
 
-  state () {
-    return this.belongsTo('App/Models/JobStatus')
+  status () {
+    return this.belongsTo('App/Models/JobStatus', 'status_id')
   }
 }
 

@@ -1,5 +1,9 @@
 'use strict'
 
+const isArray = require('lodash/isArray')
+const isObject = require('lodash/isObject')
+const formatISO9075 = require('date-fns/formatISO9075')
+
 const Participant = use('App/Models/Participant')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -541,6 +545,94 @@ class ParticipantController {
 
   /**
   * @swagger
+  * /participants/{identifier}/{studyID}/jobs:
+  *   get:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Gets the jobs for the participant of the specified study, including status and results.
+  *         The range of jobs returned can be limited by specifying the start and stop index in
+  *         the query string.
+  *     parameters:
+  *       - in: path
+  *         name: identifier
+  *         description: the identifier code of the participant.
+  *         required: true
+  *         type: string
+  *       - in: path
+  *         name: studyID
+  *         description: the study ID from which to fetch the jobs.
+  *         required: true
+  *         type: integer
+  *       - in: query
+  *         name: from
+  *         type: integer
+  *         description: The start index position.
+  *         example: 3
+  *       - in: query
+  *         name: to
+  *         type: integer
+  *         description: The end index position.
+  *         example: 6
+  *     responses:
+  *       200:
+  *         description: The requested jobs
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/JobWithRelationsAndPivot'
+  *       404:
+  *         description: The participant with the specified identifier or the study with the specified ID
+  *                      was not found.
+  *       412:
+  *         description: The specified participant is marked as inactive.
+  */
+
+  /**
+   * READ jobs
+   *
+   * @param {*} { params, request, response }
+   * @memberof StudyController
+   */
+  async fetchJobs ({ params, request, response, transform }) {
+    const { identifier, studyID } = params
+    const { from, to } = request.all()
+
+    if (to && from && to <= from) {
+      return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
+    }
+
+    // Fetch the participant, or throw an error if it isn't found.
+    const participant = await Participant.query()
+      .where('identifier', identifier)
+      .with('jobs', (query) => {
+        if (from) {
+          query.where('position', '>=', from)
+        }
+        if (to) {
+          query.where('position', '<', to)
+        }
+        query
+          .where('study_id', studyID)
+          .orderBy('position', 'asc')
+          .with('variables.dtype')
+      })
+      .firstOrFail()
+
+    const jobs = participant.getRelated('jobs')
+    if (jobs.length === 0) {
+      return response.notFound(`No jobs were found for study ID ${studyID}`)
+    }
+    for (const job of jobs.rows) {
+      await job.$relations.pivot.load('status')
+    }
+    return transform.collection(jobs, 'JobTransformer')
+  }
+
+  /**
+  * @swagger
   * /participants/{identifier}/{id}/result:
   *   patch:
   *     tags:
@@ -586,14 +678,29 @@ class ParticipantController {
   async processJobResult ({ params, request, response }) {
     const { jobID, identifier } = params
 
-    let ptcp
-    try {
-      ptcp = await Participant.findByOrFail('identifier', identifier)
-    } catch (e) {
-      return response.notFound({ message: `Could not find participant with identifier ${identifier}` })
-    }
+    const ptcp = await Participant.query()
+      .where('identifier', identifier)
+      .with('jobs', (q) => {
+        q.where('id', jobID)
+      })
+      .firstOrFail()
 
     let data = request.input('data')
+    const previousData = ptcp.getRelated('jobs').first()?.getRelated('pivot').data
+    // Check if data has already been stored
+    if (previousData) {
+      if (isObject(data)) {
+        data._time = formatISO9075(new Date())
+      }
+      if (isArray(previousData)) {
+        // If previous data already has multiple entries, simply push the current entry
+        previousData.push(data)
+        data = previousData
+      } else {
+        // If it is an object, place it in an array and add the current data instance
+        data = [previousData, data]
+      }
+    }
 
     // Try to convert the data to json string
     try {

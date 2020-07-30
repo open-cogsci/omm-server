@@ -49,6 +49,7 @@ class Participant extends Model {
     return this
       .belongsToMany('App/Models/Job')
       .pivotModel('App/Models/JobState')
+      .withPivot(['data', 'status_id'])
   }
 }
 
