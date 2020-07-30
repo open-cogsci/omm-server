@@ -42,7 +42,7 @@ Route.group(() => {
       [['studies.store'], ['SaveStudy']],
       [['studies.update'], ['SaveStudy']]
     ]))
-}).prefix(API_PREFIX).middleware(['auth:jwt'])
+}).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {
   Route.post('/auth/login', 'UserController.login').as('login')
@@ -90,6 +90,6 @@ Route.group(() => {
   Route.any('*', ({ response }) => {
     response.badRequest('This endpoint does not exist')
   })
-}).prefix(API_PREFIX)
+}).prefix(API_PREFIX).middleware(['json'])
 
 Route.any('*', 'NuxtController.render')

@@ -371,7 +371,7 @@ class StudyController {
   *         name: data
   *         description: >
   *           The jobs data to persist. Each job consists of a collection of key:value pairs, of which
-  *           the key is the variable name and the value represents the variables value. The 'at'
+  *           the key is the variable name and the value represents the variable's value. The 'at'
   *           property specifies the position in the table at which to insert the jobs, and starts
   *           counting from 1.
   *         schema:

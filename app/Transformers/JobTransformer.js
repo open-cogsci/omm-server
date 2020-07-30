@@ -20,7 +20,7 @@ class JobTransformer extends BumblebeeTransformer {
   transform (model) {
     return {
       ...model.toObject(),
-      pivot: model.getRelated('pivot').toJSON()
+      pivot: model.getRelated('pivot')?.toJSON()
     }
   }
 
