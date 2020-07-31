@@ -1,6 +1,6 @@
 const { resolve } = require('path')
-const colors = require('vuetify/es5/util/colors').default
 const i18n = require('../config/i18n.js')
+const { sortableTable } = require('~/assets/js/directives.js')
 
 module.exports = {
   mode: 'spa',
@@ -100,6 +100,13 @@ module.exports = {
   telemetry: {
     enabled: true,
     consent: true
+  },
+  render: {
+    bundleRenderer: {
+      directives: {
+        sortableTable
+      }
+    }
   },
   /*
   ** Build configuration

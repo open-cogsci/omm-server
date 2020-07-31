@@ -10,6 +10,7 @@ import Participant from '@/models/Participant'
 import Job from '@/models/Job'
 import JobVariable from '@/models/JobVariable'
 import Variable from '@/models/Variable'
+import Dtype from '@/models/Dtype'
 
 VuexORM.use(VuexORMAxios, {
   dataKey: 'data'
@@ -24,6 +25,7 @@ database.register(Participant)
 database.register(Job)
 database.register(JobVariable)
 database.register(Variable)
+database.register(Dtype)
 
 export const plugins = [
   pathify.plugin,

@@ -42,7 +42,10 @@
               <v-tab-item>
                 <v-card flat>
                   <v-card-text>
-                    <jobs-table :data="jobsTable" />
+                    <jobs-table
+                      :study="study"
+                      :loading="loading"
+                    />
                   </v-card-text>
                 </v-card>
               </v-tab-item>
@@ -60,8 +63,8 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 import { pick } from 'lodash'
+import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -100,31 +103,12 @@ export default {
     study () {
       return this.Study.query()
         .where('id', parseInt(this.$route.params.id))
-        .with(['variables', 'users', 'participants'])
+        .with(['variables.dtype', 'users', 'participants'])
         .with(['jobs'], (query) => {
           query.orderBy('position', 'asc')
             .with('variables.dtype')
         })
         .first()
-    },
-    jobsTable () {
-      // Temporary fix for nasty Vuex-ORM bug
-      const results = {}
-      if (this.study) {
-        for (const job of this.study.jobs) {
-          results[job.id] = pick(job, ['id', 'position'])
-          results[job.id].variables = {}
-          for (const variable of job.variables) {
-            const pivot = variable.value(job.id)
-            results[job.id].variables[variable.id] = {
-              name: variable.name,
-              value: pivot.value,
-              pivot
-            }
-          }
-        }
-      }
-      return results
     }
   },
   mounted () {
