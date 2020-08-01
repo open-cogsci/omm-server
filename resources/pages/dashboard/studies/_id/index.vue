@@ -15,49 +15,48 @@
           />
         </v-col>
       </v-row>
-      <template v-if="study">
-        <v-row no-gutters>
-          <v-col cols="12" lg="9" class="text-md-right">
-            <study-actions
-              :loading="loading"
-              :osexp-present="!!study.osexp_path"
-              :jobs-present="!!study.jobs.length"
-              @clicked-delete="deleteStudy"
-              @clicked-archive="archiveStudy"
-              @clicked-upload-exp="dialog.uploadExp = true"
-              @clicked-upload-jobs="dialog.uploadJobs = true"
-              @clicked-collaborators="dialog.collaborators = true"
-            />
-          </v-col>
-          <v-col cols="12" lg="3" order-lg="first">
-            <v-tabs v-model="tab">
-              <v-tab>Jobs</v-tab>
-              <v-tab>Participants</v-tab>
-            </v-tabs>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
-            <v-tabs-items v-model="tab">
-              <v-tab-item>
-                <v-card flat>
-                  <v-card-text>
-                    <jobs-table
-                      :study="study"
-                      :loading="loading"
-                    />
-                  </v-card-text>
-                </v-card>
-              </v-tab-item>
-              <v-tab-item>
-                <v-card flat>
-                  <v-card-text>Participants</v-card-text>
-                </v-card>
-              </v-tab-item>
-            </v-tabs-items>
-          </v-col>
-        </v-row>
-      </template>
+
+      <v-row no-gutters>
+        <v-col cols="12" lg="9" class="text-md-right">
+          <study-actions
+            :loading="loading || !study"
+            :osexp-present="study && !!study.osexp_path"
+            :jobs-present="study && !!study.jobs.length"
+            @clicked-delete="deleteStudy"
+            @clicked-archive="archiveStudy"
+            @clicked-upload-exp="dialog.uploadExp = true"
+            @clicked-upload-jobs="dialog.uploadJobs = true"
+            @clicked-collaborators="dialog.collaborators = true"
+          />
+        </v-col>
+        <v-col cols="12" lg="3" order-lg="first">
+          <v-tabs v-model="tab">
+            <v-tab>Jobs</v-tab>
+            <v-tab>Participants</v-tab>
+          </v-tabs>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-tabs-items v-model="tab">
+            <v-tab-item>
+              <v-card flat>
+                <v-card-text>
+                  <jobs-table
+                    :study="study"
+                    :loading="loading"
+                  />
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+            <v-tab-item>
+              <v-card flat>
+                <v-card-text>Participants</v-card-text>
+              </v-card>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>

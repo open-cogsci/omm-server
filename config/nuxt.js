@@ -1,6 +1,5 @@
 const { resolve } = require('path')
 const i18n = require('../config/i18n.js')
-const { sortableTable } = require('~/assets/js/directives.js')
 
 module.exports = {
   mode: 'spa',
@@ -35,8 +34,8 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~/plugins/mixins',
     '~/plugins/fragment',
-    '~/plugins/syncprops',
     '~/plugins/routersync',
     '~/plugins/mdifont',
     '~/plugins/vuex-orm-axios'
@@ -100,13 +99,6 @@ module.exports = {
   telemetry: {
     enabled: true,
     consent: true
-  },
-  render: {
-    bundleRenderer: {
-      directives: {
-        sortableTable
-      }
-    }
   },
   /*
   ** Build configuration

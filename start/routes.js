@@ -56,8 +56,7 @@ Route.group(() => {
   Route.get('/participants/:identifier/:studyID/jobs', 'ParticipantController.fetchJobs').as('participants.fetch_jobs')
 
   Route.patch('/participants/:identifier/:jobID/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
-
-  /* Public job CRUD actions */
+  Route.patch('/jobs/:id/move/:position', 'JobController.moveToPosition').as('jobs.move_position')
 
   // CREATE:
   // The client inserts a list of jobs into the job table of the server.

@@ -4,33 +4,33 @@ import Study from './Study'
 import Variable from './Variable'
 import JobVariable from './JobVariable'
 
-// import { STUDIES } from '@/assets/js/endpoints'
+import { JOBS } from '@/assets/js/endpoints'
 
 export default class Job extends Model {
   static entity = 'jobs'
 
-  // static apiConfig = {
-  //   baseURL: STUDIES
-  // }
+  static apiConfig = {
+    baseURL: JOBS
+  }
 
-  // static fetch (config) {
-  //   return this.api().get('', config)
-  // }
+  static fetchById (id, config) {
+    return this.api().get(id, config)
+  }
 
-  // static fetchById (id, config) {
-  //   return this.api().get(id, config)
-  // }
+  static persist (data, config) {
+    if (data.id) {
+      return this.api().patch(`/${data.id}`, data, config)
+    }
+    return this.api().post('', data, config)
+  }
 
-  // static persist (data, config) {
-  //   if (data.id) {
-  //     return this.api().patch(`/${data.id}`, data, config)
-  //   }
-  //   return this.api().post('', data, config)
-  // }
+  destroy (config) {
+    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
+  }
 
-  // destroy (config) {
-  //   return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
-  // }
+  moveTo (newPosition, config) {
+    return this.constructor.api().patch(`/${this.id}/move/${newPosition}`, config)
+  }
 
   static fields () {
     return {

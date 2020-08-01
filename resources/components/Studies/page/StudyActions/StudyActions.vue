@@ -1,62 +1,60 @@
 <template>
-  <fragment>
-    <v-skeleton-loader
-      :loading="loading"
-      type="actions"
-    >
-      <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
-        <v-btn
-          :color="osexpPresent?'default':'success'"
-          @click="$emit('clicked-upload-exp')"
-        >
-          <v-icon left :color="osexpPresent?'black':'white'">
-            mdi-upload
-          </v-icon>
-          <span class="d-none d-lg-inline">Upload&nbsp;</span>experiment
-        </v-btn>
-        <v-btn
-          :color="jobsPresent?'default':'success'"
-          @click="$emit('clicked-upload-jobs')"
-        >
-          <v-icon left :color="jobsPresent?'black':'white'">
-            mdi-upload
-          </v-icon>
-          <span class="d-none d-lg-inline">Upload&nbsp;</span>jobs
-        </v-btn>
-      </v-item-group>
+  <v-skeleton-loader
+    :loading="loading"
+    type="actions"
+  >
+    <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
+      <v-btn
+        :color="osexpPresent?'default':'success'"
+        @click="$emit('clicked-upload-exp')"
+      >
+        <v-icon left :color="osexpPresent?'black':'white'">
+          mdi-upload
+        </v-icon>
+        experiment
+      </v-btn>
+      <v-btn
+        :color="jobsPresent?'default':'success'"
+        @click="$emit('clicked-upload-jobs')"
+      >
+        <v-icon left :color="jobsPresent?'black':'white'">
+          mdi-upload
+        </v-icon>
+        jobs
+      </v-btn>
+    </v-item-group>
 
-      <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
-        <v-btn
-          @click="$emit('clicked-collaborators')"
-        >
-          <v-icon left>
-            mdi-account
-          </v-icon>
-          Collaborators
-        </v-btn>
-      </v-item-group>
+    <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
+      <v-btn
+        @click="$emit('clicked-collaborators')"
+      >
+        <v-icon left>
+          mdi-account
+        </v-icon>
+        Sharing
+      </v-btn>
+    </v-item-group>
 
-      <v-item-group class="v-btn-toggle">
-        <v-btn
-          @click="$emit('clicked-archive')"
-        >
-          <v-icon left>
-            mdi-archive
-          </v-icon>
-          Archive
-        </v-btn>
-        <v-btn
-          :disabled="disableDelete"
-          @click="$emit('clicked-delete')"
-        >
-          <v-icon left>
-            mdi-delete
-          </v-icon>
-          Delete
-        </v-btn>
-      </v-item-group>
-    </v-skeleton-loader>
-  </fragment>
+    <v-item-group class="v-btn-toggle">
+      <v-btn
+        @click="$emit('clicked-archive')"
+      >
+        <v-icon left>
+          mdi-archive
+        </v-icon>
+        Archive
+      </v-btn>
+      <v-btn
+        :disabled="disableDelete"
+        @click="$emit('clicked-delete')"
+      >
+        <v-icon left>
+          mdi-delete
+        </v-icon>
+        Delete
+      </v-btn>
+    </v-item-group>
+  </v-skeleton-loader>
 </template>
 
 <script>
