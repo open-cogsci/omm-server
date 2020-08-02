@@ -7,20 +7,20 @@
       >
         <v-data-table
           dense
-          :loading="loading"
+          :loading="loading || saving"
           :headers="columns"
-          :items="localRows"
+          :items="rows"
         >
           <template v-slot:body="{ items, headers }">
             <draggable
-              :value="rows"
+              v-model="rows"
               tag="tbody"
               handle=".sortHandle"
-              @change="saveOrder"
+              @change="updateOrder"
             >
               <tr v-if="!items.length" class="text-center">
                 <td>
-                  No jobs to show. Have you upload a jobs file yet?
+                  No jobs to show. Have you already uploaded a jobs file?
                 </td>
               </tr>
               <tr
@@ -86,7 +86,8 @@ export default {
   },
   data () {
     return {
-      localRows: this.rows || []
+      newOrder: [],
+      saving: false
     }
   },
   computed: {
@@ -114,45 +115,27 @@ export default {
         sortable: false
       })) || []
     },
-    rows () {
-      if (this.loading || !this.study.jobs) { return [] }
-      return this.study.jobs.map(job => ({
-        id: job.id,
-        ...job.variables.reduce((result, variable) => {
-          const pivot = variable.value(job.id)
-          result[variable.name] = {
-            value: pivot.value,
-            id: pivot.$id
-          }
-          return result
-        }, {})
-      }))
-    },
-    watch: {
-      rows (val) {
-        this.localRows = val
+    rows: {
+      get () {
+        if (this.loading || !this.study.jobs) { return [] }
+        return this.study.jobs.map(job => ({
+          record: job,
+          id: job.id,
+          ...job.variables.reduce((result, variable) => {
+            const pivot = variable.value(job.id)
+            result[variable.name] = {
+              value: pivot.value,
+              id: pivot.$id
+            }
+            return result
+          }, {})
+        }))
+      },
+      set (newOrder) {
+        // Store the new order locally as a temporary measure
+        this.newOrder = newOrder
       }
     }
-    // jobsTable () {
-    //   // Temporary fix for nasty Vuex-ORM bug
-    //   const results = {}
-    //   for (const job of this.study.jobs) {
-    //     results[job.position] = pick(job, ['id', 'position'])
-    //     results[job.position].record = job
-    //     results[job.position].variables = {}
-    //     for (const variable of job.variables) {
-    //       const pivot = variable.value(job.id)
-    //       results[job.position].variables[variable.id] = {
-    //         id: variable.id,
-    //         record: variable,
-    //         name: variable.name,
-    //         value: pivot.value,
-    //         pivot
-    //       }
-    //     }
-    //   }
-    //   return results
-    // }
   },
   methods: {
     ...mapActions('notifications', ['notify']),
@@ -171,13 +154,37 @@ export default {
     frozen (val) {
       return ['id'].includes(val)
     },
-    async saveOrder (event) {
+    async updateOrder (event) {
+      // First update the jobs table locally then remotely. This applies the optimistic UI principle
+      // in that a change is expected to be valid. If not, the server will respond with an error and
+      // the former data, which will bounce back the UI (in this case jobs table) to its previous
+      // state.
       try {
+        // Obtain the moved element, at the element located at the new target spot.
         const src = this.study.jobs[event.moved.oldIndex]
         const target = this.study.jobs[event.moved.newIndex]
+        // Check if the new order has been saved locally. If it hasn't been, something went
+        // wrong and abort.
+        if (this.newOrder.length === 0) {
+          throw new Error('New order is empty')
+        }
+        // Construct a new array consisting of id and position pairs that can be directly passed
+        // to the job model's update function.
+        const updatedOrder = this.newOrder.map((job, i) => ({
+          id: job.id,
+          position: i + 1
+        }))
+        // Reset newOrder value to empty
+        this.newOrder = []
+        // Emit event to parent with updated order data, so it can update the store.
+        this.$emit('updated-order', updatedOrder)
+        // Update the data on the server side too.
+        this.saving = true
         await src.moveTo(target.position)
       } catch (e) {
         processErrors(e, this.notify)
+      } finally {
+        this.saving = false
       }
     }
   }

@@ -37,17 +37,14 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="12">
+        <v-col cols="12" class="pt-6">
           <v-tabs-items v-model="tab">
             <v-tab-item>
-              <v-card flat>
-                <v-card-text>
-                  <jobs-table
-                    :study="study"
-                    :loading="loading"
-                  />
-                </v-card-text>
-              </v-card>
+              <jobs-table
+                :study="study"
+                :loading="loading"
+                @updated-order="updateJobsOrder"
+              />
             </v-tab-item>
             <v-tab-item>
               <v-card flat>
@@ -99,6 +96,9 @@ export default {
     Study () {
       return this.$store.$db().model('studies')
     },
+    Job () {
+      return this.$store.$db().model('jobs')
+    },
     study () {
       return this.Study.query()
         .where('id', parseInt(this.$route.params.id))
@@ -145,6 +145,13 @@ export default {
         await this.study.destroy()
         this.notify({ message: 'Study deleted', color: 'success' })
         this.$router.replace(this.localePath({ name: 'dashboard-studies' }))
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
+    },
+    async updateJobsOrder (newOrder) {
+      try {
+        await this.Job.update(newOrder)
       } catch (e) {
         processErrors(e, this.notify)
       }
