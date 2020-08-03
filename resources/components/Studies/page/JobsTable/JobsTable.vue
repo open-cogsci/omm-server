@@ -2,8 +2,9 @@
   <v-row no-gutters>
     <v-col cols="12">
       <v-skeleton-loader
-        :loading="loading && !study"
+        :loading="loading"
         type="table"
+        transition="fade-transition"
       >
         <v-data-table
           dense
@@ -17,8 +18,10 @@
               tag="tbody"
               handle=".sortHandle"
               @change="updateOrder"
+              @start="drag = true"
+              @end="drag = false"
             >
-              <tr v-if="!items.length" class="text-center">
+              <tr v-if="!items.length" key="no-items" class="text-center">
                 <td>
                   No jobs to show. Have you already uploaded a jobs file?
                 </td>
@@ -26,19 +29,20 @@
               <tr
                 v-for="item in items"
                 v-else
-                :id="item.position"
-                :key="item.position"
+                :id="item.id"
+                :key="item.id"
+                class="list-group=item"
               >
                 <template v-for="(header, key) in headers">
-                  <td v-if="header.value" :key="item[header.value].id">
+                  <td
+                    v-if="header.value"
+                    :key="item[header.value].record.id"
+                  >
                     <span v-if="frozen(header.value)">{{ item[header.value] }}</span>
                     <v-edit-dialog
                       v-else-if="header.dtype === 'variable'"
                       :return-value.sync="item[header.value].value"
-                      @save="save"
-                      @cancel="cancel"
-                      @open="open"
-                      @close="close"
+                      @save="save(item[header.value])"
                     >
                       {{ item[header.value].value }}
                       <template v-slot:input>
@@ -87,7 +91,8 @@ export default {
   data () {
     return {
       newOrder: [],
-      saving: false
+      saving: false,
+      drag: false
     }
   },
   computed: {
@@ -124,8 +129,8 @@ export default {
           ...job.variables.reduce((result, variable) => {
             const pivot = variable.value(job.id)
             result[variable.name] = {
-              value: pivot.value,
-              id: pivot.$id
+              record: pivot,
+              value: pivot.value
             }
             return result
           }, {})
@@ -139,17 +144,11 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    save () {
-
-    },
-    cancel () {
-
-    },
-    open () {
-
-    },
-    close () {
-
+    save (item) {
+      console.log(item)
+      item.value = 'I dont know'
+      console.log(item.value)
+      console.log(item)
     },
     frozen (val) {
       return ['id'].includes(val)

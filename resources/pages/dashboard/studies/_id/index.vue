@@ -1,5 +1,5 @@
 <template>
-  <div :key="(study && study.id) || 'not-initialized'">
+  <div>
     <upload-experiment-dialog v-model="dialog.uploadExp" />
     <upload-jobs-dialog v-model="dialog.uploadJobs" />
     <collaborators-dialog v-model="dialog.collaborators" />
@@ -16,44 +16,46 @@
         </v-col>
       </v-row>
 
-      <v-row no-gutters>
-        <v-col cols="12" lg="9" class="text-md-right">
-          <study-actions
-            :loading="loading || !study"
-            :osexp-present="study && !!study.osexp_path"
-            :jobs-present="study && !!study.jobs.length"
-            @clicked-delete="deleteStudy"
-            @clicked-archive="archiveStudy"
-            @clicked-upload-exp="dialog.uploadExp = true"
-            @clicked-upload-jobs="dialog.uploadJobs = true"
-            @clicked-collaborators="dialog.collaborators = true"
-          />
-        </v-col>
-        <v-col cols="12" lg="3" order-lg="first">
-          <v-tabs v-model="tab">
-            <v-tab>Jobs</v-tab>
-            <v-tab>Participants</v-tab>
-          </v-tabs>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" class="pt-6">
-          <v-tabs-items v-model="tab">
-            <v-tab-item>
-              <jobs-table
-                :study="study"
-                :loading="loading"
-                @updated-order="updateJobsOrder"
-              />
-            </v-tab-item>
-            <v-tab-item>
-              <v-card flat>
-                <v-card-text>Participants</v-card-text>
-              </v-card>
-            </v-tab-item>
-          </v-tabs-items>
-        </v-col>
-      </v-row>
+      <template v-if="loading || study">
+        <v-row no-gutters>
+          <v-col cols="12" lg="9" class="text-md-right">
+            <study-actions
+              :loading="loading"
+              :osexp-present="study && !!study.osexp_path"
+              :jobs-present="study && !!study.jobs.length"
+              @clicked-delete="deleteStudy"
+              @clicked-archive="archiveStudy"
+              @clicked-upload-exp="dialog.uploadExp = true"
+              @clicked-upload-jobs="dialog.uploadJobs = true"
+              @clicked-collaborators="dialog.collaborators = true"
+            />
+          </v-col>
+          <v-col cols="12" lg="3" order-lg="first">
+            <v-tabs v-model="tab">
+              <v-tab>Jobs</v-tab>
+              <v-tab>Participants</v-tab>
+            </v-tabs>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" class="pt-6">
+            <v-tabs-items v-model="tab">
+              <v-tab-item>
+                <jobs-table
+                  :study="study"
+                  :loading="loading"
+                  @updated-order="updateJobsOrder"
+                />
+              </v-tab-item>
+              <v-tab-item>
+                <v-card flat>
+                  <v-card-text>Participants</v-card-text>
+                </v-card>
+              </v-tab-item>
+            </v-tabs-items>
+          </v-col>
+        </v-row>
+      </template>
     </v-container>
   </div>
 </template>
@@ -110,7 +112,7 @@ export default {
         .first()
     }
   },
-  mounted () {
+  created () {
     this.fetchStudy(this.$route.params.id)
   },
   methods: {
