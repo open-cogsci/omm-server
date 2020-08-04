@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <fragment>
     <upload-experiment-dialog v-model="dialog.uploadExp" />
     <upload-jobs-dialog v-model="dialog.uploadJobs" />
     <collaborators-dialog v-model="dialog.collaborators" />
@@ -57,7 +57,7 @@
         </v-row>
       </template>
     </v-container>
-  </div>
+  </fragment>
 </template>
 
 <script>
@@ -159,7 +159,12 @@ export default {
       }
     },
     async archiveStudy () {
-      // await this.study.toggleArchived()
+      try {
+        await this.study.toggleArchived()
+        this.notify({ message: 'Study status changed', color: 'success' })
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
     }
   },
   validate ({ params }) {
