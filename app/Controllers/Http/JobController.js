@@ -1,10 +1,13 @@
 'use strict'
 
+const { formatISO9075 } = require('date-fns')
+
+const Job = use('App/Models/Job')
+const Database = use('Database')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
-
-const Job = use('App/Models/Job')
 
 /**
  * Resourceful controller for interacting with jobs
@@ -23,6 +26,103 @@ class JobController {
   }
 
   /**
+  * @swagger
+  * /jobs/{id}:
+  *   put:
+  *     tags:
+  *       - Jobs
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Updates a job by setting a variable value.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: integer
+  *         description: The ID of the job to update.
+  *       - in: body
+  *         name: data
+  *         description: The data to update
+  *         schema:
+  *           type: object
+  *           properties:
+  *             variable_id:
+  *               type: integer
+  *               required: true
+  *               description: The variable's value to change.
+  *               example: 23
+  *             value:
+  *               type: any
+  *               required: true
+  *               description: The new value to set for the variable.
+  *               example: blue
+  *     responses:
+  *       200:
+  *         description: The updated Job and variable record.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/JobWithRelations'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       404:
+  *         description: The job with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  *   patch:
+  *     tags:
+  *       - Jobs
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Updates a job by setting a variable value.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: integer
+  *         description: The ID of the job to update.
+  *       - in: body
+  *         name: data
+  *         description: The data to update.
+  *         schema:
+  *           type: object
+  *           properties:
+  *             variable_id:
+  *               type: integer
+  *               required: true
+  *               description: The variable's value to change.
+  *               example: 23
+  *             value:
+  *               type: any
+  *               required: true
+  *               description: The new value to set for the variable.
+  *               example: blue
+  *     responses:
+  *       200:
+  *         description: The updated Job and variable record.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/JobWithRelations'
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       404:
+  *         description: The job with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
    * Update job details.
    * PUT or PATCH jobs/:id
    *
@@ -30,7 +130,37 @@ class JobController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, auth }) {
+    const { id } = params
+    const { variable_id: variableID, value } = request.all()
+    const job = await Job.query()
+      .with('study')
+      .where('id', id)
+      .firstOrFail()
+    const study = job.getRelated('study')
+    if (!study.isEditableBy(auth.user)) {
+      throw new Error('Insufficient privileges')
+    }
+
+    const rowsUpdated = await Database.table('job_variable')
+      .where('job_id', id)
+      .where('variable_id', variableID)
+      .update({
+        value,
+        updated_at: formatISO9075(Date.now())
+      })
+
+    if (rowsUpdated === 0) {
+      throw new Error('Failed to update variable')
+    }
+
+    return {
+      data: {
+        job_id: parseInt(id),
+        variable_id: parseInt(variableID),
+        value
+      }
+    }
   }
 
   /**
@@ -82,7 +212,7 @@ class JobController {
         await job.save()
         // First take care of the other jobs' positions
         if (newPosition < oldPosition) {
-        // Move jobs following the new position up one position from the new position,
+        // Move jobs following the new position up one position,
         // up to the old position of the current job.
           await Job.query()
             .where('study_id', study.id)
@@ -90,6 +220,8 @@ class JobController {
             .orderBy('position', 'desc')
             .increment('position', 1)
         } else if (newPosition > oldPosition) {
+        // Move jobs following the old position down one position
+        // up to the old position of the current job.
           await Job.query()
             .where('study_id', study.id)
             .whereBetween('position', [oldPosition, newPosition])

@@ -34,9 +34,9 @@ export default class Job extends Model {
 
   static fields () {
     return {
-      id: this.attr(''),
+      id: this.number(null),
       position: this.number(''),
-      study_id: this.attr(''),
+      study_id: this.number(null),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),

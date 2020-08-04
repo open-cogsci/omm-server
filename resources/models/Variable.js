@@ -14,10 +14,10 @@ export default class Variable extends Model {
 
   static fields () {
     return {
-      id: this.attr(''),
+      id: this.number(null),
       name: this.attr(''),
-      study_id: this.attr(''),
-      dtype_id: this.attr(''),
+      study_id: this.number(null),
+      dtype_id: this.number(null),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),

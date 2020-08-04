@@ -145,11 +145,13 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    save (item) {
+    async save (item) {
       console.log(item)
-      item.value = 'I dont know'
-      console.log(item.value)
-      console.log(item)
+      try {
+        await item.record.setValue(item.value)
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
     },
     frozen (val) {
       return ['id'].includes(val)

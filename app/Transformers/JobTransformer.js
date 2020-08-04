@@ -14,7 +14,7 @@ class JobTransformer extends BumblebeeTransformer {
   }
 
   static get availableInclude () {
-    return ['participants']
+    return ['participants', 'study']
   }
 
   transform (model) {
@@ -30,6 +30,10 @@ class JobTransformer extends BumblebeeTransformer {
 
   includeParticipants (job) {
     return this.collection(job.getRelated('participants'), 'ParticipantTransformer')
+  }
+
+  includeStudy (job) {
+    return this.item(job.getRelated('study'), 'StudyTransformer')
   }
 }
 
