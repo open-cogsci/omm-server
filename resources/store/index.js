@@ -6,6 +6,7 @@ import User from '@/models/User'
 import UserType from '@/models/UserType'
 import Study from '@/models/Study'
 import StudyUser from '@/models/StudyUser'
+import StudyFile from '@/models/StudyFile'
 import Participant from '@/models/Participant'
 import Job from '@/models/Job'
 import JobVariable from '@/models/JobVariable'
@@ -21,6 +22,7 @@ database.register(User)
 database.register(UserType)
 database.register(Study)
 database.register(StudyUser)
+database.register(StudyFile)
 database.register(Participant)
 database.register(Job)
 database.register(JobVariable)

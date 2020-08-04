@@ -47,16 +47,16 @@
             v-on="on"
           >
             <v-icon left>
-              {{ study.active ? 'mdi-archive' : 'mdi-archive-arrow-up' }}
+              {{ study && study.active ? 'mdi-archive' : 'mdi-archive-arrow-up' }}
             </v-icon>
-            {{ study.active ? 'Archive' : 'Reactivate' }}
+            {{ study && study.active ? 'Archive' : 'Reactivate' }}
           </v-btn>
         </template>
         <template v-slot:title>
-          <span v-if="study.active">are about to archive this study</span>
+          <span v-if="study && study.active">are about to archive this study</span>
           <span v-else>You are about to reactivate this study</span>
         </template>
-        <div v-if="study.active">
+        <div v-if="study && study.active">
           <p>
             After you have archived this study, it is no longer is available for participants.
             Any reports about the study will also be removed from your dashboard.

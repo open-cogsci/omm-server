@@ -106,7 +106,7 @@ export default {
     study () {
       return this.Study.query()
         .where('id', parseInt(this.$route.params.id))
-        .with(['variables.dtype', 'users', 'participants'])
+        .with(['variables.dtype', 'users', 'participants', 'files'])
         .with(['jobs'], (query) => {
           query.orderBy('position', 'asc')
             .with('variables.dtype')

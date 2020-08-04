@@ -3,7 +3,11 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
-class File extends Model {
+class StudyFile extends Model {
+  static get table () {
+    return 'files'
+  }
+
   /**
    * The study to which the file belongs
    *
@@ -17,4 +21,4 @@ class File extends Model {
   }
 }
 
-module.exports = File
+module.exports = StudyFile

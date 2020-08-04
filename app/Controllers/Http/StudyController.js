@@ -173,10 +173,11 @@ class StudyController {
       .with('participants')
       .with('variables.dtype')
       .with('users')
+      .with('files')
       .firstOrFail()
 
     return transform
-      .include('jobs,participants,variables,users')
+      .include('jobs,participants,variables,users,files')
       .item(study, 'StudyTransformer')
   }
 

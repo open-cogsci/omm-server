@@ -102,7 +102,7 @@ class Study extends Model {
    * @memberof Study
    */
   files () {
-    return this.hasMany('App/Models/File')
+    return this.hasMany('App/Models/StudyFile')
   }
 
   /**
