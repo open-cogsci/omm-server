@@ -36,7 +36,7 @@
                 <template v-for="(header, key) in headers">
                   <td
                     v-if="header.value"
-                    :key="item[header.value].record.id"
+                    :key="item[header.value].id"
                   >
                     <span v-if="frozen(header.value)">{{ item[header.value] }}</span>
                     <v-edit-dialog
@@ -129,8 +129,9 @@ export default {
           ...job.variables.reduce((result, variable) => {
             const pivot = variable.value(job.id)
             result[variable.name] = {
-              record: pivot,
-              value: pivot.value
+              id: pivot.id || variable.name,
+              value: pivot.value,
+              record: pivot
             }
             return result
           }, {})
