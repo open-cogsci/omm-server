@@ -146,7 +146,6 @@ export default {
   methods: {
     ...mapActions('notifications', ['notify']),
     async save (item) {
-      console.log(item)
       try {
         await item.record.setValue(item.value)
       } catch (e) {

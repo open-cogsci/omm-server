@@ -148,6 +148,8 @@ class StudyController {
   *               $ref: '#/definitions/StudyWithRelations'
   *       400:
   *         description: The specified id is invalid (e.g. not the expected dtype).
+  *       401:
+  *         description: Unauthorized.
   *       404:
   *         description: The study with the specified id was not found.
   *       default:
@@ -212,6 +214,8 @@ class StudyController {
   *           type: array
   *           items:
   *             $ref: '#/definitions/ValidationError'
+  *       401:
+  *         description: Unauthorized.
   *       404:
   *         description: The study with the specified id was not found.
   *       default:
@@ -247,6 +251,8 @@ class StudyController {
   *           type: array
   *           items:
   *             $ref: '#/definitions/ValidationError'
+  *       401:
+  *         description: Unauthorized.
   *       404:
   *         description: The study with the specified id was not found.
   *       default:
@@ -275,7 +281,7 @@ class StudyController {
       })
     }
 
-    study.merge(request.only(['name', 'description']))
+    study.merge(request.only(['name', 'description', 'active']))
     study.save()
 
     return transform.item(study, 'StudyTransformer')
@@ -302,6 +308,8 @@ class StudyController {
   *         description: The study has been deleted.
   *       400:
   *         description: The specified id is invalid (e.g. not the expected dtype).
+  *       401:
+  *         description: Unauthorized.
   *       404:
   *         description: The study with the specified id was not found.
   *       default:
@@ -324,6 +332,62 @@ class StudyController {
     return response.noContent()
   }
 
+  /**
+  * @swagger
+  * /studies/{id}/archive:
+  *   patch:
+  *     tags:
+  *       - Studies
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Archives or unarchives the study designated by ID, depending on its current state.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: integer
+  *         description: The ID of the study to update
+  *     responses:
+  *       200:
+  *         description: The updated study data.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/Study'
+  *       401:
+  *         description: Unauthorized
+  *       404:
+  *         description: The study with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
+   * (Un)archive the current study
+   * PUT or PATCH studies/:id/archive
+   *
+   * @param {object} ctx
+   * @param {Params} ctx.params
+   * @param {Auth} ctx.auth
+   * @param {Response} ctx.response
+   * @param {Transform} ctx.transform
+   */
+  async archive ({ params, auth, response, transform }) {
+    const study = await auth.user
+      .studies()
+      .where('id', params.id)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({
+        message: 'You have insufficient priviliges to change this study'
+      })
+    }
+    study.active = !study.active
+    study.save()
+    return transform.item(study, 'StudyTransformer')
+  }
   // async upload ({ params, request, response }) {
   //   const { id } = params
   //   const expense = await Expense.find(id)

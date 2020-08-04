@@ -47,6 +47,10 @@ export default class Study extends Model {
     return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
   }
 
+  toggleArchived (config) {
+    return this.constructor.api().patch(`/${this.id}/archive`, config)
+  }
+
   static fields () {
     return {
       id: this.attr(''),

@@ -47,19 +47,29 @@
             v-on="on"
           >
             <v-icon left>
-              mdi-archive
+              {{ study.active ? 'mdi-archive' : 'mdi-archive-arrow-up' }}
             </v-icon>
-            Archive
+            {{ study.active ? 'Archive' : 'Reactivate' }}
           </v-btn>
         </template>
         <template v-slot:title>
-          You are about to archive this study
+          <span v-if="study.active">are about to archive this study</span>
+          <span v-else>You are about to reactivate this study</span>
         </template>
-        <p>
-          After you have archived this study, it is no longer is available for participants.
-          Any reports about the study will also be removed from your dashboard.
-        </p>
-        <p>Are you sure you want to archive this study?</p>
+        <div v-if="study.active">
+          <p>
+            After you have archived this study, it is no longer is available for participants.
+            Any reports about the study will also be removed from your dashboard.
+          </p>
+          <p>Are you sure you want to archive this study?</p>
+        </div>
+        <div v-else>
+          <p>
+            After you have reactivated this study, it will be discoverable for participants again.
+            Any reports about the study will added to your dashboard.
+          </p>
+          <p>Are you sure you want to reactivate this study?</p>
+        </div>
       </confirmation-dialog>
 
       <confirmation-dialog
@@ -97,19 +107,15 @@ export default {
     ConfirmationDialog: () => import('@/components/common/ConfirmationDialog')
   },
   props: {
+    study: {
+      type: Object,
+      default: () => ({})
+    },
     loading: {
       type: Boolean,
       default: false
     },
     disableDelete: {
-      type: Boolean,
-      default: false
-    },
-    osexpPresent: {
-      type: Boolean,
-      default: false
-    },
-    jobsPresent: {
       type: Boolean,
       default: false
     }
@@ -118,6 +124,15 @@ export default {
     return {
       deleteDialog: false,
       archiveDialog: false
+    }
+  },
+  computed: {
+    osexpPresent () {
+      // eslint-disable-next-line camelcase
+      return !!this.study?.osexp_path
+    },
+    jobsPresent () {
+      return !!this.study?.jobs?.length
     }
   }
 }

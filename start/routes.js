@@ -42,6 +42,7 @@ Route.group(() => {
       [['studies.store'], ['SaveStudy']],
       [['studies.update'], ['SaveStudy']]
     ]))
+  Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {

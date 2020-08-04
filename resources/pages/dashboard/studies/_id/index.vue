@@ -1,6 +1,9 @@
 <template>
   <fragment>
-    <upload-experiment-dialog v-model="dialog.uploadExp" />
+    <upload-experiment-dialog
+      v-model="dialog.uploadExp"
+      @upload="uploadExperiment"
+    />
     <upload-jobs-dialog v-model="dialog.uploadJobs" />
     <collaborators-dialog v-model="dialog.collaborators" />
     <v-container>
@@ -21,8 +24,7 @@
           <v-col cols="12" lg="9" class="text-md-right">
             <study-actions
               :loading="loading"
-              :osexp-present="study && !!study.osexp_path"
-              :jobs-present="study && !!study.jobs.length"
+              :study="study"
               @clicked-delete="deleteStudy"
               @clicked-archive="archiveStudy"
               @clicked-upload-exp="dialog.uploadExp = true"
@@ -165,6 +167,9 @@ export default {
       } catch (e) {
         processErrors(e, this.notify)
       }
+    },
+    async uploadExperiment () {
+
     }
   },
   validate ({ params }) {
