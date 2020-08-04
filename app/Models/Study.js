@@ -94,6 +94,18 @@ class Study extends Model {
   }
 
   /**
+   * Files belonging to this study
+   *
+   * @method files
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
+  files () {
+    return this.hasMany('App/Models/File')
+  }
+
+  /**
    * Checks if the passed user has sufficient privileges to edit this study
    *
    * @param {User} user
