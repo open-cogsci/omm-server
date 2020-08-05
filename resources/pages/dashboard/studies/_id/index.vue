@@ -2,7 +2,11 @@
   <fragment>
     <upload-experiment-dialog
       v-model="dialog.uploadExp"
+      :file.sync="uploading.experiment.file"
+      :previous-file="osexpFile"
+      :upload-status="uploading.experiment"
       @upload="uploadExperiment"
+      @clicked-cancel="cancelExperimentUpload"
     />
     <upload-jobs-dialog v-model="dialog.uploadJobs" />
     <collaborators-dialog v-model="dialog.collaborators" />
@@ -27,7 +31,7 @@
               :study="study"
               @clicked-delete="deleteStudy"
               @clicked-archive="archiveStudy"
-              @clicked-upload-exp="dialog.uploadExp = true"
+              @clicked-upload-exp="openUploadExpDialog"
               @clicked-upload-jobs="dialog.uploadJobs = true"
               @clicked-collaborators="dialog.collaborators = true"
             />
@@ -65,6 +69,7 @@
 <script>
 import { pick } from 'lodash'
 import { mapActions } from 'vuex'
+import isFunction from 'lodash/isFunction'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -84,7 +89,8 @@ export default {
       },
       errors: {
         title: {
-          name: '', description: ''
+          name: '',
+          description: ''
         }
       },
       loading: false,
@@ -93,6 +99,15 @@ export default {
         uploadExp: false,
         uploadJobs: false,
         collaborators: false
+      },
+      uploading: {
+        experiment: {
+          inProgress: false,
+          progress: null,
+          cancel: null,
+          file: null
+        },
+        job: false
       }
     }
   },
@@ -112,6 +127,9 @@ export default {
             .with('variables.dtype')
         })
         .first()
+    },
+    osexpFile () {
+      return this.study?.files.filter(fl => fl.type === 'experiment')[0]
     }
   },
   created () {
@@ -168,8 +186,40 @@ export default {
         processErrors(e, this.notify)
       }
     },
-    async uploadExperiment () {
+    openUploadExpDialog () {
+      this.uploading.experiment.progress = null
+      this.uploading.experiment.file = null
+      this.dialog.uploadExp = true
+    },
+    async uploadExperiment (file) {
+      this.uploading.experiment.inProgress = true
+      const CancelToken = this.$axios.CancelToken
 
+      try {
+        this.uploading.experiment.progress = 0
+        await this.study.uploadExperiment(file, {
+          cancelToken: new CancelToken((c) => {
+            this.uploading.experiment.cancel = c
+          }),
+          onUploadProgress: (event) => {
+            this.uploading.experiment.progress = event.loaded / event.total * 100
+          }
+        })
+        this.uploading.experiment.progress = 100
+      } catch (e) {
+        if (!e.__CANCEL__) {
+          processErrors(e, this.notify)
+        }
+        this.uploading.experiment.progress = -1
+      } finally {
+        this.uploading.experiment.inProgress = false
+        this.uploading.experiment.cancel = null
+      }
+    },
+    cancelExperimentUpload () {
+      if (isFunction(this.uploading.experiment.cancel)) {
+        this.uploading.experiment.cancel('Upload canceled')
+      }
     }
   },
   validate ({ params }) {

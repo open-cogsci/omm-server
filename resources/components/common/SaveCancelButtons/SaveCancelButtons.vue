@@ -17,10 +17,8 @@
       :loading="saving"
       @click="$emit('clicked-save')"
     >
-      <v-icon left>
-        mdi-check
-      </v-icon>
-      Save
+      <v-icon left v-text="saveIcon" />
+      {{ saveText }}
     </v-btn>
   </fragment>
 </template>
@@ -39,6 +37,14 @@ export default {
     saveHidden: {
       type: Boolean,
       default: false
+    },
+    saveText: {
+      type: String,
+      default: 'Save'
+    },
+    saveIcon: {
+      type: String,
+      default: 'mdi-check'
     },
     cancelDisabled: {
       type: Boolean,
