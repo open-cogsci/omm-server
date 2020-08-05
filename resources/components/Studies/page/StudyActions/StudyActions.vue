@@ -128,8 +128,7 @@ export default {
   },
   computed: {
     osexpPresent () {
-      // eslint-disable-next-line camelcase
-      return !!this.study?.osexp_path
+      return !!this.study?.files.filter(item => item.type === 'experiment').length
     },
     jobsPresent () {
       return !!this.study?.jobs?.length

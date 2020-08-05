@@ -20,8 +20,6 @@ const Model = use('Model')
 *          example: This task is awesome
 *        active:
 *          type: boolean
-*        osexp_path:
-*          type: string
 *        created_at:
 *          type: string
 *          format: date-time
@@ -37,8 +35,29 @@ const Model = use('Model')
 *           properties:
 *             jobs:
 *               type: array
+*               description: The jobs belonging to this study
 *               items:
 *                 $ref: '#/definitions/JobWithRelations'
+*             participants:
+*               type: array
+*               description: Participants assigned to this study
+*               items:
+*                 $ref: '#/definitions/Participant'
+*             variables:
+*               type: array
+*               description: The variables belonging to this study
+*               items:
+*                 $ref: '#/definitions/VariableWithRelations'
+*             users:
+*               type: array
+*               description: The users associated with this study
+*               items:
+*                 $ref: '#/definitions/User'
+*             files:
+*               type: array
+*               description: The experiment and job files for this study
+*               items:
+*                 $ref: '#/definitions/StudyFile'
 */
 class Study extends Model {
   /**
