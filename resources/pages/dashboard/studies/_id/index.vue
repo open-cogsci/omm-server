@@ -4,11 +4,15 @@
       v-model="dialog.uploadExp"
       :previous-file="osexpFile"
       :upload-status="uploading.experiment"
-      @upload="uploadExperiment"
-      @clicked-cancel="cancelExperimentUpload"
+      @upload="file => upload('experiment', file)"
+      @clicked-cancel="cancelUpload('experiment')"
     />
     <upload-jobs-dialog
       v-model="dialog.uploadJobs"
+      :previous-file="jobsFile"
+      :upload-status="uploading.jobs"
+      @upload="file => upload('jobs', file)"
+      @clicked-cancel="cancelUpload('jobs')"
     />
     <collaborators-dialog v-model="dialog.collaborators" />
     <v-container>
@@ -33,7 +37,7 @@
               @clicked-delete="deleteStudy"
               @clicked-archive="archiveStudy"
               @clicked-upload-exp="openUploadExpDialog"
-              @clicked-upload-jobs="dialog.uploadJobs = true"
+              @clicked-upload-jobs="openUploadJobsDialog"
               @clicked-collaborators="dialog.collaborators = true"
             />
           </v-col>
@@ -108,7 +112,12 @@ export default {
           cancel: null,
           file: null
         },
-        job: false
+        jobs: {
+          inProgress: false,
+          progress: null,
+          cancel: null,
+          file: null
+        }
       }
     }
   },
@@ -131,6 +140,9 @@ export default {
     },
     osexpFile () {
       return this.study?.files.filter(fl => fl.type === 'experiment')[0]
+    },
+    jobsFile () {
+      return this.study?.files.filter(fl => fl.type === 'jobs')[0]
     }
   },
   created () {
@@ -191,34 +203,38 @@ export default {
       this.uploading.experiment.progress = null
       this.dialog.uploadExp = true
     },
-    async uploadExperiment (file) {
-      this.uploading.experiment.inProgress = true
+    openUploadJobsDialog () {
+      this.uploading.jobs.progress = null
+      this.dialog.uploadJobs = true
+    },
+    async upload (type, file) {
+      this.uploading[type].inProgress = true
       const CancelToken = this.$axios.CancelToken
 
       try {
-        this.uploading.experiment.progress = 0
-        await this.study.uploadExperiment(file, {
+        this.uploading[type].progress = 0
+        await this.study.upload(type, file, {
           cancelToken: new CancelToken((c) => {
-            this.uploading.experiment.cancel = c
+            this.uploading[type].cancel = c
           }),
           onUploadProgress: (event) => {
-            this.uploading.experiment.progress = event.loaded / event.total * 100
+            this.uploading[type].progress = event.loaded / event.total * 100
           }
         })
-        this.uploading.experiment.progress = 100
+        this.uploading[type].progress = 100
       } catch (e) {
         if (!e.__CANCEL__) {
           processErrors(e, this.notify)
         }
-        this.uploading.experiment.progress = -1
+        this.uploading[type].progress = -1
       } finally {
-        this.uploading.experiment.inProgress = false
-        this.uploading.experiment.cancel = null
+        this.uploading[type].inProgress = false
+        this.uploading[type].cancel = null
       }
     },
-    cancelExperimentUpload () {
-      if (isFunction(this.uploading.experiment.cancel)) {
-        this.uploading.experiment.cancel('Upload canceled')
+    cancelUpload (item) {
+      if (isFunction(this.uploading[item].cancel)) {
+        this.uploading[item].cancel('Upload canceled')
       }
     }
   },

@@ -52,11 +52,12 @@ export default class Study extends Model {
     return this.constructor.api().patch(`/${this.id}/archive`, config)
   }
 
-  uploadExperiment (file, config) {
+  upload (type, file, config) {
     const formData = new FormData()
-    formData.append('osexp', file)
+    formData.append('payload', file)
+    formData.append('type', type)
     return this.constructor.api().post(
-      `/${this.id}/upload/experiment`,
+      `/${this.id}/upload/${type}`,
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },

@@ -9,8 +9,8 @@ const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
 const Helpers = use('Helpers')
 
+const fs = require('fs')
 const isInteger = require('lodash/isInteger')
-
 /**
  * Resourceful controller for interacting with studies
  */
@@ -406,8 +406,8 @@ class StudyController {
    * @param {Response} ctx.response
    * @param {Response} ctx.response
    */
-  async uploadExperiment ({ params, auth, request, response }) {
-    const { id } = params
+  async uploadFile ({ params, auth, request, response }) {
+    const { id, type } = params
     const study = await auth.user.studies()
       .where('id', id)
       .with('files')
@@ -417,27 +417,36 @@ class StudyController {
       return response.unauthorized('Insufficient privileges to edit this study')
     }
 
-    const expFile = request.file('osexp')
-
+    const uploadedFile = request.file('payload')
     const storagePath = Helpers.publicPath(`files/${study.id}`)
-    await expFile.move(storagePath, {
-      name: 'experiment.osexp',
+    const filename = `${type}.${uploadedFile.extname}`
+    const removeFile = Helpers.promisify(fs.unlink)
+
+    for (const fl of study.getRelated('files').rows.filter(fl => fl.type === type)) {
+      await removeFile(Helpers.publicPath(fl.path))
+    }
+
+    await uploadedFile.move(storagePath, {
+      name: filename,
       overwrite: true
     })
-
-    if (!expFile.moved()) {
-      return expFile.error()
+    if (!uploadedFile.moved()) {
+      return uploadedFile.error()
     }
 
     // Delete previous experiment file records
-    await study.files().where({ type: 'experiment' }).delete()
+    await study.files().where({ type }).delete()
+
+    const localPath = `${storagePath}/${uploadedFile.fileName}`
+    if (type === 'jobs') {
+      await study.processJobsFile(localPath)
+    }
 
     await study.files().create({
-      filename: expFile.clientName,
-      path: `${storagePath}/${expFile.fileName}`.replace(Helpers.publicPath(), ''),
-      type: 'experiment'
+      filename: uploadedFile.clientName,
+      path: localPath.replace(Helpers.publicPath(), ''),
+      type
     })
-
     // Fetch all files to also account for potential deletions/overwrites
     const files = await study.files().fetch()
     return { data: { id: study.id, files } }

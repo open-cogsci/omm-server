@@ -182,6 +182,17 @@ class Study extends Model {
     return jobs
   }
 
+  /* Private functions */
+
+  /**
+   * Save Jobs using transaction (for DB other than )
+   *
+   * @param {*} jobData
+   * @param {*} variables
+   * @param {*} trx
+   * @returns
+   * @memberof Study
+   */
   async _trxSaveJobsFromInput (jobData, variables, trx) {
     const varsList = Object.keys(variables)
     // Create the job
