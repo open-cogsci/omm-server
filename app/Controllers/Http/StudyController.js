@@ -418,8 +418,10 @@ class StudyController {
     }
 
     const expFile = request.file('osexp')
-    await expFile.move(Helpers.tmpPath('uploads'), {
-      name: expFile.clientName,
+
+    const storagePath = Helpers.publicPath(`files/${study.id}`)
+    await expFile.move(storagePath, {
+      name: 'experiment.osexp',
       overwrite: true
     })
 
@@ -427,26 +429,18 @@ class StudyController {
       return expFile.error()
     }
 
-    // Delete previous experiment files
-    // const previousFiles = await study.files().where({ type: 'experiment' }).fetch()
-    // for (const prevFile of previousFiles.rows) {
-    //   prevFile.path
-    // }
+    // Delete previous experiment file records
+    await study.files().where({ type: 'experiment' }).delete()
 
     await study.files().create({
       filename: expFile.clientName,
-      path: expFile.fileName,
+      path: `${storagePath}/${expFile.fileName}`.replace(Helpers.publicPath(), ''),
       type: 'experiment'
     })
 
     // Fetch all files to also account for potential deletions/overwrites
     const files = await study.files().fetch()
-    return {
-      data: {
-        id: study.id,
-        files
-      }
-    }
+    return { data: { id: study.id, files } }
   }
 
   /**
