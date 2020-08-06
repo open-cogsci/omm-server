@@ -47,7 +47,7 @@ class StudySeeder {
     })
 
     captureStudy.files().create({
-      path: '/osexp/attentional-capture.osexp',
+      path: '/files/1/experiment.osexp',
       filename: 'attentional-capture.osexp',
       type: 'experiment'
     })
