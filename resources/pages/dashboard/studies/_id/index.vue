@@ -2,13 +2,14 @@
   <fragment>
     <upload-experiment-dialog
       v-model="dialog.uploadExp"
-      :file.sync="uploading.experiment.file"
       :previous-file="osexpFile"
       :upload-status="uploading.experiment"
       @upload="uploadExperiment"
       @clicked-cancel="cancelExperimentUpload"
     />
-    <upload-jobs-dialog v-model="dialog.uploadJobs" />
+    <upload-jobs-dialog
+      v-model="dialog.uploadJobs"
+    />
     <collaborators-dialog v-model="dialog.collaborators" />
     <v-container>
       <v-row dense>
@@ -188,7 +189,6 @@ export default {
     },
     openUploadExpDialog () {
       this.uploading.experiment.progress = null
-      this.uploading.experiment.file = null
       this.dialog.uploadExp = true
     },
     async uploadExperiment (file) {

@@ -93,4 +93,4 @@ sw.*
 database/*.sqlite
 
 # File uploads
-files/**
+public/files/**

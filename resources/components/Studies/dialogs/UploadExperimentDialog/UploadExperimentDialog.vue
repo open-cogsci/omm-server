@@ -94,7 +94,6 @@
 import isNumber from 'lodash/isNumber'
 
 export default {
-  sync: ['file'],
   components: {
     SaveCancelButtons: () => import('@/components/common/SaveCancelButtons')
   },
@@ -118,6 +117,7 @@ export default {
   },
   data () {
     return {
+      file: null,
       replaceFile: false
     }
   },
@@ -129,6 +129,7 @@ export default {
   watch: {
     value (val) {
       if (val) {
+        this.file = null
         this.replaceFile = false
       }
     }
