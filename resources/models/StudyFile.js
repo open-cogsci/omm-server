@@ -12,7 +12,10 @@ export default class StudyFile extends Model {
       study: this.belongsTo(Study, 'study_id'),
       path: this.attr(''),
       filename: this.attr(''),
-      type: this.attr('')
+      type: this.attr(''),
+      created_at: this.attr(''),
+      updated_at: this.attr(''),
+      deleted_at: this.attr('')
     }
   }
 }

@@ -7,6 +7,7 @@
 const Database = use('Database')
 const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
+const Helpers = use('Helpers')
 
 const isInteger = require('lodash/isInteger')
 
@@ -326,9 +327,14 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, auth, response }) {
-    const study = await await auth.user.studies()
+    const study = await auth.user.studies()
       .where('id', params.id)
       .firstOrFail()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({
+        message: 'You have insufficient priviliges to delete this study'
+      })
+    }
     study.delete()
     return response.noContent()
   }
@@ -389,32 +395,53 @@ class StudyController {
     study.save()
     return transform.item(study, 'StudyTransformer')
   }
-  // async upload ({ params, request, response }) {
-  //   const { id } = params
-  //   const expense = await Expense.find(id)
 
-  //   if (!expense) {
-  //     return response.json({ success: false })
-  //   }
+  /**
+   * Upload an experiment for the study
+   * PUT or PATCH studies/:id/archive
+   *
+   * @param {object} ctx
+   * @param {Params} ctx.params
+   * @param {Auth} ctx.auth
+   * @param {Response} ctx.response
+   * @param {Response} ctx.response
+   */
+  async uploadExperiment ({ params, auth, request, response }) {
+    const { id } = params
+    const study = await auth.user.studies()
+      .where('id', id)
+      .with('files')
+      .firstOrFail()
 
-  //   const receiptImage = request.file('receipt')
-  //   const imageName = receiptImage.clientName
+    if (!study.isEditableBy(auth.user)) {
+      return response.unauthorized('Insufficient privileges to edit this study')
+    }
 
-  //   const Helpers = use('Helpers')
-  //   await receiptImage.move(Helpers.publicPath('uploads'), {
-  //     name: imageName,
-  //     overwrite: true
-  //   })
+    const expFile = request.file('osexp')
 
-  //   if (!receiptImage.moved()) {
-  //     return receiptImage.error()
-  //   }
+    const storagePath = Helpers.publicPath(`files/${study.id}`)
+    await expFile.move(storagePath, {
+      name: 'experiment.osexp',
+      overwrite: true
+    })
 
-  //   expense.image = imageName
-  //   await expense.save()
+    if (!expFile.moved()) {
+      return expFile.error()
+    }
 
-  //   return response.json(expense)
-  // }
+    // Delete previous experiment file records
+    await study.files().where({ type: 'experiment' }).delete()
+
+    await study.files().create({
+      filename: expFile.clientName,
+      path: `${storagePath}/${expFile.fileName}`.replace(Helpers.publicPath(), ''),
+      type: 'experiment'
+    })
+
+    // Fetch all files to also account for potential deletions/overwrites
+    const files = await study.files().fetch()
+    return { data: { id: study.id, files } }
+  }
 
   /**
   * @swagger
