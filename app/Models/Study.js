@@ -2,6 +2,10 @@
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
+const Database = use('Database')
+const XLSX = require('xlsx')
+const { isArray } = require('lodash')
+const { formatISO9075 } = require('date-fns')
 
 /**
 *  @swagger
@@ -182,6 +186,93 @@ class Study extends Model {
     return jobs
   }
 
+  /**
+   * Process a jobs file (csv/xls(x))
+   *
+   * @param {String} path
+   * @memberof Study
+   */
+  async processJobsFile (path) {
+    const workbook = XLSX.readFile(path)
+    const sheet = workbook.Sheets[workbook.SheetNames[0]]
+    const jsonData = XLSX.utils.sheet_to_json(sheet)
+
+    const variables = Object.keys(jsonData[0]).map(varName => ({
+      name: varName,
+      dtype_id: 1
+    }))
+
+    // Delete old jobs data
+    await this.jobs().delete()
+    await this.variables().delete()
+
+    // Create the variables in the database
+    const variableRecords = await this.variables().createMany(variables)
+    // Compose an object in which the key is the varname and value is its ID
+    const varTable = variableRecords.reduce((result, current) => {
+      result[current.id] = current.name
+      return result
+    }, {})
+
+    for (const [i, row] of Object.entries(jsonData)) {
+      const job = await this.jobs().create({
+        position: parseInt(i) + 1
+      })
+
+      await job.variables().attach(Object.keys(varTable), (record) => {
+        record.value = row[varTable[record.variable_id]]
+      })
+    }
+  }
+
+  async attachParticipantsToJobs () {
+    let ptcpIDs, jobIDs
+    const loadedPtcps = this.getRelated('participants')
+    const loadedJobs = this.getRelated('jobs')
+
+    if (isArray(loadedPtcps?.rows)) {
+      ptcpIDs = loadedPtcps.rows.map(ptcp => ptcp.id)
+    } else {
+      ptcpIDs = await this.participants().ids()
+    }
+
+    if (isArray(loadedJobs?.rows)) {
+      jobIDs = loadedJobs.rows.map(ptcp => ptcp.id)
+    } else {
+      jobIDs = await this.jobs().ids()
+    }
+    // If there are no participants or jobs for the study, there is nothing left to do
+    if (ptcpIDs.length === 0 || jobIDs.length === 0) {
+      return
+    }
+
+    const records = []
+    // eslint-disable-next-line camelcase
+    for (const job_id of jobIDs) {
+      // eslint-disable-next-line camelcase
+      for (const participant_id of ptcpIDs) {
+        records.push({
+          job_id,
+          participant_id,
+          created_at: formatISO9075(Date.now()),
+          updated_at: formatISO9075(Date.now())
+        })
+      }
+    }
+    await Database.table('job_states').insert(records)
+  }
+
+  /* Private functions */
+
+  /**
+   * Save Jobs using transaction (for DB other than )
+   *
+   * @param {*} jobData
+   * @param {*} variables
+   * @param {*} trx
+   * @returns
+   * @memberof Study
+   */
   async _trxSaveJobsFromInput (jobData, variables, trx) {
     const varsList = Object.keys(variables)
     // Create the job

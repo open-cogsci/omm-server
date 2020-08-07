@@ -38,7 +38,8 @@ module.exports = {
     '~/plugins/fragment',
     '~/plugins/routersync',
     '~/plugins/mdifont',
-    '~/plugins/vuex-orm-axios'
+    '~/plugins/vuex-orm-axios',
+    '~/plugins/profiling'
   ],
   /*
   ** Nuxt.js dev-modules
@@ -104,7 +105,12 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    extend (config, ctx) {},
+    extend (config, { isClient }) {
+      // Extend only webpack config for client-bundle
+      if (isClient) {
+        config.devtool = process.env.NODE_ENV === 'development' ? 'inline-source-map' : ''
+      }
+    },
     watch: [
       'lang/**/*.js'
     ],

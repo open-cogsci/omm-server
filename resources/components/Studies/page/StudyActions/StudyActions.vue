@@ -53,7 +53,7 @@
           </v-btn>
         </template>
         <template v-slot:title>
-          <span v-if="study && study.active">are about to archive this study</span>
+          <span v-if="study && study.active">You are about to archive this study</span>
           <span v-else>You are about to reactivate this study</span>
         </template>
         <div v-if="study && study.active">

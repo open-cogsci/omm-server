@@ -44,7 +44,8 @@
     "vue-fragment": "^1.5.1",
     "vuedraggable": "^2.24.0",
     "vuex-pathify": "^1.4.1",
-    "vuex-router-sync": "^5.0.0"
+    "vuex-router-sync": "^5.0.0",
+    "xlsx": "^0.16.5"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.4",

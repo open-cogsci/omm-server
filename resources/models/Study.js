@@ -16,6 +16,23 @@ export default class Study extends Model {
     baseURL: STUDIES
   }
 
+  static fields () {
+    return {
+      id: this.attr(''),
+      name: this.string(''),
+      description: this.string(''),
+      active: this.boolean(true),
+      created_at: this.attr(''),
+      updated_at: this.attr(''),
+      deleted_at: this.attr(''),
+      participants_count: this.number(0),
+      users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id'),
+      jobs: this.hasMany(Job, 'study_id'),
+      variables: this.hasMany(Variable, 'study_id'),
+      files: this.hasMany(StudyFile, 'study_id')
+    }
+  }
+
   static fetch (config) {
     return this.api().get('', config)
   }
@@ -52,11 +69,12 @@ export default class Study extends Model {
     return this.constructor.api().patch(`/${this.id}/archive`, config)
   }
 
-  uploadExperiment (file, config) {
+  upload (type, file, config) {
     const formData = new FormData()
-    formData.append('osexp', file)
+    formData.append('payload', file)
+    formData.append('type', type)
     return this.constructor.api().post(
-      `/${this.id}/upload/experiment`,
+      `/${this.id}/upload/${type}`,
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -68,20 +86,12 @@ export default class Study extends Model {
     )
   }
 
-  static fields () {
-    return {
-      id: this.attr(''),
-      name: this.string(''),
-      description: this.string(''),
-      active: this.boolean(true),
-      created_at: this.attr(''),
-      updated_at: this.attr(''),
-      deleted_at: this.attr(''),
-      participants_count: this.number(0),
-      users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id'),
-      jobs: this.hasMany(Job, 'study_id'),
-      variables: this.hasMany(Variable, 'study_id'),
-      files: this.hasMany(StudyFile, 'study_id')
-    }
+  refreshJobs (config) {
+    return this.constructor.api().get(`${this.id}/jobs/refresh`, {
+      persistOptions: {
+        create: ['jobs', 'variables']
+      },
+      ...config
+    })
   }
 }
