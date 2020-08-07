@@ -5,6 +5,7 @@
     title="Upload jobs"
     subtitle="Supply your jobs in a tabular format (e.g excel or csv)"
     accepted-file-types=".csv,.xls,.xlsx"
+    :message="warning"
     v-bind="$props"
     v-on="$listeners"
   >
@@ -36,6 +37,12 @@ export default {
       default: () => ({})
     }
   },
+  data: () => ({
+    warning: {
+      type: 'orange--text',
+      content: '<strong>Warning:</strong> Replacing the jobs file will erase all collected data for this study.'
+    }
+  }),
   computed: {
     progress () {
       return isNumber(this.uploadStatus.progress) && this.uploadStatus.progress

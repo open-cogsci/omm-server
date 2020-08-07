@@ -21,6 +21,8 @@
                 <a :href="previousFile.path" target="_blank">{{ previousFile.filename }}</a>
               </span>
               <span class="caption">(uploaded at {{ previousFile.created_at }})</span>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-if="message" class="pt-5" :class="message.type" v-html="message.content" />
             </v-col>
             <v-col cols="12" sm="2">
               <v-btn color="primary" @click="replaceFile = true">
@@ -119,6 +121,10 @@ export default {
     },
     acceptedFileTypes: {
       type: String,
+      default: null
+    },
+    message: {
+      type: Object,
       default: null
     }
   },

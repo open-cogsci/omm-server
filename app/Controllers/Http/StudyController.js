@@ -447,6 +447,10 @@ class StudyController {
       path: localPath.replace(Helpers.publicPath(), ''),
       type
     })
+
+    // Attach study participants (if any) to jobs
+    await study.attachParticipantsToJobs()
+
     // Fetch all files to also account for potential deletions/overwrites
     const files = await study.files().fetch()
     return { data: { id: study.id, files } }
@@ -664,6 +668,29 @@ class StudyController {
     const study = await query.firstOrFail()
     const jobs = study.getRelated('jobs')
     return transform.include('participants').collection(jobs, 'JobTransformer')
+  }
+
+  /**
+   * Refresh the jobs of a study (for after uploading a new jobs file)
+   *
+   * @param {*} { params, auth, transform }
+   * @returns
+   * @memberof StudyController
+   */
+  async refreshJobs ({ params, auth, transform }) {
+    const { id } = params
+
+    // Fetch the study, or throw an error if it isn't found.
+    const study = await auth.user
+      .studies()
+      .where('id', id)
+      .with('jobs.variables.dtype')
+      .with('variables.dtype')
+      .firstOrFail()
+
+    return transform
+      .include('jobs,variables')
+      .item(study, 'StudyTransformer')
   }
 
   /**

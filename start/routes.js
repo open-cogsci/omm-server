@@ -45,6 +45,7 @@ Route.group(() => {
   Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
   Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
     .as('studies.upload')
+  Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {

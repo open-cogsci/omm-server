@@ -54,7 +54,7 @@
               <v-tab-item>
                 <jobs-table
                   :study="study"
-                  :loading="loading"
+                  :loading="loading || refreshingJobs"
                   @updated-order="updateJobsOrder"
                 />
               </v-tab-item>
@@ -99,6 +99,7 @@ export default {
         }
       },
       loading: false,
+      refreshingJobs: false,
       tab: 0,
       dialog: {
         uploadExp: false,
@@ -230,6 +231,21 @@ export default {
       } finally {
         this.uploading[type].inProgress = false
         this.uploading[type].cancel = null
+      }
+
+      if (type === 'jobs') {
+        try {
+          this.notify({
+            message: 'Refreshing jobs',
+            color: 'info'
+          })
+          this.refreshingJobs = true
+          await this.study.refreshJobs()
+        } catch (e) {
+          processErrors(e, this.notify)
+        } finally {
+          this.refreshingJobs = false
+        }
       }
     },
     cancelUpload (item) {
