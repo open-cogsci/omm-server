@@ -1,8 +1,8 @@
 import { Model } from '@vuex-orm/core'
 
 import Study from './Study'
-import Variable from './Variable'
-import JobVariable from './JobVariable'
+// import Variable from './Variable'
+// import JobVariable from './JobVariable'
 
 import { JOBS } from '@/assets/js/endpoints'
 
@@ -41,7 +41,7 @@ export default class Job extends Model {
       updated_at: this.attr(''),
       deleted_at: this.attr(''),
       study: this.belongsTo(Study, 'study_id'),
-      variables: this.belongsToMany(Variable, JobVariable, 'job_id', 'variable_id')
+      variables: this.attr([])
     }
   }
 }

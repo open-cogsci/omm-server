@@ -1,9 +1,10 @@
 import { Model } from '@vuex-orm/core'
 
+import { keyBy } from 'lodash'
 import User from './User'
 import StudyUser from './StudyUser'
 import Job from './Job'
-import JobVariable from './JobVariable'
+// import JobVariable from './JobVariable'
 import Variable from './Variable'
 import StudyFile from './StudyFile'
 
@@ -38,19 +39,29 @@ export default class Study extends Model {
   }
 
   static async fetchById (id, config) {
-    const result = await this.api().get(id, config)
-    // TEMPORARY FIX to store JobVariable pivot data correctly
-    const jobs = result.response.data.data.jobs
-    for (const job of jobs) {
-      for (const variable of job.variables) {
-        await JobVariable.update({
-          where: [variable.pivot.job_id, variable.pivot.variable_id],
-          data: {
-            value: variable.pivot.value
-          }
+    const result = await this.api().get(id, {
+      dataTransformer: ({ data }) => {
+        const study = data.data
+        study.jobs = study.jobs.map((job) => {
+          job.variables = keyBy(job.variables, 'name')
+          return job
         })
-      }
-    }
+        return study
+      },
+      ...config
+    })
+    // TEMPORARY FIX to store JobVariable pivot data correctly
+    // const jobs = result.response.data.data.jobs
+    // for (const job of jobs) {
+    //   for (const variable of job.variables) {
+    //     await JobVariable.update({
+    //       where: [variable.pivot.job_id, variable.pivot.variable_id],
+    //       data: {
+    //         value: variable.pivot.value
+    //       }
+    //     })
+    //   }
+    // }
     return result
   }
 
