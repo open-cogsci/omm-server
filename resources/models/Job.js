@@ -1,10 +1,14 @@
 import { Model } from '@vuex-orm/core'
-
+import { cloneDeep, keyBy } from 'lodash'
 import Study from './Study'
-// import Variable from './Variable'
-// import JobVariable from './JobVariable'
 
 import { JOBS } from '@/assets/js/endpoints'
+
+export const jobTransformer = ({ data }) => {
+  const job = data.data
+  job.variables = keyBy(job.variables, 'name')
+  return job
+}
 
 export default class Job extends Model {
   static entity = 'jobs'
@@ -30,6 +34,30 @@ export default class Job extends Model {
 
   moveTo (newPosition, config) {
     return this.constructor.api().patch(`/${this.id}/move/${newPosition}`, config)
+  }
+
+  setVariableValue (variableID, value, config) {
+    // First update the local store
+    this.constructor.update({
+      where: this.id,
+      data (job) {
+        const varRecord = cloneDeep(Object.values(job.variables).find(variable => variable.id === variableID))
+        varRecord.pivot.value = value
+        job.variables[varRecord.name] = varRecord
+      }
+    })
+    // Then remotely
+    // return this.constructor.api().patch(
+    //   `/${this.id}`,
+    //   {
+    //     variable_id: variableID,
+    //     value
+    //   },
+    //   {
+    //     dataTransformer: jobTransformer,
+    //     ...config
+    //   }
+    // )
   }
 
   static fields () {

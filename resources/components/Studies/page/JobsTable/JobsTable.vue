@@ -13,7 +13,14 @@
           :items="rows"
         >
           <template v-slot:body="{ items, headers }">
-            <tbody>
+            <draggable
+              v-model="rows"
+              tag="tbody"
+              handle=".sortHandle"
+              @change="updateOrder"
+              @start="drag = true"
+              @end="drag = false"
+            >
               <tr v-if="!items.length" key="no-items" class="text-center">
                 <td>
                   No jobs to show. Have you already uploaded a jobs file?
@@ -26,6 +33,11 @@
                 :key="item.id"
                 class="list-group-item"
               >
+                <td class="px-1" style="width: 0.1%">
+                  <v-btn style="cursor: move" icon class="sortHandle">
+                    <v-icon>mdi-drag-horizontal-variant</v-icon>
+                  </v-btn>
+                </td>
                 <td style="min-width:70px">
                   {{ item.id }}
                 </td>
@@ -34,11 +46,29 @@
                     v-if="header.value && item.variables[header.value]"
                     :key="item.variables[header.value].id"
                   >
-                    <span>{{ item.variables[header.value].pivot.value }}</span>
+                    <span v-if="header.dtype !== 'variable'">
+                      {{ item.variables[header.value].pivot.value }}
+                    </span>
+                    <v-edit-dialog
+                      v-else
+                      :return-value="editingBuffer"
+                      @open="editingBuffer=item.variables[header.value].pivot.value"
+                      @cancel="editingBuffer=null"
+                      @save="save(editingBuffer, item.id, item.variables[header.value].id)"
+                    >
+                      {{ item.variables[header.value].pivot.value }}
+                      <template v-slot:input>
+                        <v-text-field
+                          v-model="editingBuffer"
+                          label="Edit"
+                          single-line
+                        />
+                      </template>
+                    </v-edit-dialog>
                   </td>
                 </template>
               </tr>
-            </tbody>
+            </draggable>
           </template>
         </v-data-table>
       </v-skeleton-loader>
@@ -52,6 +82,9 @@ import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
+  components: {
+    draggable: () => import('vuedraggable')
+  },
   props: {
     study: {
       type: Object,
@@ -66,7 +99,8 @@ export default {
     return {
       newOrder: [],
       saving: false,
-      drag: false
+      drag: false,
+      editingBuffer: ''
     }
   },
   computed: {
@@ -75,6 +109,9 @@ export default {
         return []
       }
       return [
+        {
+          sortable: false
+        },
         {
           text: 'Job ID',
           value: 'id',
@@ -104,11 +141,18 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async save (item) {
+    async save (value, jobID, variableID) {
       try {
-        await item.record.setValue(item.value)
+        this.saving = true
+        const job = this.study.jobs.find(job => job.id === jobID)
+        if (!job) {
+          throw new Error('Job not found in local records')
+        }
+        await job.setVariableValue(variableID, value)
       } catch (e) {
         processErrors(e, this.notify)
+      } finally {
+        this.saving = false
       }
     },
     frozen (val) {

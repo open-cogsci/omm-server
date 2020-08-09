@@ -130,7 +130,7 @@ class JobController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, auth }) {
+  async update ({ params, request, auth, transform }) {
     const { id } = params
     const { variable_id: variableID, value } = request.all()
     const job = await Job.query()
@@ -154,13 +154,8 @@ class JobController {
       throw new Error('Failed to update variable')
     }
 
-    return {
-      data: {
-        job_id: parseInt(id),
-        variable_id: parseInt(variableID),
-        value
-      }
-    }
+    await job.load('variables')
+    return transform.item(job, 'JobTransformer')
   }
 
   /**
