@@ -37,27 +37,29 @@ export default class Job extends Model {
   }
 
   setVariableValue (variableID, value, config) {
-    // First update the local store
+    // First update the local store to immediately reflect changes in the GUI
     this.constructor.update({
       where: this.id,
       data (job) {
         const varRecord = cloneDeep(Object.values(job.variables).find(variable => variable.id === variableID))
+        const variablesClone = cloneDeep(job.variables)
         varRecord.pivot.value = value
-        job.variables[varRecord.name] = varRecord
+        variablesClone[varRecord.name] = varRecord
+        job.variables = variablesClone
       }
     })
     // Then remotely
-    // return this.constructor.api().patch(
-    //   `/${this.id}`,
-    //   {
-    //     variable_id: variableID,
-    //     value
-    //   },
-    //   {
-    //     dataTransformer: jobTransformer,
-    //     ...config
-    //   }
-    // )
+    return this.constructor.api().patch(
+      `/${this.id}`,
+      {
+        variable_id: variableID,
+        value
+      },
+      {
+        dataTransformer: jobTransformer,
+        ...config
+      }
+    )
   }
 
   static fields () {
