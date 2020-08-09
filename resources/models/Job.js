@@ -4,9 +4,10 @@ import Study from './Study'
 
 import { JOBS } from '@/assets/js/endpoints'
 
-export const jobTransformer = ({ data }) => {
-  const job = data.data
-  job.variables = keyBy(job.variables, 'name')
+export const jobTransformer = (job) => {
+  if (job.variables?.length) {
+    job.variables = keyBy(job.variables, 'name')
+  }
   return job
 }
 
@@ -31,11 +32,17 @@ export default class Job extends Model {
   }
 
   static fetchById (id, config) {
-    return this.api().get(id, config)
+    return this.api().get(id, {
+      dataTransformer: ({ data }) => jobTransformer(data.data),
+      ...config
+    })
   }
 
   static fetchByStudyId (studyID, config) {
-    return this.api().get(`/study/${studyID}`, config)
+    return this.api().get(`/study/${studyID}`, {
+      dataTransformer: ({ data }) => data.data.map(jobTransformer),
+      ...config
+    })
   }
 
   static persist (data, config) {

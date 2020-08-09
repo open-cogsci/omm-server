@@ -79,7 +79,8 @@ class JobController {
       .where('study_id', studyID)
       .orderBy('position', 'asc')
       .paginate(1)
-    return transform.paginate(jobs, 'JobsTransformer')
+
+    return transform.paginate(jobs, 'JobTransformer')
   }
 
   /**

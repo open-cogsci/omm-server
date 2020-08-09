@@ -55,7 +55,9 @@
                 <jobs-table
                   :study="study"
                   :loading="loading || refreshingJobs"
-                  @updated-order="updateJobsOrder"
+                  :pagination="pagination"
+                  @update:order="updateJobsOrder"
+                  @update:options="updatePagination"
                 />
               </v-tab-item>
               <v-tab-item>
@@ -98,6 +100,7 @@ export default {
           description: ''
         }
       },
+      pagination: null,
       loading: false,
       refreshingJobs: false,
       tab: 0,
@@ -146,20 +149,31 @@ export default {
       return this.study?.files.filter(fl => fl.type === 'jobs')[0]
     }
   },
-  created () {
-    this.fetchStudy(this.$route.params.id)
+  async created () {
+    await this.fetchStudy(this.$route.params.id)
+    await this.fetchJobs(this.$route.params.id)
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async fetchStudy (studyId) {
+    async fetchStudy (studyID) {
       this.loading = true
       try {
-        await this.Study.fetchById(studyId)
-        await this.Job.fetchFor(studyId)
+        await this.Study.fetchById(studyID)
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
         this.loading = false
+      }
+    },
+    async fetchJobs (studyID) {
+      this.refreshingJobs = true
+      try {
+        const response = await this.Job.fetchByStudyId(studyID)
+        this.pagination = response.response.data.pagination
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.refreshingJobs = false
       }
     },
     async saveTitleInfo (data) {
@@ -192,6 +206,9 @@ export default {
       } catch (e) {
         processErrors(e, this.notify)
       }
+    },
+    async updatePagination (options) {
+
     },
     async archiveStudy () {
       try {

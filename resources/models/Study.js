@@ -48,11 +48,10 @@ export default class Study extends Model {
   }
 
   static async fetchById (id, config) {
-    const result = await this.api().get(id, {
+    return await this.api().get(id, {
       dataTransformer: jobTransformer,
       ...config
     })
-    return result
   }
 
   static persist (data, config) {

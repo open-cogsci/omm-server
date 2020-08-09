@@ -11,9 +11,11 @@
           :loading="loading || saving"
           :headers="columns"
           :items="rows"
+          :server-items-length="pagination && pagination.total || 0"
           :footer-props="{
             itemsPerPageOptions: [10, 25, 50]
           }"
+          @update:options="$emit('update:options', $event)"
         >
           <template v-slot:body="{ items, headers }">
             <draggable
@@ -92,6 +94,15 @@ export default {
     study: {
       type: Object,
       default: () => ({})
+    },
+    pagination: {
+      type: Object,
+      default: () => ({
+        page: 1,
+        lastPage: 1,
+        perPage: 10,
+        total: 0
+      })
     },
     loading: {
       type: Boolean,
@@ -184,7 +195,7 @@ export default {
         // Reset newOrder value to empty
         this.newOrder = []
         // Emit event to parent with updated order data, so it can update the store.
-        this.$emit('updated-order', updatedOrder)
+        this.$emit('update:order', updatedOrder)
         // Update the data on the server side too.
         this.saving = true
         await src.moveTo(target.position)
