@@ -10,10 +10,12 @@ import { STUDIES } from '@/assets/js/endpoints'
 
 export const jobTransformer = ({ data }) => {
   const study = data.data
-  study.jobs = study.jobs.map((job) => {
-    job.variables = keyBy(job.variables, 'name')
-    return job
-  })
+  if (study.jobs?.length) {
+    study.jobs = study.jobs.map((job) => {
+      job.variables = keyBy(job.variables, 'name')
+      return job
+    })
+  }
   return study
 }
 

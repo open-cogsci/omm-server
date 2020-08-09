@@ -17,8 +17,25 @@ export default class Job extends Model {
     baseURL: JOBS
   }
 
+  static fields () {
+    return {
+      id: this.number(null),
+      position: this.number(''),
+      study_id: this.number(null),
+      created_at: this.attr(''),
+      updated_at: this.attr(''),
+      deleted_at: this.attr(''),
+      study: this.belongsTo(Study, 'study_id'),
+      variables: this.attr([])
+    }
+  }
+
   static fetchById (id, config) {
     return this.api().get(id, config)
+  }
+
+  static fetchByStudyId (studyID, config) {
+    return this.api().get(`/study/${studyID}`, config)
   }
 
   static persist (data, config) {
@@ -60,18 +77,5 @@ export default class Job extends Model {
         ...config
       }
     )
-  }
-
-  static fields () {
-    return {
-      id: this.number(null),
-      position: this.number(''),
-      study_id: this.number(null),
-      created_at: this.attr(''),
-      updated_at: this.attr(''),
-      deleted_at: this.attr(''),
-      study: this.belongsTo(Study, 'study_id'),
-      variables: this.attr([])
-    }
   }
 }

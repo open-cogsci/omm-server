@@ -11,6 +11,9 @@
           :loading="loading || saving"
           :headers="columns"
           :items="rows"
+          :footer-props="{
+            itemsPerPageOptions: [10, 25, 50]
+          }"
         >
           <template v-slot:body="{ items, headers }">
             <draggable
@@ -105,7 +108,7 @@ export default {
   },
   computed: {
     columns () {
-      if (this.variables.length === 0 || this.loading) {
+      if (this.variables.length === 0 || this.loading || !this.study?.jobs.length) {
         return []
       }
       return [

@@ -46,6 +46,7 @@ Route.group(() => {
   Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
     .as('studies.upload')
   Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
+  Route.get('/jobs/study/:study_id', 'StudyController.index')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {

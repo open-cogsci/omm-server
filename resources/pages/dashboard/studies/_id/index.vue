@@ -155,6 +155,7 @@ export default {
       this.loading = true
       try {
         await this.Study.fetchById(studyId)
+        await this.Job.fetchFor(studyId)
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
