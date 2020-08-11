@@ -29,7 +29,7 @@
               @start="drag = true"
               @end="drag = false"
             >
-              <tr v-if="!items.length" key="no-items" class="text-center">
+              <tr v-if="!(items.length || headers.length)" key="no-items" class="text-center">
                 <td>
                   No jobs to show. Have you already uploaded a jobs file?
                 </td>
