@@ -14,7 +14,11 @@
       @upload="file => upload('jobs', file)"
       @clicked-cancel="cancelUpload('jobs')"
     />
-    <collaborators-dialog v-model="dialog.collaborators" />
+    <collaborators-dialog
+      v-if="userIsOwner"
+      v-model="dialog.collaborators"
+      :users="study && study.users"
+    />
     <v-container class="py-0 my-0">
       <v-row dense>
         <v-col cols="12">
@@ -35,6 +39,7 @@
               :loading="loading"
               :study="study"
               :jobs="jobs"
+              :user-is-owner="userIsOwner"
               @clicked-delete="deleteStudy"
               @clicked-archive="archiveStudy"
               @clicked-upload-exp="openUploadExpDialog"
@@ -171,6 +176,9 @@ export default {
     },
     jobsFile () {
       return this.study?.files.filter(fl => fl.type === 'jobs')[0]
+    },
+    userIsOwner () {
+      return !!this.study?.users.find(user => user.id === this.$auth.user.id && user.pivot.is_owner)
     }
   },
   async created () {

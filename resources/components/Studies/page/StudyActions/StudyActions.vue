@@ -24,12 +24,12 @@
       </v-btn>
     </v-item-group>
 
-    <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
+    <v-item-group v-if="userIsOwner" class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
       <v-btn
         @click="$emit('clicked-collaborators')"
       >
         <v-icon left>
-          mdi-account
+          mdi-share-variant
         </v-icon>
         Sharing
       </v-btn>
@@ -114,6 +114,10 @@ export default {
     jobs: {
       type: Array,
       default: () => ([])
+    },
+    userIsOwner: {
+      type: Boolean,
+      default: false
     },
     loading: {
       type: Boolean,
