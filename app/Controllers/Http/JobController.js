@@ -75,10 +75,13 @@ class JobController {
       .where('study_id', studyID)
       .firstOrFail()
 
+    const perPage = request.input('perPage', 10)
+    const page = request.input('page', 1)
+
     const jobs = await Job.query()
       .where('study_id', studyID)
       .orderBy('position', 'asc')
-      .paginate(1)
+      .paginate(page, perPage)
 
     return transform.paginate(jobs, 'JobTransformer')
   }

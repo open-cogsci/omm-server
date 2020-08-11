@@ -111,6 +111,10 @@ export default {
       type: Object,
       default: () => ({})
     },
+    jobs: {
+      type: Array,
+      default: () => ([])
+    },
     loading: {
       type: Boolean,
       default: false
@@ -131,7 +135,7 @@ export default {
       return !!this.study?.files.filter(item => item.type === 'experiment').length
     },
     jobsPresent () {
-      return !!this.study?.jobs?.length
+      return !!this.jobs?.length
     }
   }
 }

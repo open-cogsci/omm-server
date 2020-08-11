@@ -8,7 +8,7 @@
       >
         <v-data-table
           dense
-          :loading="loading || saving"
+          :loading="saving"
           :headers="columns"
           :items="rows"
           :server-items-length="totalRecords"
@@ -16,7 +16,9 @@
             itemsPerPageOptions: [10, 25, 50]
           }"
           :page.sync="page"
-          :items-per-page.sync="per_page"
+          :items-per-page.sync="perPage"
+          fixed-header
+          :height="tableHeight"
         >
           <template v-slot:body="{ items, headers }">
             <draggable
@@ -88,7 +90,7 @@ import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
-  sync: ['page', 'per_page'],
+  sync: ['page', 'per-page'],
   components: {
     draggable: () => import('vuedraggable')
   },
@@ -97,7 +99,19 @@ export default {
       type: Object,
       default: () => ({})
     },
+    jobs: {
+      type: Array,
+      default: () => []
+    },
+    variables: {
+      type: Array,
+      default: () => []
+    },
     loading: {
+      type: Boolean,
+      default: false
+    },
+    refreshing: {
       type: Boolean,
       default: false
     },
@@ -116,7 +130,7 @@ export default {
   },
   computed: {
     columns () {
-      if (this.variables.length === 0 || this.loading || !this.study?.jobs.length) {
+      if (this.variables.length === 0 || this.loading || !this.jobs?.length) {
         return []
       }
       return [
@@ -128,26 +142,27 @@ export default {
           value: 'id',
           sortable: false
         },
-        ...this.variables
+        ...(this.variables?.map(aVar => ({
+          text: upperFirst(aVar.name),
+          value: aVar.name,
+          dtype: aVar.dtype?.name,
+          sortable: false
+        })) || [])
       ]
-    },
-    variables () {
-      return this.study?.variables.map(aVar => ({
-        text: upperFirst(aVar.name),
-        value: aVar.name,
-        dtype: aVar.dtype?.name,
-        sortable: false
-      })) || []
     },
     rows: {
       get () {
-        if (this.loading || !this.study.jobs) { return [] }
-        return this.study.jobs
+        if (this.loading || !this.jobs) { return [] }
+        return this.jobs
       },
       set (newOrder) {
         // Store the new order locally as a temporary measure
         this.newOrder = newOrder
       }
+    },
+    tableHeight () {
+      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+      return vh - 400
     }
   },
   methods: {
@@ -155,7 +170,7 @@ export default {
     async save (value, jobID, variableID) {
       try {
         this.saving = true
-        const job = this.study.jobs.find(job => job.id === jobID)
+        const job = this.jobs.find(job => job.id === jobID)
         if (!job) {
           throw new Error('Job not found in local records')
         }
@@ -176,8 +191,8 @@ export default {
       // state.
       try {
         // Obtain the moved element, at the element located at the new target spot.
-        const src = this.study.jobs[event.moved.oldIndex]
-        const target = this.study.jobs[event.moved.newIndex]
+        const src = this.jobs[event.moved.oldIndex]
+        const target = this.jobs[event.moved.newIndex]
         // Check if the new order has been saved locally. If it hasn't been, something went
         // wrong and abort.
         if (this.newOrder.length === 0) {
