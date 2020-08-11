@@ -11,11 +11,12 @@
           :loading="loading || saving"
           :headers="columns"
           :items="rows"
-          :server-items-length="pagination && pagination.total || 0"
+          :server-items-length="totalRecords"
           :footer-props="{
             itemsPerPageOptions: [10, 25, 50]
           }"
-          @update:options="$emit('update:options', $event)"
+          :page.sync="page"
+          :items-per-page.sync="per_page"
         >
           <template v-slot:body="{ items, headers }">
             <draggable
@@ -87,6 +88,7 @@ import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
+  sync: ['page', 'per_page'],
   components: {
     draggable: () => import('vuedraggable')
   },
@@ -95,18 +97,13 @@ export default {
       type: Object,
       default: () => ({})
     },
-    pagination: {
-      type: Object,
-      default: () => ({
-        page: 1,
-        lastPage: 1,
-        perPage: 10,
-        total: 0
-      })
-    },
     loading: {
       type: Boolean,
       default: false
+    },
+    totalRecords: {
+      type: Number,
+      default: 0
     }
   },
   data () {

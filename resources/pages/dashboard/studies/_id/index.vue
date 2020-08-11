@@ -55,9 +55,10 @@
                 <jobs-table
                   :study="study"
                   :loading="loading || refreshingJobs"
-                  :pagination="pagination"
+                  :total-records="pagination.total"
+                  :page.sync="pagination.page"
+                  :per_page.sync="pagination.perPage"
                   @update:order="updateJobsOrder"
-                  @update:options="updatePagination"
                 />
               </v-tab-item>
               <v-tab-item>
@@ -100,7 +101,12 @@ export default {
           description: ''
         }
       },
-      pagination: null,
+      pagination: {
+        page: 1,
+        lastPage: 1,
+        perPage: 10,
+        total: 0
+      },
       loading: false,
       refreshingJobs: false,
       tab: 0,
@@ -149,9 +155,13 @@ export default {
       return this.study?.files.filter(fl => fl.type === 'jobs')[0]
     }
   },
-  async created () {
-    await this.fetchStudy(this.$route.params.id)
-    await this.fetchJobs(this.$route.params.id)
+  watch: {
+    pagination (val) {
+      console.log(val)
+    }
+  },
+  async mounted () {
+    await this.fetchAll(this.$route.params.id)
   },
   methods: {
     ...mapActions('notifications', ['notify']),
@@ -175,6 +185,10 @@ export default {
       } finally {
         this.refreshingJobs = false
       }
+    },
+    async fetchAll (studyID) {
+      await this.fetchStudy(studyID)
+      await this.fetchJobs(studyID)
     },
     async saveTitleInfo (data) {
       const payload = {
@@ -206,9 +220,6 @@ export default {
       } catch (e) {
         processErrors(e, this.notify)
       }
-    },
-    async updatePagination (options) {
-
     },
     async archiveStudy () {
       try {
@@ -280,7 +291,7 @@ export default {
     // The component is reused if the id simply changed, so mounted is not called in this case.
     // Force a refetch if the id has changed.
     if (to.params.id !== from.params.id) {
-      this.fetchStudy(to.params.id)
+      this.fetchAll(to.params.id)
     }
     next()
   },
