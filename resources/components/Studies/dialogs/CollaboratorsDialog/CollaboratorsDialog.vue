@@ -11,58 +11,66 @@
       <v-card-text class="body-1 font-weight-light">
         Share this experiment with other users
       </v-card-text>
-      <v-card-text v-if="collaborators.length === 0">
-        There are no collaborators for this experiment.
-      </v-card-text>
-      <v-card-text v-else>
-        <v-list>
-          <v-list-item v-for="user of collaborators" :key="user.id">
-            <v-list-item-content>
-              <v-row no-gutters align="center">
-                <v-col cols="8" md="9">
-                  <v-list-item-title>
-                    {{ user.name }}
-                  </v-list-item-title>
-                </v-col>
-                <v-col cols="4" md="3">
-                  <v-select
-                    v-model="user.pivot.access_permission_id"
-                    dense
-                    :items="accessLevels"
-                    hide-details
-                  />
-                </v-col>
-              </v-row>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-btn icon>
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </v-list-item-action>
-          </v-list-item>
-        </v-list>
-      </v-card-text>
+      <v-expand-transition>
+        <v-fade-transition absolute mode="out-in">
+          <v-card-text v-if="searchField" key="search">
+            <user-searcher
+              :items="searchResults"
+              :searching="searchingUsers"
+              @query="$emit('query', $event)"
+            />
+          </v-card-text>
+          <v-card-text v-else-if="collaborators.length" key="collabs">
+            <v-list>
+              <v-list-item v-for="user of collaborators" :key="user.id">
+                <v-list-item-content>
+                  <v-row no-gutters align="center">
+                    <v-col cols="8" md="9">
+                      <v-list-item-title>
+                        {{ user.name }}
+                      </v-list-item-title>
+                    </v-col>
+                    <v-col cols="4" md="3">
+                      <v-select
+                        v-model="user.pivot.access_permission_id"
+                        dense
+                        :items="accessLevels"
+                        hide-details
+                      />
+                    </v-col>
+                  </v-row>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-btn icon>
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+          <v-card-text v-else key="no-collabs">
+            There are no collaborators for this experiment.
+          </v-card-text>
+        </v-fade-transition>
+      </v-expand-transition>
       <v-card-actions>
+        <v-btn
+          text
+          color="primary"
+          :disabled="searchField"
+          @click="searchField = true"
+        >
+          <v-icon left>
+            mdi-plus
+          </v-icon>
+          Add colloborator
+        </v-btn>
         <v-spacer />
         <v-btn
           text
           @click="cancel"
         >
-          <v-icon left>
-            mdi-cancel
-          </v-icon> Cancel
-        </v-btn>
-        <v-btn
-          text
-          color="success"
-          :disabled="!formValid"
-          :loading="saving"
-          @click="save"
-        >
-          <v-icon left>
-            mdi-check
-          </v-icon>
-          Save
+          Close
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -71,6 +79,9 @@
 
 <script>
 export default {
+  components: {
+    UserSearcher: () => import('@/components/Users/UserSearcher')
+  },
   props: {
     value: {
       type: Boolean,
@@ -84,20 +95,37 @@ export default {
       type: Boolean,
       default: true
     },
-    users: {
+    searchResults: {
       type: Array,
       default: () => []
+    },
+    searchingUsers: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data () {
+    return {
+      searchField: false
     }
   },
   computed: {
     collaborators () {
-      return this.users?.filter(user => user.id !== this.$auth.user.id)
+      return this.users?.filter(user => user.id !== this.$auth.user.id) || []
     },
     accessLevels () {
       return [
         { value: 1, text: this.$vuetify.breakpoint.smAndUp ? 'Can read' : 'Read' },
-        { value: 2, text: this.$vuetify.breakpoint.smAndUp ? 'Can edit' : 'Edit' }
+        { value: 2, text: this.$vuetify.breakpoint.smAndUp ? 'Can view' : 'Edit' }
       ]
+    }
+  },
+  watch: {
+    value (val) {
+      if (val) {
+        this.searchField = false
+        this.search = ''
+      }
     }
   },
   methods: {

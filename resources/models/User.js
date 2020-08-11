@@ -26,6 +26,13 @@ export default class User extends Model {
     return this.api().post('', data, config)
   }
 
+  static search (term, config) {
+    return [{
+      text: 'Karel Appel',
+      value: 55
+    }]
+  }
+
   resendAccountEmail (config) {
     return this.constructor.api().post('/resend_account_email', { id: this.id }, {
       save: false,
