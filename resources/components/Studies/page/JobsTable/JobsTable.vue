@@ -8,9 +8,17 @@
       >
         <v-data-table
           dense
-          :loading="loading || saving"
+          :loading="saving"
           :headers="columns"
           :items="rows"
+          :server-items-length="totalRecords"
+          :footer-props="{
+            itemsPerPageOptions: [10, 25, 50]
+          }"
+          :page.sync="page"
+          :items-per-page.sync="perPage"
+          fixed-header
+          :height="tableHeight"
         >
           <template v-slot:body="{ items, headers }">
             <draggable
@@ -31,33 +39,40 @@
                 v-else
                 :id="item.id"
                 :key="item.id"
-                class="list-group=item"
+                class="list-group-item"
               >
-                <template v-for="(header, key) in headers">
+                <td class="px-1" style="width: 0.1%">
+                  <v-btn style="cursor: move" icon class="sortHandle">
+                    <v-icon>mdi-drag-horizontal-variant</v-icon>
+                  </v-btn>
+                </td>
+                <td style="min-width:70px">
+                  {{ item.id }}
+                </td>
+                <template v-for="header in headers">
                   <td
-                    v-if="header.value"
-                    :key="item[header.value].id"
+                    v-if="header.value && item.variables[header.value]"
+                    :key="item.variables[header.value].id"
                   >
-                    <span v-if="frozen(header.value)">{{ item[header.value] }}</span>
+                    <span v-if="header.dtype !== 'variable'">
+                      {{ item.variables[header.value].pivot.value }}
+                    </span>
                     <v-edit-dialog
-                      v-else-if="header.dtype === 'variable'"
-                      :return-value.sync="item[header.value].value"
-                      @save="save(item[header.value])"
+                      v-else
+                      :return-value="editingBuffer"
+                      @open="editingBuffer=item.variables[header.value].pivot.value"
+                      @cancel="editingBuffer=null"
+                      @save="save(editingBuffer, item.id, item.variables[header.value].id)"
                     >
-                      {{ item[header.value].value }}
+                      {{ item.variables[header.value].pivot.value }}
                       <template v-slot:input>
                         <v-text-field
-                          v-model="item[header.value].value"
+                          v-model="editingBuffer"
                           label="Edit"
                           single-line
                         />
                       </template>
                     </v-edit-dialog>
-                  </td>
-                  <td v-else :key="key" class="px-1" style="width: 0.1%">
-                    <v-btn style="cursor: move" icon class="sortHandle">
-                      <v-icon>mdi-drag-horizontal-variant</v-icon>
-                    </v-btn>
                   </td>
                 </template>
               </tr>
@@ -75,6 +90,7 @@ import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
+  sync: ['page', 'per-page'],
   components: {
     draggable: () => import('vuedraggable')
   },
@@ -83,21 +99,38 @@ export default {
       type: Object,
       default: () => ({})
     },
+    jobs: {
+      type: Array,
+      default: () => []
+    },
+    variables: {
+      type: Array,
+      default: () => []
+    },
     loading: {
       type: Boolean,
       default: false
+    },
+    refreshing: {
+      type: Boolean,
+      default: false
+    },
+    totalRecords: {
+      type: Number,
+      default: 0
     }
   },
   data () {
     return {
       newOrder: [],
       saving: false,
-      drag: false
+      drag: false,
+      editingBuffer: ''
     }
   },
   computed: {
     columns () {
-      if (this.variables.length === 0 || this.loading) {
+      if (this.variables.length === 0 || this.loading || !this.jobs?.length) {
         return []
       }
       return [
@@ -109,47 +142,43 @@ export default {
           value: 'id',
           sortable: false
         },
-        ...this.variables
+        ...(this.variables?.map(aVar => ({
+          text: upperFirst(aVar.name),
+          value: aVar.name,
+          dtype: aVar.dtype?.name,
+          sortable: false
+        })) || [])
       ]
-    },
-    variables () {
-      return this.study?.variables.map(aVar => ({
-        text: upperFirst(aVar.name),
-        value: aVar.name,
-        dtype: aVar.dtype?.name,
-        sortable: false
-      })) || []
     },
     rows: {
       get () {
-        if (this.loading || !this.study.jobs) { return [] }
-        return this.study.jobs.map(job => ({
-          record: job,
-          id: job.id,
-          ...job.variables.reduce((result, variable) => {
-            const pivot = variable.value(job.id)
-            result[variable.name] = {
-              id: pivot.id || variable.name,
-              value: pivot.value,
-              record: pivot
-            }
-            return result
-          }, {})
-        }))
+        if (this.loading || !this.jobs) { return [] }
+        return this.jobs
       },
       set (newOrder) {
         // Store the new order locally as a temporary measure
         this.newOrder = newOrder
       }
+    },
+    tableHeight () {
+      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+      return vh - 400
     }
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async save (item) {
+    async save (value, jobID, variableID) {
       try {
-        await item.record.setValue(item.value)
+        this.saving = true
+        const job = this.jobs.find(job => job.id === jobID)
+        if (!job) {
+          throw new Error('Job not found in local records')
+        }
+        await job.setVariableValue(variableID, value)
       } catch (e) {
         processErrors(e, this.notify)
+      } finally {
+        this.saving = false
       }
     },
     frozen (val) {
@@ -162,8 +191,8 @@ export default {
       // state.
       try {
         // Obtain the moved element, at the element located at the new target spot.
-        const src = this.study.jobs[event.moved.oldIndex]
-        const target = this.study.jobs[event.moved.newIndex]
+        const src = this.jobs[event.moved.oldIndex]
+        const target = this.jobs[event.moved.newIndex]
         // Check if the new order has been saved locally. If it hasn't been, something went
         // wrong and abort.
         if (this.newOrder.length === 0) {
@@ -178,7 +207,7 @@ export default {
         // Reset newOrder value to empty
         this.newOrder = []
         // Emit event to parent with updated order data, so it can update the store.
-        this.$emit('updated-order', updatedOrder)
+        this.$emit('update:order', updatedOrder)
         // Update the data on the server side too.
         this.saving = true
         await src.moveTo(target.position)

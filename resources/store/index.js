@@ -9,7 +9,6 @@ import StudyUser from '@/models/StudyUser'
 import StudyFile from '@/models/StudyFile'
 import Participant from '@/models/Participant'
 import Job from '@/models/Job'
-import JobVariable from '@/models/JobVariable'
 import Variable from '@/models/Variable'
 import Dtype from '@/models/Dtype'
 
@@ -25,7 +24,6 @@ database.register(StudyUser)
 database.register(StudyFile)
 database.register(Participant)
 database.register(Job)
-database.register(JobVariable)
 database.register(Variable)
 database.register(Dtype)
 

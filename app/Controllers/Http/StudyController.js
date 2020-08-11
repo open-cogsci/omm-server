@@ -170,7 +170,6 @@ class StudyController {
     const study = await auth.user
       .studies()
       .where('id', params.id)
-      .with('jobs.variables.dtype')
       .with('participants')
       .with('variables.dtype')
       .with('users')
@@ -178,7 +177,7 @@ class StudyController {
       .firstOrFail()
 
     return transform
-      .include('jobs,participants,variables,users,files')
+      .include('participants,variables,users,files')
       .item(study, 'StudyTransformer')
   }
 

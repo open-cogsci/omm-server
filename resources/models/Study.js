@@ -1,13 +1,23 @@
 import { Model } from '@vuex-orm/core'
-
+import keyBy from 'lodash/keyBy'
 import User from './User'
 import StudyUser from './StudyUser'
 import Job from './Job'
-import JobVariable from './JobVariable'
 import Variable from './Variable'
 import StudyFile from './StudyFile'
 
 import { STUDIES } from '@/assets/js/endpoints'
+
+export const jobTransformer = ({ data }) => {
+  const study = data.data
+  if (study.jobs?.length) {
+    study.jobs = study.jobs.map((job) => {
+      job.variables = keyBy(job.variables, 'name')
+      return job
+    })
+  }
+  return study
+}
 
 export default class Study extends Model {
   static entity = 'studies'
@@ -38,20 +48,10 @@ export default class Study extends Model {
   }
 
   static async fetchById (id, config) {
-    const result = await this.api().get(id, config)
-    // TEMPORARY FIX to store JobVariable pivot data correctly
-    const jobs = result.response.data.data.jobs
-    for (const job of jobs) {
-      for (const variable of job.variables) {
-        await JobVariable.update({
-          where: [variable.pivot.job_id, variable.pivot.variable_id],
-          data: {
-            value: variable.pivot.value
-          }
-        })
-      }
-    }
-    return result
+    return await this.api().get(id, {
+      dataTransformer: jobTransformer,
+      ...config
+    })
   }
 
   static persist (data, config) {
@@ -86,8 +86,16 @@ export default class Study extends Model {
     )
   }
 
+  /**
+   * Refresh jobs from the server
+   *
+   * @param {*} config
+   * @returns Promise
+   * @memberof Study
+   */
   refreshJobs (config) {
     return this.constructor.api().get(`${this.id}/jobs/refresh`, {
+      dataTransformer: jobTransformer,
       persistOptions: {
         create: ['jobs', 'variables']
       },

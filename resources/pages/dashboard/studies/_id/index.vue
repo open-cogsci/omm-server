@@ -15,7 +15,7 @@
       @clicked-cancel="cancelUpload('jobs')"
     />
     <collaborators-dialog v-model="dialog.collaborators" />
-    <v-container>
+    <v-container class="py-0 my-0">
       <v-row dense>
         <v-col cols="12">
           <study-title
@@ -34,6 +34,7 @@
             <study-actions
               :loading="loading"
               :study="study"
+              :jobs="jobs"
               @clicked-delete="deleteStudy"
               @clicked-archive="archiveStudy"
               @clicked-upload-exp="openUploadExpDialog"
@@ -49,13 +50,20 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" class="pt-6">
+          <v-col cols="12" class="pt-6 pb-0 mb-0">
             <v-tabs-items v-model="tab">
               <v-tab-item>
                 <jobs-table
-                  :study="study"
-                  :loading="loading || refreshingJobs"
-                  @updated-order="updateJobsOrder"
+                  :variables="variables"
+                  :jobs="jobs"
+                  :loading="loading"
+                  :refreshing="refreshingJobs"
+                  :total-records="pagination.total"
+                  :page="pagination.page"
+                  :per-page="pagination.perPage"
+                  @update:page="updatePage"
+                  @update:per-page="updatePerPage"
+                  @update:order="updateJobsOrder"
                 />
               </v-tab-item>
               <v-tab-item>
@@ -98,6 +106,14 @@ export default {
           description: ''
         }
       },
+      pagination: {
+        page: 1,
+        lastPage: 1,
+        perPage: 10,
+        total: 0,
+        pageStart: 0,
+        pageStop: 10
+      },
       loading: false,
       refreshingJobs: false,
       tab: 0,
@@ -133,11 +149,22 @@ export default {
       return this.Study.query()
         .where('id', parseInt(this.$route.params.id))
         .with(['variables.dtype', 'users', 'participants', 'files'])
-        .with(['jobs'], (query) => {
-          query.orderBy('position', 'asc')
-            .with('variables.dtype')
-        })
         .first()
+    },
+    jobs () {
+      if (!this.study?.id) {
+        return []
+      }
+      return this.Job.query()
+        .where('study_id', this.study.id)
+        .orderBy('position', 'asc')
+        .where('position',
+          value => value > this.pagination.pageStart && value <= this.pagination.pageStop)
+        .with('variables.dtype')
+        .get()
+    },
+    variables () {
+      return (!this.loading && this.study?.variables) || []
     },
     osexpFile () {
       return this.study?.files.filter(fl => fl.type === 'experiment')[0]
@@ -146,20 +173,44 @@ export default {
       return this.study?.files.filter(fl => fl.type === 'jobs')[0]
     }
   },
-  created () {
-    this.fetchStudy(this.$route.params.id)
+  async created () {
+    await this.fetchAll(this.$route.params.id)
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async fetchStudy (studyId) {
-      this.loading = true
+    async fetchStudy (studyID) {
       try {
-        await this.Study.fetchById(studyId)
+        await this.Study.fetchById(studyID)
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
+    },
+    async fetchJobs (studyID) {
+      this.refreshingJobs = true
+      try {
+        const response = await this.Job.fetchByStudyId(
+          studyID, { params: pick(this.pagination, ['page', 'perPage']) }
+        )
+        const serverPagination = response.response.data.pagination
+        const pageStart = (serverPagination.page - 1) * serverPagination.perPage
+        const pageStop = serverPagination.page * serverPagination.perPage
+        this.pagination = {
+          ...this.pagination,
+          ...serverPagination,
+          pageStart,
+          pageStop
+        }
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
-        this.loading = false
+        this.refreshingJobs = false
       }
+    },
+    async fetchAll (studyID) {
+      this.loading = true
+      await this.fetchStudy(studyID)
+      await this.fetchJobs(studyID)
+      this.loading = false
     },
     async saveTitleInfo (data) {
       const payload = {
@@ -252,6 +303,24 @@ export default {
       if (isFunction(this.uploading[item].cancel)) {
         this.uploading[item].cancel('Upload canceled')
       }
+    },
+    updatePage (val) {
+      this.pagination.page = val
+      return this.fetchJobs(this.study.id)
+    },
+    updatePerPage (val) {
+      this.pagination.perPage = val
+      return this.fetchJobs(this.study.id)
+    },
+    resetPagination () {
+      this.pagination = {
+        page: 1,
+        lastPage: 1,
+        perPage: 10,
+        total: 0,
+        pageStart: 0,
+        pageStop: 10
+      }
     }
   },
   validate ({ params }) {
@@ -262,8 +331,9 @@ export default {
     // The component is reused if the id simply changed, so mounted is not called in this case.
     // Force a refetch if the id has changed.
     if (to.params.id !== from.params.id) {
-      this.fetchStudy(to.params.id)
+      this.fetchAll(to.params.id)
     }
+    this.resetPagination()
     next()
   },
   head () {

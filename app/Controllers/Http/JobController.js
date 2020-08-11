@@ -27,6 +27,67 @@ class JobController {
 
   /**
   * @swagger
+  * /jobs/study/{study_id}:
+  *   get:
+  *     tags:
+  *       - Jobs
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Retrieves a paginated list of jobs for the specifiied study.
+  *     parameters:
+  *       - in: path
+  *         name: study_id
+  *         required: true
+  *         type: integer
+  *         description: The study to fetch jobs for.
+  *       - in: query
+  *         name: active
+  *         required: false
+  *         type: boolean
+  *         description: Whether to retrieve active or archived studies.
+  *     responses:
+  *       200:
+  *         description: An array of jobs
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 $ref: '#/definitions/JobWithRelations'
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
+   * Show a list of all studies.
+   * GET studies
+   *
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Auth} ctx.auth
+   * @param {Response} ctx.response
+   */
+  async index ({ params, request, auth, transform }) {
+    const { study_id: studyID } = params
+    // Check if user has permission to view this study
+    await auth.user.studies()
+      .where('study_id', studyID)
+      .firstOrFail()
+
+    const perPage = request.input('perPage', 10)
+    const page = request.input('page', 1)
+
+    const jobs = await Job.query()
+      .where('study_id', studyID)
+      .orderBy('position', 'asc')
+      .paginate(page, perPage)
+
+    return transform.paginate(jobs, 'JobTransformer')
+  }
+
+  /**
+  * @swagger
   * /jobs/{id}:
   *   put:
   *     tags:
@@ -130,7 +191,7 @@ class JobController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, auth }) {
+  async update ({ params, request, auth, transform }) {
     const { id } = params
     const { variable_id: variableID, value } = request.all()
     const job = await Job.query()
@@ -154,13 +215,8 @@ class JobController {
       throw new Error('Failed to update variable')
     }
 
-    return {
-      data: {
-        job_id: parseInt(id),
-        variable_id: parseInt(variableID),
-        value
-      }
-    }
+    await job.load('variables')
+    return transform.item(job, 'JobTransformer')
   }
 
   /**
