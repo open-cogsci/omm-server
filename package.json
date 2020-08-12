@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "serve:dev": "npm run dev",
-    "dev": "nodemon --watch app --watch bootstrap --watch config --watch .env --watch start -x node server.js",
+    "dev": "nodemon --watch app --watch config --watch .env --watch start -x node server.js",
     "build": "cross-env NODE_ENV=production node ./ace nuxtbuild",
     "start": "cross-env NODE_ENV=production node server.js",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
