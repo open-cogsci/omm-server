@@ -19,6 +19,7 @@ const API_PREFIX = '/api/v1'
 Route.group(() => {
   Route.get('/users/types', 'UserController.userTypes')
   Route.post('/users/resend_account_email', 'UserController.resendAccountEmail').as('users.resend_account_email')
+  Route.post('/users/search', 'UserController.search').as('users.search')
   Route.resource('users', 'UserController').apiOnly()
     .validator(new Map([
       [['users.store'], ['SaveUser']],
@@ -37,15 +38,19 @@ Route.group(() => {
       [['participants.store'], ['SaveParticipant']],
       [['participants.update'], ['SaveParticipant']]
     ]))
+  Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
+  Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
+    .as('studies.upload')
+  Route.post('/studies/:id/collaborator', 'StudyController.addCollaborator').as('studies.add_collaborator')
+  Route.patch('/studies/:id/collaborator', 'StudyController.updateCollaborator').as('studies.update_collaborator')
+  Route.delete('/studies/:id/collaborator/:userID', 'StudyController.removeCollaborator').as('studies.remove_collaborator')
   Route.resource('studies', 'StudyController').apiOnly()
     .validator(new Map([
       [['studies.store'], ['SaveStudy']],
       [['studies.update'], ['SaveStudy']]
     ]))
-  Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
-  Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
-    .as('studies.upload')
   Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
+
   Route.get('/jobs/study/:study_id', 'JobController.index').as('jobs.index')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 

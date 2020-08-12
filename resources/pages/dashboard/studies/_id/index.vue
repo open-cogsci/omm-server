@@ -1,45 +1,62 @@
 <template>
   <fragment>
     <upload-experiment-dialog
-      v-model="dialog.uploadExp"
+      v-model="uploading.experiment.dialog"
       :previous-file="osexpFile"
       :upload-status="uploading.experiment"
       @upload="file => upload('experiment', file)"
       @clicked-cancel="cancelUpload('experiment')"
     />
     <upload-jobs-dialog
-      v-model="dialog.uploadJobs"
+      v-model="uploading.jobs.dialog"
       :previous-file="jobsFile"
       :upload-status="uploading.jobs"
       @upload="file => upload('jobs', file)"
       @clicked-cancel="cancelUpload('jobs')"
     />
-    <collaborators-dialog v-model="dialog.collaborators" />
+    <collaborators-dialog
+      v-if="userIsOwner"
+      v-model="collaborators.dialog"
+      :users="study && study.users"
+      :search-field.sync="collaborators.searchField"
+      :searching-users="collaborators.searching"
+      :search-results="collaborators.searchResults"
+      :saving="collaborators.saving"
+      :deleting="collaborators.deleting"
+      :saving-access="collaborators.savingAccess"
+      @query="searchUsers"
+      @add-user="addCollaborator"
+      @remove-user="removeCollaborator"
+      @set-access-level="setAccessLevel"
+    />
     <v-container class="py-0 my-0">
       <v-row dense>
         <v-col cols="12">
           <study-title
             :study="study"
-            :saving="saving.title"
-            :loading="loading"
+            :saving="status.savingTitle"
+            :loading="status.loading"
             :errors.sync="errors.title"
+            :editable="userCanEdit"
             @editted="saveTitleInfo"
           />
         </v-col>
       </v-row>
 
-      <template v-if="loading || study">
+      <template v-if="status.loading || study">
         <v-row no-gutters>
           <v-col cols="12" lg="9" class="text-md-right">
             <study-actions
-              :loading="loading"
+              v-if="userCanEdit"
+              :loading="status.loading"
               :study="study"
               :jobs="jobs"
+              :user-is-owner="userIsOwner"
               @clicked-delete="deleteStudy"
               @clicked-archive="archiveStudy"
               @clicked-upload-exp="openUploadExpDialog"
               @clicked-upload-jobs="openUploadJobsDialog"
-              @clicked-collaborators="dialog.collaborators = true"
+              @clicked-collaborators="collaborators.dialog = true"
             />
           </v-col>
           <v-col cols="12" lg="3" order-lg="first">
@@ -54,10 +71,11 @@
             <v-tabs-items v-model="tab">
               <v-tab-item>
                 <jobs-table
+                  :editable="userCanEdit"
                   :variables="variables"
                   :jobs="jobs"
-                  :loading="loading"
-                  :refreshing="refreshingJobs"
+                  :loading="status.loading"
+                  :refreshing="status.refreshingJobs"
                   :total-records="pagination.total"
                   :page="pagination.page"
                   :per-page="pagination.perPage"
@@ -80,9 +98,8 @@
 </template>
 
 <script>
-import { pick } from 'lodash'
+import { pick, debounce, isFunction } from 'lodash'
 import { mapActions } from 'vuex'
-import isFunction from 'lodash/isFunction'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -97,8 +114,11 @@ export default {
   },
   data () {
     return {
-      saving: {
-        title: false
+      tab: 0,
+      status: {
+        savingTitle: false,
+        loading: false,
+        refreshingJobs: false
       },
       errors: {
         title: {
@@ -114,22 +134,25 @@ export default {
         pageStart: 0,
         pageStop: 10
       },
-      loading: false,
-      refreshingJobs: false,
-      tab: 0,
-      dialog: {
-        uploadExp: false,
-        uploadJobs: false,
-        collaborators: false
+      collaborators: {
+        dialog: false,
+        searchField: false,
+        searching: false,
+        saving: false,
+        savingAccess: null,
+        searchTerm: '',
+        searchResults: []
       },
       uploading: {
         experiment: {
+          dialog: false,
           inProgress: false,
           progress: null,
           cancel: null,
           file: null
         },
         jobs: {
+          dialog: false,
           inProgress: false,
           progress: null,
           cancel: null,
@@ -144,6 +167,9 @@ export default {
     },
     Job () {
       return this.$store.$db().model('jobs')
+    },
+    User () {
+      return this.$store.$db().model('users')
     },
     study () {
       return this.Study.query()
@@ -164,16 +190,24 @@ export default {
         .get()
     },
     variables () {
-      return (!this.loading && this.study?.variables) || []
+      return (!this.status.loading && this.study?.variables) || []
     },
     osexpFile () {
       return this.study?.files.filter(fl => fl.type === 'experiment')[0]
     },
     jobsFile () {
       return this.study?.files.filter(fl => fl.type === 'jobs')[0]
+    },
+    userIsOwner () {
+      return !!this.study?.users.find(user => user.id === this.$auth.user.id && user.pivot.is_owner)
+    },
+    userCanEdit () {
+      return !!this.study?.users.find(user => user.id === this.$auth.user.id &&
+        user.pivot.access_permission_id === 2)
     }
   },
   async created () {
+    this.searchUsers = debounce(this.searchUsers, 250)
     await this.fetchAll(this.$route.params.id)
   },
   methods: {
@@ -207,24 +241,24 @@ export default {
       }
     },
     async fetchAll (studyID) {
-      this.loading = true
+      this.status.loading = true
       await this.fetchStudy(studyID)
       await this.fetchJobs(studyID)
-      this.loading = false
+      this.status.loading = false
     },
     async saveTitleInfo (data) {
       const payload = {
         ...pick(this.study, ['id', 'name', 'description']),
         ...data
       }
-      this.saving.title = true
+      this.status.savingTitle = true
       try {
         await this.Study.persist(payload)
         this.errors.title = {}
       } catch (e) {
         this.errors.title = processErrors(e, this.notify)
       } finally {
-        this.saving.title = false
+        this.status.savingTitle = false
       }
     },
     async deleteStudy () {
@@ -250,14 +284,6 @@ export default {
       } catch (e) {
         processErrors(e, this.notify)
       }
-    },
-    openUploadExpDialog () {
-      this.uploading.experiment.progress = null
-      this.dialog.uploadExp = true
-    },
-    openUploadJobsDialog () {
-      this.uploading.jobs.progress = null
-      this.dialog.uploadJobs = true
     },
     async upload (type, file) {
       this.uploading[type].inProgress = true
@@ -299,18 +325,63 @@ export default {
         }
       }
     },
+    async searchUsers (val) {
+      if (this.collaborators.searching) { return }
+      this.collaborators.searching = true
+      this.collaborators.searchResults = await this.User.search(val)
+      this.collaborators.searching = false
+    },
+    async addCollaborator (userID) {
+      this.collaborators.saving = true
+      try {
+        await this.study.addUser(userID)
+        this.collaborators.searchField = false
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.collaborators.saving = false
+      }
+    },
+    async setAccessLevel (payload) {
+      try {
+        this.collaborators.savingAccess = payload.userID
+        await this.study.setAccessLevel(payload)
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.collaborators.savingAccess = null
+      }
+    },
+    async removeCollaborator (userID) {
+      this.collaborators.deleting = userID
+      try {
+        await this.study.deleteUser(userID)
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.collaborators.deleting = null
+      }
+    },
     cancelUpload (item) {
       if (isFunction(this.uploading[item].cancel)) {
         this.uploading[item].cancel('Upload canceled')
       }
     },
+    openUploadExpDialog () {
+      this.uploading.experiment.progress = null
+      this.uploading.experiment.dialog = true
+    },
+    openUploadJobsDialog () {
+      this.uploading.jobs.progress = null
+      this.uploading.jobs.dialog = true
+    },
     updatePage (val) {
       this.pagination.page = val
-      return this.fetchJobs(this.study.id)
+      this.fetchJobs(this.study.id)
     },
     updatePerPage (val) {
       this.pagination.perPage = val
-      return this.fetchJobs(this.study.id)
+      this.fetchJobs(this.study.id)
     },
     resetPagination () {
       this.pagination = {

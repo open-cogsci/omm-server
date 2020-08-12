@@ -25,11 +25,12 @@
               v-model="rows"
               tag="tbody"
               handle=".sortHandle"
+              :disabled="!editable"
               @change="updateOrder"
               @start="drag = true"
               @end="drag = false"
             >
-              <tr v-if="!items.length" key="no-items" class="text-center">
+              <tr v-if="!(items.length || headers.length)" key="no-items" class="text-center">
                 <td>
                   No jobs to show. Have you already uploaded a jobs file?
                 </td>
@@ -41,7 +42,7 @@
                 :key="item.id"
                 class="list-group-item"
               >
-                <td class="px-1" style="width: 0.1%">
+                <td v-if="editable" class="px-1" style="width: 0.1%">
                   <v-btn style="cursor: move" icon class="sortHandle">
                     <v-icon>mdi-drag-horizontal-variant</v-icon>
                   </v-btn>
@@ -54,7 +55,7 @@
                     v-if="header.value && item.variables[header.value]"
                     :key="item.variables[header.value].id"
                   >
-                    <span v-if="header.dtype !== 'variable'">
+                    <span v-if="header.dtype !== 'variable' || !editable">
                       {{ item.variables[header.value].pivot.value }}
                     </span>
                     <v-edit-dialog
@@ -118,6 +119,10 @@ export default {
     totalRecords: {
       type: Number,
       default: 0
+    },
+    editable: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -133,10 +138,8 @@ export default {
       if (this.variables.length === 0 || this.loading || !this.jobs?.length) {
         return []
       }
-      return [
-        {
-          sortable: false
-        },
+
+      const headers = [
         {
           text: 'Job ID',
           value: 'id',
@@ -149,6 +152,10 @@ export default {
           sortable: false
         })) || [])
       ]
+      if (this.editable) {
+        headers.unshift({ sortable: false })
+      }
+      return headers
     },
     rows: {
       get () {

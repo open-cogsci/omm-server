@@ -57,7 +57,7 @@ class UserController {
       .with('userType')
       .orderBy('name', 'asc')
       .fetch()
-    return transform.collection(users, 'UserTransformer.withStudiesCount')
+    return transform.include('user_type').collection(users, 'UserTransformer.withStudiesCount')
   }
 
   /**
@@ -281,16 +281,17 @@ class UserController {
 
     const user = await User.query()
       .where('id', params.id)
+      .with('userType')
       .with('studies', (builder) => {
         builder
           .wherePivot('is_owner', true)
           .withCount('participants')
-          // Somehowe, the pivot fields below are also included after the withCount() call
+          // Somehow, the pivot fields below are also included after the withCount() call
           // Remove them here to tidy up the response.
           .setHidden(['access_permission_id', 'is_owner', 'study_id', 'user_id'])
       })
       .firstOrFail()
-    return transform.include('studies.participants_count').item(user, 'UserTransformer')
+    return transform.include('studies.participants_count,user_type').item(user, 'UserTransformer')
   }
 
   /**
@@ -331,6 +332,9 @@ class UserController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, response, auth }) {
+    if (!auth.current.user.isAdmin) {
+      return response.status(401).json({ message: 'Permission denied' })
+    }
     if (auth.user.id === params.id) {
       return response.status(400).json({ message: 'You cannot delete yourself' })
     }
@@ -902,6 +906,75 @@ class UserController {
     } catch (e) {
       return response.status(400).json({ message: 'Could not fetch user types' })
     }
+  }
+
+  /**
+  * @swagger
+  * /users/search:
+  *   post:
+  *     tags:
+  *       - Users
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Searches for users by name
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: body
+  *         name: term
+  *         description: The search term; the name to search for.
+  *         schema:
+  *           type: object
+  *           properties:
+  *             term:
+  *               type: string
+  *               description: The name to search for
+  *               example: John
+  *               required: true
+  *     responses:
+  *       200:
+  *         description: The users matching the query
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 type: object
+  *                 properties:
+  *                   value:
+  *                     type: integer
+  *                     description: The ID of the user
+  *                     example: 22
+  *                   text:
+  *                     type: string
+  *                     description: The name of the user
+  *                     example: John Doe
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       401:
+  *         description: Unauthorized.
+  *       default:
+  *         description: Unexpected error.
+  */
+  async search ({ request }) {
+    const term = request.input('term')
+    if (!term || term.length < 2) {
+      return { data: [] }
+    }
+
+    const data = await User.query()
+      .where('name', 'LIKE', `%${term}%`)
+      .where('account_status', 'active')
+      .select('id as value', 'name as text')
+      .limit(10)
+      .fetch()
+
+    return { data }
   }
 }
 

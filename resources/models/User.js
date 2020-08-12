@@ -26,6 +26,16 @@ export default class User extends Model {
     return this.api().post('', data, config)
   }
 
+  static async search (term, config) {
+    if (!term || term.length < 3) { return [] }
+    const results = await this.api().post('/search', { term },
+      {
+        save: false,
+        ...config
+      })
+    return results.response.data?.data || []
+  }
+
   resendAccountEmail (config) {
     return this.constructor.api().post('/resend_account_email', { id: this.id }, {
       save: false,

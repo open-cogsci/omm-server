@@ -29,7 +29,7 @@
           <span class="py-1">
             {{ value }}&nbsp;
           </span>
-          <v-fab-transition>
+          <v-fab-transition v-if="editable">
             <v-btn v-show="hover" icon @click="edit">
               <v-icon color="primary">
                 mdi-pencil
@@ -68,6 +68,10 @@ export default {
     maxLength: {
       type: Number,
       default: null
+    },
+    editable: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
