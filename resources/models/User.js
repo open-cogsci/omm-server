@@ -26,11 +26,14 @@ export default class User extends Model {
     return this.api().post('', data, config)
   }
 
-  static search (term, config) {
-    return [{
-      text: 'Karel Appel',
-      value: 55
-    }]
+  static async search (term, config) {
+    if (!term || term.length < 3) { return [] }
+    const results = await this.api().post('/search', { term },
+      {
+        save: false,
+        ...config
+      })
+    return results.response.data?.data || []
   }
 
   resendAccountEmail (config) {

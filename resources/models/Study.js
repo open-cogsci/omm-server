@@ -102,4 +102,10 @@ export default class Study extends Model {
       ...config
     })
   }
+
+  addUser (userID) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => resolve(userID), 2000)
+    })
+  }
 }

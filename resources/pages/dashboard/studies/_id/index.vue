@@ -20,7 +20,9 @@
       :users="study && study.users"
       :searching-users="collaborators.searching"
       :search-results="collaborators.searchResults"
+      :saving="collaborators.saving"
       @query="searchUsers"
+      @add-user="addCollaborator"
     />
     <v-container class="py-0 my-0">
       <v-row dense>
@@ -127,6 +129,7 @@ export default {
       collaborators: {
         dialog: false,
         searching: false,
+        saving: false,
         searchTerm: '',
         searchResults: []
       },
@@ -190,7 +193,7 @@ export default {
     }
   },
   async created () {
-    this.searchUsers = debounce(this.searchUsers, 100)
+    this.searchUsers = debounce(this.searchUsers, 250)
     await this.fetchAll(this.$route.params.id)
   },
   methods: {
@@ -234,14 +237,14 @@ export default {
         ...pick(this.study, ['id', 'name', 'description']),
         ...data
       }
-      this.saving.title = true
+      this.status.savingTitle = true
       try {
         await this.Study.persist(payload)
         this.errors.title = {}
       } catch (e) {
         this.errors.title = processErrors(e, this.notify)
       } finally {
-        this.saving.title = false
+        this.status.savingTitle = false
       }
     },
     async deleteStudy () {
@@ -313,6 +316,11 @@ export default {
       this.collaborators.searching = true
       this.collaborators.searchResults = await this.User.search(val)
       this.collaborators.searching = false
+    },
+    async addCollaborator (userID) {
+      this.collaborators.saving = true
+      await this.study.addUser(userID)
+      this.collaborators.saving = false
     },
     cancelUpload (item) {
       if (isFunction(this.uploading[item].cancel)) {

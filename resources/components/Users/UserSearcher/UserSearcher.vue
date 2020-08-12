@@ -1,17 +1,35 @@
 <template>
-  <v-autocomplete
-    v-model="user"
-    :items="items"
-    :search-input.sync="search"
-    :loading="searching"
-    outlined
-    prepend-icon="mdi-account-search"
-    label="Search user"
-    hide-no-data
-    hide-selected
-    cache-items
-    return-object
-  />
+  <v-row align="center">
+    <v-col cols="12" sm="9">
+      <v-autocomplete
+        v-model="selected"
+        :items="items"
+        :search-input.sync="search"
+        :loading="searching"
+        :filter="userFilter"
+        outlined
+        prepend-icon="mdi-account-search"
+        label="Search user"
+        hide-no-data
+        hide-selected
+        hide-details
+        cache-items
+        return-object
+      />
+    </v-col>
+    <v-col cols="12" sm="3" class="text-right">
+      <v-item-group class="v-btn-toggle">
+        <v-btn :disabled="!selected" :loading="saving" color="primary" @click="add">
+          <v-icon dark>
+            mdi-plus
+          </v-icon>
+        </v-btn>
+        <v-btn :disabled="saving" @click="cancel">
+          <v-icon>mdi-cancel</v-icon>
+        </v-btn>
+      </v-item-group>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -24,20 +42,46 @@ export default {
     searching: {
       type: Boolean,
       default: false
+    },
+    saving: {
+      type: Boolean,
+      default: false
+    },
+    users: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
     return {
       search: '',
-      user: {}
+      selected: null
+    }
+  },
+  computed: {
+    collabIDs () {
+      return this.users.map(user => user.id)
     }
   },
   watch: {
     search (val) {
       val && val !== this.user?.text && this.$emit('query', val)
+    }
+  },
+  methods: {
+    clear () {
+      this.selected = null
     },
-    select () {
-      this.user && this.$emit('select-user', this.user.id)
+    cancel () {
+      this.clear()
+      this.$emit('clicked-cancel')
+    },
+    userFilter (item) {
+      // Leave away users that are already among the collaborators
+      return !this.collabIDs.includes(item.value)
+    },
+    add () {
+      this.selected && this.$emit('clicked-add', this.selected.value)
     }
   }
 }

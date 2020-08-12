@@ -903,6 +903,80 @@ class UserController {
       return response.status(400).json({ message: 'Could not fetch user types' })
     }
   }
+
+  /**
+  * @swagger
+  * /users/search:
+  *   post:
+  *     tags:
+  *       - Users
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Searches for users by name
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: body
+  *         name: term
+  *         description: The search term; the name to search for.
+  *         schema:
+  *           type: object
+  *           properties:
+  *             term:
+  *               type: string
+  *               description: The name to search for
+  *               example: John
+  *               required: true
+  *     responses:
+  *       200:
+  *         description: The users matching the query
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: array
+  *               items:
+  *                 type: object
+  *                 properties:
+  *                   value:
+  *                     type: integer
+  *                     description: The ID of the user
+  *                     example: 22
+  *                   text:
+  *                     type: string
+  *                     description: The name of the user
+  *                     example: John Doe
+  *       400:
+  *         description: The request was invalid (e.g. the passed data did not validate).
+  *         schema:
+  *           type: array
+  *           items:
+  *             $ref: '#/definitions/ValidationError'
+  *       401:
+  *         description: Unauthorized.
+  *       default:
+  *         description: Unexpected error.
+  */
+  async search ({ request }) {
+    const term = request.input('term')
+    if (!term || term.length < 2) {
+      return { data: [] }
+    }
+
+    const result = await User.query()
+      .where('name', 'LIKE', `%${term}%`)
+      .where('account_status', 'active')
+      .select('id', 'name')
+      .limit(10)
+      .fetch()
+
+    const data = result.toJSON().map(usr => ({
+      value: usr.id,
+      text: usr.name
+    }))
+
+    return { data }
+  }
 }
 
 module.exports = UserController

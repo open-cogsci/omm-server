@@ -19,6 +19,7 @@ const API_PREFIX = '/api/v1'
 Route.group(() => {
   Route.get('/users/types', 'UserController.userTypes')
   Route.post('/users/resend_account_email', 'UserController.resendAccountEmail').as('users.resend_account_email')
+  Route.post('/users/search', 'UserController.search').as('users.search')
   Route.resource('users', 'UserController').apiOnly()
     .validator(new Map([
       [['users.store'], ['SaveUser']],

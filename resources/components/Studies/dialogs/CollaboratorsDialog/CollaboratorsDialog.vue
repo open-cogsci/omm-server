@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     :value="value"
-    max-width="600px"
+    max-width="620px"
     @input="$emit('input', $event)"
   >
     <v-card>
@@ -15,9 +15,14 @@
         <v-fade-transition absolute mode="out-in">
           <v-card-text v-if="searchField" key="search">
             <user-searcher
+              ref="userSearcher"
               :items="searchResults"
               :searching="searchingUsers"
+              :users="users"
+              :saving="saving"
               @query="$emit('query', $event)"
+              @clicked-cancel="searchField = false"
+              @clicked-add="$emit('add-user', $event)"
             />
           </v-card-text>
           <v-card-text v-else-if="collaborators.length" key="collabs">
@@ -87,6 +92,10 @@ export default {
       type: Boolean,
       default: false
     },
+    users: {
+      type: Array,
+      default: () => []
+    },
     saving: {
       type: Boolean,
       default: false
@@ -115,8 +124,8 @@ export default {
     },
     accessLevels () {
       return [
-        { value: 1, text: this.$vuetify.breakpoint.smAndUp ? 'Can read' : 'Read' },
-        { value: 2, text: this.$vuetify.breakpoint.smAndUp ? 'Can view' : 'Edit' }
+        { value: 1, text: this.$vuetify.breakpoint.smAndUp ? 'Can view' : 'View' },
+        { value: 2, text: this.$vuetify.breakpoint.smAndUp ? 'Can edit' : 'Edit' }
       ]
     }
   },
@@ -131,9 +140,6 @@ export default {
   methods: {
     cancel () {
       this.$emit('input', false)
-    },
-    save () {
-
     }
   }
 }
