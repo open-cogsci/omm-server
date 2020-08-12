@@ -57,7 +57,7 @@ class UserController {
       .with('userType')
       .orderBy('name', 'asc')
       .fetch()
-    return transform.collection(users, 'UserTransformer.withStudiesCount')
+    return transform.include('user_type').collection(users, 'UserTransformer.withStudiesCount')
   }
 
   /**
@@ -281,16 +281,17 @@ class UserController {
 
     const user = await User.query()
       .where('id', params.id)
+      .with('userType')
       .with('studies', (builder) => {
         builder
           .wherePivot('is_owner', true)
           .withCount('participants')
-          // Somehowe, the pivot fields below are also included after the withCount() call
+          // Somehow, the pivot fields below are also included after the withCount() call
           // Remove them here to tidy up the response.
           .setHidden(['access_permission_id', 'is_owner', 'study_id', 'user_id'])
       })
       .firstOrFail()
-    return transform.include('studies.participants_count').item(user, 'UserTransformer')
+    return transform.include('studies.participants_count,user_type').item(user, 'UserTransformer')
   }
 
   /**
@@ -331,6 +332,9 @@ class UserController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, response, auth }) {
+    if (!auth.current.user.isAdmin) {
+      return response.status(401).json({ message: 'Permission denied' })
+    }
     if (auth.user.id === params.id) {
       return response.status(400).json({ message: 'You cannot delete yourself' })
     }
@@ -963,17 +967,12 @@ class UserController {
       return { data: [] }
     }
 
-    const result = await User.query()
+    const data = await User.query()
       .where('name', 'LIKE', `%${term}%`)
       .where('account_status', 'active')
-      .select('id', 'name')
+      .select('id as value', 'name as text')
       .limit(10)
       .fetch()
-
-    const data = result.toJSON().map(usr => ({
-      value: usr.id,
-      text: usr.name
-    }))
 
     return { data }
   }

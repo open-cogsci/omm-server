@@ -103,9 +103,44 @@ export default class Study extends Model {
     })
   }
 
-  addUser (userID) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => resolve(userID), 2000)
+  /**
+   * Add collaborator to this study
+   *
+   * @param {Number} userID
+   * @param {Object} config
+   * @returns
+   * @memberof Study
+   */
+  addUser (userID, config) {
+    return this.constructor.api().post(`${this.id}/collaborator`, { userID }, config)
+  }
+
+  /**
+   * Remove collaborator from this study
+   *
+   * @param {Number} userID
+   * @param {Object} config
+   * @returns
+   * @memberof Study
+   */
+  async deleteUser (userID, config) {
+    const response = await this.constructor.api().delete(`${this.id}/collaborator/${userID}`, {
+      save: false,
+      ...config
     })
+    StudyUser.delete([this.id, userID])
+    return response
+  }
+
+  /**
+   * Set access level of collaborator
+   *
+   * @param {Object} { userID, level }
+   * @param {Object} config
+   * @returns
+   * @memberof Study
+   */
+  setAccessLevel ({ userID, level }, config) {
+    return this.constructor.api().patch(`${this.id}/collaborator`, { userID, level }, config)
   }
 }

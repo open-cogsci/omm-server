@@ -20,7 +20,7 @@
     <v-col cols="12" sm="3" class="text-right">
       <v-item-group class="v-btn-toggle">
         <v-btn :disabled="!selected" :loading="saving" color="primary" @click="add">
-          <v-icon dark>
+          <v-icon color="white">
             mdi-plus
           </v-icon>
         </v-btn>

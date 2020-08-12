@@ -862,6 +862,49 @@ class StudyController {
       data: { jobs_deleted: rowsDeleted }
     }
   }
+
+  async addCollaborator ({ params, request, response, auth, transform }) {
+    const { id } = params
+    const userID = request.input('userID')
+
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({ message: 'Only the study owner can add collaborators' })
+    }
+    await study.users().attach([userID])
+    await study.load('users', (query) => {
+      query.where('id', userID)
+    })
+    return transform.include('users').item(study, 'StudyTransformer')
+  }
+
+  async updateCollaborator ({ params, request, response, auth, transform }) {
+    const { id } = params
+    const { userID, level } = request.all()
+
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({ message: 'Only the study owner can edit access levels' })
+    }
+    await study.users().pivotQuery()
+      .where('user_id', userID)
+      .update({ access_permission_id: level })
+
+    await study.load('users', (query) => {
+      query.where('id', userID)
+    })
+    return transform.include('users').item(study, 'StudyTransformer')
+  }
+
+  async removeCollaborator ({ params, response, auth }) {
+    const { id, userID } = params
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({ message: 'Only the study owner can remove collaborators' })
+    }
+    await study.users().detach([userID])
+    return response.noContent()
+  }
 }
 
 module.exports = StudyController

@@ -9,6 +9,7 @@
       <v-col cols="12">
         <v-row no-gutters>
           <editable-text
+            :editable="editable"
             label="Name"
             :value="study.name"
             :max-length="maxLength.name"
@@ -21,6 +22,7 @@
         </v-row>
         <v-row no-gutters>
           <editable-text
+            :editable="editable"
             label="Description"
             :value="study.description"
             :max-length="maxLength.description"
@@ -59,6 +61,10 @@ export default {
     errors: {
       type: Object,
       default: () => ({ name: '', description: '' })
+    },
+    editable: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

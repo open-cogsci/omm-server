@@ -18,11 +18,16 @@
       v-if="userIsOwner"
       v-model="collaborators.dialog"
       :users="study && study.users"
+      :search-field.sync="collaborators.searchField"
       :searching-users="collaborators.searching"
       :search-results="collaborators.searchResults"
       :saving="collaborators.saving"
+      :deleting="collaborators.deleting"
+      :saving-access="collaborators.savingAccess"
       @query="searchUsers"
       @add-user="addCollaborator"
+      @remove-user="removeCollaborator"
+      @set-access-level="setAccessLevel"
     />
     <v-container class="py-0 my-0">
       <v-row dense>
@@ -32,6 +37,7 @@
             :saving="status.savingTitle"
             :loading="status.loading"
             :errors.sync="errors.title"
+            :editable="userCanEdit"
             @editted="saveTitleInfo"
           />
         </v-col>
@@ -41,6 +47,7 @@
         <v-row no-gutters>
           <v-col cols="12" lg="9" class="text-md-right">
             <study-actions
+              v-if="userCanEdit"
               :loading="status.loading"
               :study="study"
               :jobs="jobs"
@@ -64,6 +71,7 @@
             <v-tabs-items v-model="tab">
               <v-tab-item>
                 <jobs-table
+                  :editable="userCanEdit"
                   :variables="variables"
                   :jobs="jobs"
                   :loading="status.loading"
@@ -128,8 +136,10 @@ export default {
       },
       collaborators: {
         dialog: false,
+        searchField: false,
         searching: false,
         saving: false,
+        savingAccess: null,
         searchTerm: '',
         searchResults: []
       },
@@ -190,6 +200,10 @@ export default {
     },
     userIsOwner () {
       return !!this.study?.users.find(user => user.id === this.$auth.user.id && user.pivot.is_owner)
+    },
+    userCanEdit () {
+      return !!this.study?.users.find(user => user.id === this.$auth.user.id &&
+        user.pivot.access_permission_id === 2)
     }
   },
   async created () {
@@ -319,8 +333,34 @@ export default {
     },
     async addCollaborator (userID) {
       this.collaborators.saving = true
-      await this.study.addUser(userID)
-      this.collaborators.saving = false
+      try {
+        await this.study.addUser(userID)
+        this.collaborators.searchField = false
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.collaborators.saving = false
+      }
+    },
+    async setAccessLevel (payload) {
+      try {
+        this.collaborators.savingAccess = payload.userID
+        await this.study.setAccessLevel(payload)
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.collaborators.savingAccess = null
+      }
+    },
+    async removeCollaborator (userID) {
+      this.collaborators.deleting = userID
+      try {
+        await this.study.deleteUser(userID)
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.collaborators.deleting = null
+      }
     },
     cancelUpload (item) {
       if (isFunction(this.uploading[item].cancel)) {
@@ -337,11 +377,11 @@ export default {
     },
     updatePage (val) {
       this.pagination.page = val
-      return this.fetchJobs(this.study.id)
+      this.fetchJobs(this.study.id)
     },
     updatePerPage (val) {
       this.pagination.perPage = val
-      return this.fetchJobs(this.study.id)
+      this.fetchJobs(this.study.id)
     },
     resetPagination () {
       this.pagination = {
