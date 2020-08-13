@@ -16,7 +16,6 @@
             <v-list-item-subtitle v-text="item.identifier" />
           </v-list-item-content>
         </v-list-item>
-        <v-divider />
       </template>
     </v-virtual-scroll>
     <h3 v-else class="px-4 font-weight-light">

@@ -263,6 +263,10 @@ class Study extends Model {
     await Database.table('job_states').insert(records)
   }
 
+  async getCollectedData () {
+
+  }
+
   /* Private functions */
 
   /**

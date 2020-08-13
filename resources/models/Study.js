@@ -146,4 +146,21 @@ export default class Study extends Model {
   setAccessLevel ({ userID, level }, config) {
     return this.constructor.api().patch(`${this.id}/collaborator`, { userID, level }, config)
   }
+
+  async fetchStats (config) {
+    const result = await this.constructor.api().get(`${this.id}/stats`, {
+      save: false,
+      ...config
+    })
+    return result.response.data.data
+  }
+
+  async downloadData (config) {
+    const result = await this.constructor.api().get(`${this.id}/data`, {
+      responseType: 'blob',
+      timeout: 30000,
+      ...config
+    })
+    return new Blob([result.response.data])
+  }
 }

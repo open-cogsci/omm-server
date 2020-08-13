@@ -170,14 +170,13 @@ class StudyController {
     const study = await auth.user
       .studies()
       .where('id', params.id)
-      .with('participants')
       .with('variables.dtype')
       .with('users')
       .with('files')
       .firstOrFail()
 
     return transform
-      .include('participants,variables,users,files')
+      .include('variables,users,files')
       .item(study, 'StudyTransformer')
   }
 
@@ -863,6 +862,13 @@ class StudyController {
     }
   }
 
+  /**
+   * Add collaborator for this study
+   *
+   * @param {*} { params, request, response, auth, transform }
+   * @returns
+   * @memberof StudyController
+   */
   async addCollaborator ({ params, request, response, auth, transform }) {
     const { id } = params
     const userID = request.input('userID')
@@ -878,6 +884,13 @@ class StudyController {
     return transform.include('users').item(study, 'StudyTransformer')
   }
 
+  /**
+   * Set access permissions for collaborator
+   *
+   * @param {*} { params, request, response, auth, transform }
+   * @returns
+   * @memberof StudyController
+   */
   async updateCollaborator ({ params, request, response, auth, transform }) {
     const { id } = params
     const { userID, level } = request.all()
@@ -896,6 +909,13 @@ class StudyController {
     return transform.include('users').item(study, 'StudyTransformer')
   }
 
+  /**
+   * Remove collaborator from study
+   *
+   * @param {*} { params, response, auth }
+   * @returns
+   * @memberof StudyController
+   */
   async removeCollaborator ({ params, response, auth }) {
     const { id, userID } = params
     const study = await auth.user.studies().where('id', id).firstOrFail()
@@ -905,6 +925,13 @@ class StudyController {
     await study.users().detach([userID])
     return response.noContent()
   }
-}
 
+  async downloadData ({ params, response, auth }) {
+    const { id } = params
+    const study = await auth.user.studies()
+      .where('id', id).firstOrFail()
+    const data = await study.getCollectedData()
+    return data
+  }
+}
 module.exports = StudyController

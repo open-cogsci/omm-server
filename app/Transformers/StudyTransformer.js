@@ -14,11 +14,10 @@ class StudyTransformer extends BumblebeeTransformer {
   }
 
   transform (model) {
-    const data = { ...model.toObject() }
-    if (model?.$relations?.pivot) {
-      data.pivot = { ...model?.$relations?.pivot.toObject() }
+    return {
+      ...model.toObject(),
+      pivot: model.$relations?.pivot?.toObject()
     }
-    return data
   }
 
   includeUsers (study) {

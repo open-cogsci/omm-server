@@ -32,12 +32,17 @@ Route.group(() => {
   Route.post('/auth/logout', 'UserController.logout').as('logout')
   Route.post('/auth/email/resend', 'UserController.resendVerificationEmail').as('users.resend_verification_email')
 
+  Route.get('/jobs/study/:study_id', 'JobController.index').as('jobs.index')
   Route.resource('jobs', 'JobController').apiOnly()
+
+  Route.get('/participants/study/:study_id', 'ParticipantController.fetchForStudy').as('participants.fetch_for_study')
   Route.resource('participants', 'ParticipantController').apiOnly()
     .validator(new Map([
       [['participants.store'], ['SaveParticipant']],
       [['participants.update'], ['SaveParticipant']]
     ]))
+
+  Route.get('/studies/:id/data', 'StudyController.downloadData').as('studies.download_data')
   Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
   Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
     .as('studies.upload')
@@ -50,8 +55,6 @@ Route.group(() => {
       [['studies.update'], ['SaveStudy']]
     ]))
   Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
-
-  Route.get('/jobs/study/:study_id', 'JobController.index').as('jobs.index')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {

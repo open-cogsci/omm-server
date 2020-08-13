@@ -87,7 +87,6 @@
               <v-tab-item>
                 <participants-panel
                   :study="study"
-                  :loading="status.loading"
                 />
               </v-tab-item>
             </v-tabs-items>
