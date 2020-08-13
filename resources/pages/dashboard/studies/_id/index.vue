@@ -45,7 +45,7 @@
 
       <template v-if="status.loading || study">
         <v-row no-gutters>
-          <v-col cols="12" lg="9" class="text-md-right">
+          <v-col cols="12" lg="8" xl="9" class="text-md-right">
             <study-actions
               v-if="userCanEdit"
               :loading="status.loading"
@@ -59,7 +59,7 @@
               @clicked-collaborators="collaborators.dialog = true"
             />
           </v-col>
-          <v-col cols="12" lg="3" order-lg="first">
+          <v-col cols="12" lg="4" xl="3" order-lg="first">
             <v-tabs v-model="tab">
               <v-tab>Jobs</v-tab>
               <v-tab>Participants</v-tab>

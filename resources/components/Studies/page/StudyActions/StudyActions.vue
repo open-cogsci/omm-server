@@ -28,10 +28,10 @@
       <v-btn
         @click="$emit('clicked-collaborators')"
       >
-        <v-icon left>
+        <v-icon v-bind="shareIconAttrs">
           mdi-share-variant
         </v-icon>
-        Sharing
+        <span class="d-none d-sm-inline">Sharing</span>
       </v-btn>
     </v-item-group>
 
@@ -46,10 +46,12 @@
             v-bind="attrs"
             v-on="on"
           >
-            <v-icon left>
+            <v-icon v-bind="delArchiveIconAttrs">
               {{ study && study.active ? 'mdi-archive' : 'mdi-archive-arrow-up' }}
             </v-icon>
-            {{ study && study.active ? 'Archive' : 'Reactivate' }}
+            <span class="d-none d-sm-inline d-lg-none d-xl-inline">
+              {{ study && study.active ? 'Archive' : 'Reactivate' }}
+            </span>
           </v-btn>
         </template>
         <template v-slot:title>
@@ -83,10 +85,10 @@
             v-bind="attrs"
             v-on="on"
           >
-            <v-icon left>
+            <v-icon v-bind="delArchiveIconAttrs">
               mdi-delete
             </v-icon>
-            Delete
+            <span class="d-none d-sm-inline d-lg-none d-xl-inline">Delete</span>
           </v-btn>
         </template>
         <template v-slot:title>
@@ -140,6 +142,16 @@ export default {
     },
     jobsPresent () {
       return !!this.jobs?.length
+    },
+    shareIconAttrs () {
+      return this.$vuetify.breakpoint.mdAndUp || this.$vuetify.breakpoint.smOnly
+        ? { left: true }
+        : { size: 18 }
+    },
+    delArchiveIconAttrs () {
+      return this.$vuetify.breakpoint.xsOnly || this.$vuetify.breakpoint.lgOnly
+        ? { size: 18 }
+        : { left: true }
     }
   }
 }
