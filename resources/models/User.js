@@ -11,6 +11,24 @@ export default class User extends Model {
     baseURL: USERS
   }
 
+  static fields () {
+    return {
+      id: this.attr(null),
+      user_type_id: this.attr(null),
+      user_type: this.belongsTo(UserType, 'user_type_id'),
+      name: this.string(''),
+      email: this.string(''),
+      password: this.string(''),
+      account_status: this.attr(''),
+      last_login: this.attr(''),
+      created_at: this.attr(''),
+      updated_at: this.attr(''),
+      deleted_at: this.attr(''),
+      studies_count: this.number(null),
+      studies: this.belongsToMany(Study, StudyUser, 'user_id', 'study_id')
+    }
+  }
+
   static fetch (config) {
     return this.api().get('', config)
   }
@@ -57,23 +75,5 @@ export default class User extends Model {
 
   get isAdmin () {
     return this.user_type_id === 1
-  }
-
-  static fields () {
-    return {
-      id: this.attr(null),
-      user_type_id: this.attr(null),
-      user_type: this.belongsTo(UserType, 'user_type_id'),
-      name: this.string(''),
-      email: this.string(''),
-      password: this.string(''),
-      account_status: this.attr(''),
-      last_login: this.attr(''),
-      created_at: this.attr(''),
-      updated_at: this.attr(''),
-      deleted_at: this.attr(''),
-      studies_count: this.number(null),
-      studies: this.belongsToMany(Study, StudyUser, 'user_id', 'study_id')
-    }
   }
 }

@@ -5,6 +5,8 @@ import StudyUser from './StudyUser'
 import Job from './Job'
 import Variable from './Variable'
 import StudyFile from './StudyFile'
+import Participant from './Participant'
+import Participation from './Participation'
 
 import { STUDIES } from '@/assets/js/endpoints'
 
@@ -39,7 +41,8 @@ export default class Study extends Model {
       users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id'),
       jobs: this.hasMany(Job, 'study_id'),
       variables: this.hasMany(Variable, 'study_id'),
-      files: this.hasMany(StudyFile, 'study_id')
+      files: this.hasMany(StudyFile, 'study_id'),
+      participants: this.belongsToMany(Participant, Participation, 'study_id', 'participant_id')
     }
   }
 

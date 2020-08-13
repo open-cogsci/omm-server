@@ -85,9 +85,10 @@
                 />
               </v-tab-item>
               <v-tab-item>
-                <v-card flat>
-                  <v-card-text>Participants</v-card-text>
-                </v-card>
+                <participants-panel
+                  :study="study"
+                  :loading="status.loading"
+                />
               </v-tab-item>
             </v-tabs-items>
           </v-col>
@@ -110,7 +111,8 @@ export default {
     JobsTable: () => import('@/components/Studies/page/JobsTable'),
     UploadExperimentDialog: () => import('@/components/Studies/dialogs/UploadExperimentDialog'),
     UploadJobsDialog: () => import('@/components/Studies/dialogs/UploadJobsDialog'),
-    CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog')
+    CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog'),
+    ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel')
   },
   data () {
     return {
