@@ -35,7 +35,10 @@
             This experiment is currently shared with:
           </div>
           <v-expand-transition>
-            <v-list>
+            <v-slide-y-transition
+              group
+              tag="v-list"
+            >
               <v-list-item v-for="user of collaborators" :key="user.id">
                 <v-list-item-content>
                   <v-row no-gutters align="center">
@@ -62,7 +65,7 @@
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
-            </v-list>
+            </v-slide-y-transition>
           </v-expand-transition>
         </v-card-text>
         <v-card-text v-else key="no-collabs">
