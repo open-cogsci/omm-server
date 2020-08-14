@@ -7,6 +7,7 @@
 const Database = use('Database')
 const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
+const User = use('App/Models/User')
 const Helpers = use('Helpers')
 
 const fs = require('fs')
@@ -877,6 +878,12 @@ class StudyController {
     if (!await study.isOwnedBy(auth.user)) {
       return response.unauthorized({ message: 'Only the study owner can add collaborators' })
     }
+
+    const user = User.findOrFail(userID)
+    if (user.account_status !== 'active') {
+      return response.badRequest({ message: 'User status does not allow collaboration' })
+    }
+
     await study.users().attach([userID])
     await study.load('users', (query) => {
       query.where('id', userID)
@@ -926,7 +933,14 @@ class StudyController {
     return response.noContent()
   }
 
-  async downloadData ({ params, response, auth }) {
+  /**
+   * Download the study's data
+   *
+   * @param {*} { params, response, auth }
+   * @returns
+   * @memberof StudyController
+   */
+  async downloadData ({ params, auth }) {
     const { id } = params
     const study = await auth.user.studies()
       .where('id', id).firstOrFail()

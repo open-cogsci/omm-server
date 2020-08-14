@@ -147,6 +147,13 @@ export default class Study extends Model {
     return this.constructor.api().patch(`${this.id}/collaborator`, { userID, level }, config)
   }
 
+  /**
+   * Fetch the participation stats for this study
+   *
+   * @param {Object} config
+   * @returns {Object}
+   * @memberof Study
+   */
   async fetchStats (config) {
     const result = await this.constructor.api().get(`${this.id}/stats`, {
       save: false,
@@ -155,6 +162,13 @@ export default class Study extends Model {
     return result.response.data.data
   }
 
+  /**
+   * Dwonload the data for this study
+   *
+   * @param {Object} config
+   * @returns {Blob}
+   * @memberof Study
+   */
   async downloadData (config) {
     const result = await this.constructor.api().get(`${this.id}/data`, {
       responseType: 'blob',
