@@ -357,7 +357,14 @@ class ParticipantController {
   *         schema:
   *           properties:
   *             data:
-  *               $ref: '#/definitions/Study'
+  *               allOf:
+  *                 - $ref: '#/definitions/Study'
+  *                 - type: object
+  *                   properties:
+  *                     files:
+  *                       type: array
+  *                       items:
+  *                         $ref: '#/definitions/StudyFile'
   *       400:
   *         description: The specified identifier is invalid (e.g. not the expected dtype).
   *       404:
