@@ -1,11 +1,12 @@
 'use strict'
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Model = use('Model')
-const Database = use('Database')
-const XLSX = require('xlsx')
 const { isArray } = require('lodash')
 const { formatISO9075 } = require('date-fns')
+
+const Model = use('Model')
+const Database = use('Database')
+const pool = use('Workers/Sheets')
 
 /**
 *  @swagger
@@ -194,9 +195,10 @@ class Study extends Model {
    * @memberof Study
    */
   async processJobsFile (path) {
-    const workbook = XLSX.readFile(path)
-    const sheet = workbook.Sheets[workbook.SheetNames[0]]
-    const jsonData = XLSX.utils.sheet_to_json(sheet)
+    // const workbook = XLSX.readFile(path)
+    // const sheet = workbook.Sheets[workbook.SheetNames[0]]
+    // const jsonData = XLSX.utils.sheet_to_json(sheet)
+    const jsonData = await pool.exec('readSheet', [path])
 
     const variables = Object.keys(jsonData[0]).map(varName => ({
       name: varName,
@@ -264,7 +266,16 @@ class Study extends Model {
   }
 
   async getCollectedData () {
+    const jobs = await this.jobs()
+      .with('variables', (query) => {
+        query.select('id', 'name')
+      })
+      .with('participants')
+      .select('id', 'position', 'study_id')
+      .fetch()
 
+    // Offload below to worker thread
+    return await pool.exec('writeSheet', [jobs.toJSON()])
   }
 
   /* Private functions */

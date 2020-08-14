@@ -940,12 +940,12 @@ class StudyController {
    * @returns
    * @memberof StudyController
    */
-  async downloadData ({ params, auth }) {
+  async downloadData ({ params, auth, response }) {
     const { id } = params
     const study = await auth.user.studies()
       .where('id', id).firstOrFail()
-    const data = await study.getCollectedData()
-    return data
+    response.header('Content-Disposition', 'attachment;filename=data.csv')
+    return await study.getCollectedData()
   }
 }
 module.exports = StudyController
