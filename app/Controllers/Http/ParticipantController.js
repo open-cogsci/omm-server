@@ -316,14 +316,14 @@ class ParticipantController {
   *     tags:
   *       - Studies
   *     summary: >
-  *         When a participant enters a cubicle, the omm client announces this to the server, and the server replies by
-  *         sending the study information.
+  *         When a participant enters a cubicle, the omm client announces this to the server,
+  *         and the server replies by sending the study information.
   *     parameters:
   *       - in: path
   *         name: identifier
   *         required: true
   *         type: string
-  *         description: The identifier code of the participant transmitted by its chip.
+  *         description: The identifier code of the participant.
   *     responses:
   *       200:
   *         description: Sends the study to perform, including a download link for the osexp file.
@@ -357,6 +357,7 @@ class ParticipantController {
     try {
       // First find studies that are in progress, then select pending studies.
       study = await ptcp.studies()
+        .with('files')
         .whereInPivot('status_id', [1, 2])
         .orderBy('status_id', 'desc')
         .orderBy('created_at', 'asc')
@@ -379,7 +380,7 @@ class ParticipantController {
       }
     }
 
-    return transform.item(study, 'StudyTransformer')
+    return transform.include('files').item(study, 'StudyTransformer')
   }
 
   /**
