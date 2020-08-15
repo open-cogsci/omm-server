@@ -668,7 +668,7 @@ class ParticipantController {
 
   /**
   * @swagger
-  * /participants/{identifier}/{id}/result:
+  * /participants/{identifier}/{job_id}/result:
   *   patch:
   *     tags:
   *       - Jobs
@@ -681,7 +681,7 @@ class ParticipantController {
   *         type: string
   *         description: The identifier of the participant for which the result is submitted.
   *       - in: path
-  *         name: id
+  *         name: job_id
   *         required: true
   *         type: integer
   *         description: The ID of the job which the results belong to.
@@ -711,7 +711,7 @@ class ParticipantController {
   *         description: Unexpected error
   */
   async processJobResult ({ params, request, response }) {
-    const { jobID, identifier } = params
+    const { job_id: jobID, identifier } = params
 
     const ptcp = await Participant.query()
       .where('identifier', identifier)

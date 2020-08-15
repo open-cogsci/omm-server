@@ -68,7 +68,7 @@ Route.group(() => {
   Route.get('/participants/:identifier/:studyID/currentjob_idx', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
   Route.get('/participants/:identifier/:studyID/jobs', 'ParticipantController.fetchJobs').as('participants.fetch_jobs')
 
-  Route.patch('/participants/:identifier/:jobID/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
+  Route.patch('/participants/:identifier/:job_id/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
   Route.patch('/jobs/:id/move/:position', 'JobController.moveToPosition').as('jobs.move_position')
 
   // CREATE:

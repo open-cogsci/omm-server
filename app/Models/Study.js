@@ -266,13 +266,29 @@ class Study extends Model {
   }
 
   async getCollectedData () {
-    const jobs = await this.jobs()
-      .with('variables', (query) => {
-        query.select('id', 'name')
-      })
-      .with('participants')
-      .select('id', 'position', 'study_id')
-      .fetch()
+    const jobs = await Database
+      .select('jobs.id', 'jobs.position', 'jobs.study_id', 'job_states.data',
+        'participants.identifier', 'job_states.updated_at as timestamp',
+        Database.raw('JSON_OBJECTAGG(variables.name, job_variable.value) as trial_vars'))
+      .from('jobs')
+      .leftJoin('job_variable', 'jobs.id', 'job_variable.job_id')
+      .leftJoin('variables', 'variables.id', 'job_variable.variable_id')
+      .leftJoin('job_states', 'jobs.id', 'job_states.job_id')
+      .leftJoin('participants', 'job_states.participant_id', 'participants.id')
+      .where('jobs.study_id', 1)
+      .where('job_states.status_id', 3)
+      .groupBy('jobs.id')
+      .groupBy('job_states.data')
+      .groupBy('timestamp')
+      .groupBy('participants.identifier')
+
+    // const jobs = await this.jobs()
+    //   .with('variables', (query) => {
+    //     query.select('id', 'name')
+    //   })
+    //   .with('participants')
+    //   .select('id', 'position', 'study_id')
+    //   .fetch()
 
     // Offload below to worker thread
     return await pool.exec('writeSheet', [jobs.toJSON()])
