@@ -26,7 +26,8 @@ const providers = [
   '@adonisjs/mail/providers/MailProvider',
   'adonis-bumblebee/providers/BumblebeeProvider',
   'adonis-swagger/providers/SwaggerProvider',
-  path.join(__dirname, '..', 'providers', 'NuxtProvider')
+  path.join(__dirname, '..', 'providers', 'NuxtProvider'),
+  path.join(__dirname, '..', 'providers', 'SheetProvider')
 ]
 
 /*

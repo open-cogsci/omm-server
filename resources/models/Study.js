@@ -5,6 +5,8 @@ import StudyUser from './StudyUser'
 import Job from './Job'
 import Variable from './Variable'
 import StudyFile from './StudyFile'
+import Participant from './Participant'
+import Participation from './Participation'
 
 import { STUDIES } from '@/assets/js/endpoints'
 
@@ -39,7 +41,8 @@ export default class Study extends Model {
       users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id'),
       jobs: this.hasMany(Job, 'study_id'),
       variables: this.hasMany(Variable, 'study_id'),
-      files: this.hasMany(StudyFile, 'study_id')
+      files: this.hasMany(StudyFile, 'study_id'),
+      participants: this.belongsToMany(Participant, Participation, 'study_id', 'participant_id')
     }
   }
 
@@ -142,5 +145,36 @@ export default class Study extends Model {
    */
   setAccessLevel ({ userID, level }, config) {
     return this.constructor.api().patch(`${this.id}/collaborator`, { userID, level }, config)
+  }
+
+  /**
+   * Fetch the participation stats for this study
+   *
+   * @param {Object} config
+   * @returns {Object}
+   * @memberof Study
+   */
+  async fetchStats (config) {
+    const result = await this.constructor.api().get(`${this.id}/stats`, {
+      save: false,
+      ...config
+    })
+    return result.response.data.data
+  }
+
+  /**
+   * Dwonload the data for this study
+   *
+   * @param {Object} config
+   * @returns {Blob}
+   * @memberof Study
+   */
+  async downloadData (config) {
+    const result = await this.constructor.api().get(`${this.id}/data`, {
+      responseType: 'blob',
+      timeout: 30000,
+      ...config
+    })
+    return new Blob([result.response.data])
   }
 }

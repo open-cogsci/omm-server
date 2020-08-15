@@ -61,6 +61,33 @@ class ParticipantController {
   }
 
   /**
+   * Fetch participants for a specific study
+   *
+   * @param {*} { params, request, auth, transform }
+   * @returns
+   * @memberof ParticipantController
+   */
+  async fetchForStudy ({ params, request, auth, transform }) {
+    const { study_id: studyID } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', studyID)
+      .firstOrFail()
+
+    const perPage = request.input('perPage', 10)
+    const page = request.input('page', 1)
+
+    const ptcps = await study.participants()
+      .with('studies', (q) => {
+        q.where('study_id', study.id).select('id')
+      })
+      .orderBy('pivot_status_id', 'desc')
+      .paginate(page, perPage)
+
+    return transform.include('studies').paginate(ptcps, 'ParticipantTransformer')
+  }
+
+  /**
   * @swagger
   * /participants:
   *   post:
@@ -330,7 +357,14 @@ class ParticipantController {
   *         schema:
   *           properties:
   *             data:
-  *               $ref: '#/definitions/Study'
+  *               allOf:
+  *                 - $ref: '#/definitions/Study'
+  *                 - type: object
+  *                   properties:
+  *                     files:
+  *                       type: array
+  *                       items:
+  *                         $ref: '#/definitions/StudyFile'
   *       400:
   *         description: The specified identifier is invalid (e.g. not the expected dtype).
   *       404:

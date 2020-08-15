@@ -7,6 +7,7 @@
 const Database = use('Database')
 const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
+const User = use('App/Models/User')
 const Helpers = use('Helpers')
 
 const fs = require('fs')
@@ -170,14 +171,13 @@ class StudyController {
     const study = await auth.user
       .studies()
       .where('id', params.id)
-      .with('participants')
       .with('variables.dtype')
       .with('users')
       .with('files')
       .firstOrFail()
 
     return transform
-      .include('participants,variables,users,files')
+      .include('variables,users,files')
       .item(study, 'StudyTransformer')
   }
 
@@ -863,6 +863,13 @@ class StudyController {
     }
   }
 
+  /**
+   * Add collaborator for this study
+   *
+   * @param {*} { params, request, response, auth, transform }
+   * @returns
+   * @memberof StudyController
+   */
   async addCollaborator ({ params, request, response, auth, transform }) {
     const { id } = params
     const userID = request.input('userID')
@@ -871,6 +878,12 @@ class StudyController {
     if (!await study.isOwnedBy(auth.user)) {
       return response.unauthorized({ message: 'Only the study owner can add collaborators' })
     }
+
+    const user = User.findOrFail(userID)
+    if (user.account_status !== 'active') {
+      return response.badRequest({ message: 'User status does not allow collaboration' })
+    }
+
     await study.users().attach([userID])
     await study.load('users', (query) => {
       query.where('id', userID)
@@ -878,6 +891,13 @@ class StudyController {
     return transform.include('users').item(study, 'StudyTransformer')
   }
 
+  /**
+   * Set access permissions for collaborator
+   *
+   * @param {*} { params, request, response, auth, transform }
+   * @returns
+   * @memberof StudyController
+   */
   async updateCollaborator ({ params, request, response, auth, transform }) {
     const { id } = params
     const { userID, level } = request.all()
@@ -896,6 +916,13 @@ class StudyController {
     return transform.include('users').item(study, 'StudyTransformer')
   }
 
+  /**
+   * Remove collaborator from study
+   *
+   * @param {*} { params, response, auth }
+   * @returns
+   * @memberof StudyController
+   */
   async removeCollaborator ({ params, response, auth }) {
     const { id, userID } = params
     const study = await auth.user.studies().where('id', id).firstOrFail()
@@ -905,6 +932,20 @@ class StudyController {
     await study.users().detach([userID])
     return response.noContent()
   }
-}
 
+  /**
+   * Download the study's data
+   *
+   * @param {*} { params, response, auth }
+   * @returns
+   * @memberof StudyController
+   */
+  async downloadData ({ params, auth, response }) {
+    const { id } = params
+    const study = await auth.user.studies()
+      .where('id', id).firstOrFail()
+    response.header('Content-Disposition', 'attachment;filename=data.csv')
+    return await study.getCollectedData()
+  }
+}
 module.exports = StudyController
