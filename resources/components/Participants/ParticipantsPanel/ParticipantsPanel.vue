@@ -125,14 +125,14 @@ export default {
         this.loading.stats = false
       }
     },
-    async downloadStudyData () {
+    async downloadStudyData (format = 'csv') {
       this.loading.data = true
       try {
-        const blob = await this.study.downloadData()
+        const blob = await this.study.downloadData({ params: { format } })
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', 'data.csv')
+        link.setAttribute('download', `data.${format}`)
         document.body.appendChild(link)
         link.click()
         setTimeout(() => document.body.removeChild(link), 10 * 1000)

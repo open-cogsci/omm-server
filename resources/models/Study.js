@@ -171,6 +171,7 @@ export default class Study extends Model {
    */
   async downloadData (config) {
     const result = await this.constructor.api().get(`${this.id}/data`, {
+      save: false,
       responseType: 'blob',
       timeout: 30000,
       ...config

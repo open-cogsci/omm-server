@@ -1,6 +1,7 @@
 const workerpool = require('workerpool')
 const XLSX = require('xlsx')
-const { isArray, pick } = require('lodash')
+const { isArray } = require('lodash')
+const { formatISO9075 } = require('date-fns')
 
 // a deliberately inefficient implementation of the fibonacci sequence
 function readSheet (path) {
@@ -9,51 +10,51 @@ function readSheet (path) {
   return XLSX.utils.sheet_to_json(sheet)
 }
 
-function writeSheet (jobs) {
-  const data = jobs.reduce((result, job) => {
-    const variables = job.variables.reduce((varList, variable) => {
-      varList[variable.name] = variable.pivot.value
-      return varList
-    }, {})
+function writeSheet (jobs, format = 'csv') {
+  const rows = jobs.reduce((result, job) => {
+    // If there are multiple entries for data, suffix the object key values
+    // eslint-disable-next-line camelcase, prefer-const
+    let { data, trial_vars, timestamp, ...rest } = job
 
-    for (const ptcp of job.participants) {
-      let jobData = {}
-      if (ptcp.pivot.data !== null) {
-        // If there are multiple entries for data, suffix the object key values
-        if (isArray(ptcp.pivot.data)) {
-          jobData = ptcp.pivot.data.reduce((total, dataEntry, idx) => {
-            if (idx !== 0) {
-              dataEntry = Object.entries(dataEntry).reduce((result, [key, value]) => {
-                result[`${key}_${idx}`] = value
-                return result
-              }, {})
-            }
-            total = {
-              ...dataEntry,
-              ...total
-            }
-            return total
-          })
-        } else {
-          jobData = ptcp.pivot.data
+    if (isArray(data)) {
+      data = job.data.reduce((total, dataEntry, idx) => {
+        if (idx !== 0) {
+          dataEntry = Object.entries(dataEntry).reduce((result, [key, value]) => {
+            result[`${key}_${idx}`] = value
+            return result
+          }, {})
         }
-      }
-
-      const row = {
-        job_id: job.id,
-        study_id: job.study_id,
-        position: job.position,
-        ...pick(ptcp, ['name', 'identifier']),
-        ...variables,
-        ...jobData
-      }
-      result.push(row)
+        total = {
+          ...dataEntry,
+          ...total
+        }
+        return total
+      })
     }
+    result.push({
+      ...rest,
+      ...data,
+      // eslint-disable-next-line camelcase
+      ...trial_vars,
+      timestamp: formatISO9075(timestamp)
+    })
     return result
   }, [])
-  const sheet = XLSX.utils.json_to_sheet(data)
-  const csv = XLSX.utils.sheet_to_csv(sheet)
-  return csv
+
+  const sheet = XLSX.utils.json_to_sheet(rows)
+  let formatted
+  switch (format) {
+    case 'csv':
+      formatted = XLSX.utils.sheet_to_csv(sheet)
+      break
+    case 'xls':
+      break
+
+    case 'xlsx':
+      break
+  }
+
+  return formatted
 }
 // create a worker and register public functions
 workerpool.worker({

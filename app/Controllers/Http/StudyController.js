@@ -940,12 +940,18 @@ class StudyController {
    * @returns
    * @memberof StudyController
    */
-  async downloadData ({ params, auth, response }) {
+  async downloadData ({ params, auth, request, response }) {
     const { id } = params
+    const format = request.input('format', 'csv')
+    const allowedFormats = ['xls', 'xlsx', 'csv']
+    if (!allowedFormats.includes(format)) {
+      return response.badRequest(`Invalid file format, possible values are ${allowedFormats}`)
+    }
+
     const study = await auth.user.studies()
       .where('id', id).firstOrFail()
-    response.header('Content-Disposition', 'attachment;filename=data.csv')
-    return await study.getCollectedData()
+    response.header('Content-Disposition', `attachment;filename=data.${format}`)
+    return await study.getCollectedData(format)
   }
 }
 module.exports = StudyController
