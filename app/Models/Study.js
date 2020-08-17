@@ -284,7 +284,7 @@ class Study extends Model {
       .groupBy('timestamp')
       .groupBy('participants.identifier')
 
-    // Offload below to worker thread
+    // Offload file creation to worker thread
     return await pool.exec('writeSheet', [jobs, format])
   }
 

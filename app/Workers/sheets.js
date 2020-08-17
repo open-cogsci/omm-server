@@ -24,11 +24,7 @@ function writeSheet (jobs, format = 'csv') {
             return result
           }, {})
         }
-        total = {
-          ...dataEntry,
-          ...total
-        }
-        return total
+        return { ...dataEntry, ...total }
       })
     }
     result.push({
