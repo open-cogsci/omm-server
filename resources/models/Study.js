@@ -169,13 +169,7 @@ export default class Study extends Model {
    * @returns {Blob}
    * @memberof Study
    */
-  async downloadData (config) {
-    const result = await this.constructor.api().get(`${this.id}/data`, {
-      save: false,
-      responseType: 'blob',
-      timeout: 30000,
-      ...config
-    })
-    return new Blob([result.response.data])
+  generateDataFile (config) {
+    return this.constructor.api().get(`${this.id}/data`, config)
   }
 }

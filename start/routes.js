@@ -42,7 +42,7 @@ Route.group(() => {
       [['participants.update'], ['SaveParticipant']]
     ]))
 
-  Route.get('/studies/:id/data', 'StudyController.downloadData').as('studies.download_data')
+  Route.get('/studies/:id/data', 'StudyController.generateDatafile').as('studies.generate_datafile')
   Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
   Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
     .as('studies.upload')

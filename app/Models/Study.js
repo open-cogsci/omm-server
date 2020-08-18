@@ -6,7 +6,6 @@ const { formatISO9075 } = require('date-fns')
 
 const Model = use('Model')
 const Database = use('Database')
-const pool = use('Workers/Sheets')
 
 /**
 *  @swagger
@@ -189,17 +188,12 @@ class Study extends Model {
   }
 
   /**
-   * Process a jobs file (csv/xls(x))
+   * Process a json representation of a jobs file (csv/xls(x))
    *
-   * @param {String} path
+   * @param {Object} jsonData
    * @memberof Study
    */
-  async processJobsFile (path) {
-    // const workbook = XLSX.readFile(path)
-    // const sheet = workbook.Sheets[workbook.SheetNames[0]]
-    // const jsonData = XLSX.utils.sheet_to_json(sheet)
-    const jsonData = await pool.exec('readSheet', [path])
-
+  async processJobs (jsonData) {
     const variables = Object.keys(jsonData[0]).map(varName => ({
       name: varName,
       dtype_id: 1
@@ -228,6 +222,11 @@ class Study extends Model {
     }
   }
 
+  /**
+   * Attaches all participants of a study to the study's jobs
+   *
+   * @memberof Study
+   */
   async attachParticipantsToJobs () {
     let ptcpIDs, jobIDs
     const loadedPtcps = this.getRelated('participants')
@@ -265,11 +264,25 @@ class Study extends Model {
     await Database.table('job_states').insert(records)
   }
 
-  async getCollectedData (format = 'csv') {
-    const jobs = await Database
+  /**
+   * Exports the collected data of the study as json.
+   *
+   * @param {string} [engine='mysql']
+   * @returns Array
+   * @memberof Study
+   */
+  async getCollectedData (db = 'mysql2') {
+    let aggVars
+    if (db === 'sqlite3') {
+      aggVars = Database.raw('json_group_object(variables.name, job_variable.value) as trial_vars')
+    } else {
+      aggVars = Database.raw('JSON_OBJECTAGG(variables.name, job_variable.value) as trial_vars')
+    }
+
+    return await Database
       .select('jobs.id as job_id', 'jobs.position', 'jobs.study_id', 'job_states.data',
         'job_statuses.name as status', 'participants.identifier', 'job_states.updated_at as timestamp',
-        Database.raw('JSON_OBJECTAGG(variables.name, job_variable.value) as trial_vars'))
+        aggVars)
       .from('jobs')
       .leftJoin('job_variable', 'jobs.id', 'job_variable.job_id')
       .leftJoin('variables', 'variables.id', 'job_variable.variable_id')
@@ -283,9 +296,6 @@ class Study extends Model {
       .groupBy('status')
       .groupBy('timestamp')
       .groupBy('participants.identifier')
-
-    // Offload file creation to worker thread
-    return await pool.exec('writeSheet', [jobs, format])
   }
 
   /* Private functions */

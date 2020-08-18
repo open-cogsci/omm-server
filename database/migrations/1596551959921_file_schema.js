@@ -11,6 +11,7 @@ class FileSchema extends Schema {
       table.string('path').notNullable()
       table.string('filename').notNullable()
       table.string('type').notNullable()
+      table.integer('size').default(0)
       table.timestamps()
     })
   }

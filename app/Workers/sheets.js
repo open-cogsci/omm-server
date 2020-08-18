@@ -10,7 +10,7 @@ function readSheet (path) {
   return XLSX.utils.sheet_to_json(sheet)
 }
 
-function writeSheet (jobs, format = 'csv') {
+function writeSheet (jobs, destination, format = 'csv') {
   const rows = jobs.reduce((result, job) => {
     // If there are multiple entries for data, suffix the object key values
     // eslint-disable-next-line camelcase, prefer-const
@@ -36,21 +36,11 @@ function writeSheet (jobs, format = 'csv') {
     })
     return result
   }, [])
-
   const sheet = XLSX.utils.json_to_sheet(rows)
-  let formatted
-  switch (format) {
-    case 'csv':
-      formatted = XLSX.utils.sheet_to_csv(sheet)
-      break
-    case 'xls':
-      break
-
-    case 'xlsx':
-      break
-  }
-
-  return formatted
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, sheet, 'data')
+  XLSX.writeFile(wb, destination, { type: format })
+  return true
 }
 // create a worker and register public functions
 workerpool.worker({

@@ -9,9 +9,14 @@ const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
 const User = use('App/Models/User')
 const Helpers = use('Helpers')
+const pool = use('Workers/Sheets')
 
 const fs = require('fs')
 const isInteger = require('lodash/isInteger')
+const format = require('date-fns/format')
+
+const removeFile = Helpers.promisify(fs.unlink)
+
 /**
  * Resourceful controller for interacting with studies
  */
@@ -419,7 +424,6 @@ class StudyController {
     const uploadedFile = request.file('payload')
     const storagePath = Helpers.publicPath(`files/${study.id}`)
     const filename = `${type}.${uploadedFile.extname}`
-    const removeFile = Helpers.promisify(fs.unlink)
 
     for (const fl of study.getRelated('files').rows.filter(fl => fl.type === type)) {
       await removeFile(Helpers.publicPath(fl.path))
@@ -438,17 +442,18 @@ class StudyController {
 
     const localPath = `${storagePath}/${uploadedFile.fileName}`
     if (type === 'jobs') {
-      await study.processJobsFile(localPath)
+      const jsonData = await pool.exec('readSheet', [localPath])
+      await study.processJobs(jsonData)
+      // Attach study participants (if any) to jobs
+      await study.attachParticipantsToJobs()
     }
 
     await study.files().create({
       filename: uploadedFile.clientName,
       path: localPath.replace(Helpers.publicPath(), ''),
+      size: uploadedFile.size,
       type
     })
-
-    // Attach study participants (if any) to jobs
-    await study.attachParticipantsToJobs()
 
     // Fetch all files to also account for potential deletions/overwrites
     const files = await study.files().fetch()
@@ -940,18 +945,38 @@ class StudyController {
    * @returns
    * @memberof StudyController
    */
-  async downloadData ({ params, auth, request, response }) {
+  async generateDatafile ({ params, auth, request, response, transform }) {
     const { id } = params
-    const format = request.input('format', 'csv')
-    const allowedFormats = ['xls', 'xlsx', 'csv']
-    if (!allowedFormats.includes(format)) {
+    const filetype = request.input('format', 'csv')
+    const allowedFormats = ['ods', 'xlsx', 'csv']
+    if (!allowedFormats.includes(filetype)) {
       return response.badRequest(`Invalid file format, possible values are ${allowedFormats}`)
     }
 
-    const study = await auth.user.studies()
-      .where('id', id).firstOrFail()
-    response.header('Content-Disposition', `attachment;filename=data.${format}`)
-    return await study.getCollectedData(format)
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+
+    const data = await study.getCollectedData(Database.connection().connectionClient)
+    const destFolder = Helpers.publicPath(`files/${study.id}`)
+    const timestamp = format(new Date(), 'yyyyMMddHHmmss')
+    const filename = `data_${timestamp}.${filetype}`
+    const path = `${destFolder}/${filename}`
+    const type = `data-${filetype}`
+    // Offload file creation to worker thread
+    await pool.exec('writeSheet', [data, path, filetype])
+
+    // Delete any previous occurrences of the file in the current format
+    const previousFile = await study.files().where('type', type).first()
+    if (previousFile) {
+      await removeFile(Helpers.publicPath(previousFile.path))
+      await previousFile.delete()
+    }
+
+    const newFile = await study.files().create({
+      path: path.replace(Helpers.publicPath(), ''),
+      filename,
+      type
+    })
+    return { data: { id: study.id, files: [newFile] } }
   }
 }
 module.exports = StudyController

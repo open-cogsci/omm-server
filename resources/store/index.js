@@ -36,7 +36,8 @@ export const plugins = [
 
 export const state = () => ({
   cookieWarningVisible: false,
-  cookieWarningShown: false
+  cookieWarningShown: false,
+  studyTab: 0
 })
 export const mutations = make.mutations(state)
 
