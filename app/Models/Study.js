@@ -6,7 +6,6 @@ const { formatISO9075 } = require('date-fns')
 
 const Model = use('Model')
 const Database = use('Database')
-const pool = use('Workers/Sheets')
 
 /**
 *  @swagger
@@ -189,17 +188,12 @@ class Study extends Model {
   }
 
   /**
-   * Process a jobs file (csv/xls(x))
+   * Process a json representation of a jobs file (csv/xls(x))
    *
-   * @param {String} path
+   * @param {Object} jsonData
    * @memberof Study
    */
-  async processJobsFile (path) {
-    // const workbook = XLSX.readFile(path)
-    // const sheet = workbook.Sheets[workbook.SheetNames[0]]
-    // const jsonData = XLSX.utils.sheet_to_json(sheet)
-    const jsonData = await pool.exec('readSheet', [path])
-
+  async processJobs (jsonData) {
     const variables = Object.keys(jsonData[0]).map(varName => ({
       name: varName,
       dtype_id: 1
@@ -228,6 +222,11 @@ class Study extends Model {
     }
   }
 
+  /**
+   * Attaches all participants of a study to the study's jobs
+   *
+   * @memberof Study
+   */
   async attachParticipantsToJobs () {
     let ptcpIDs, jobIDs
     const loadedPtcps = this.getRelated('participants')
@@ -265,17 +264,38 @@ class Study extends Model {
     await Database.table('job_states').insert(records)
   }
 
-  async getCollectedData () {
-    const jobs = await this.jobs()
-      .with('variables', (query) => {
-        query.select('id', 'name')
-      })
-      .with('participants')
-      .select('id', 'position', 'study_id')
-      .fetch()
+  /**
+   * Exports the collected data of the study as json.
+   *
+   * @param {string} [engine='mysql']
+   * @returns Array
+   * @memberof Study
+   */
+  async getCollectedData (db = 'mysql2') {
+    let aggVars
+    if (db === 'sqlite3') {
+      aggVars = Database.raw('json_group_object(variables.name, job_variable.value) as trial_vars')
+    } else {
+      aggVars = Database.raw('JSON_OBJECTAGG(variables.name, job_variable.value) as trial_vars')
+    }
 
-    // Offload below to worker thread
-    return await pool.exec('writeSheet', [jobs.toJSON()])
+    return await Database
+      .select('jobs.id as job_id', 'jobs.position', 'jobs.study_id', 'job_states.data',
+        'job_statuses.name as status', 'participants.identifier', 'job_states.updated_at as timestamp',
+        aggVars)
+      .from('jobs')
+      .leftJoin('job_variable', 'jobs.id', 'job_variable.job_id')
+      .leftJoin('variables', 'variables.id', 'job_variable.variable_id')
+      .leftJoin('job_states', 'jobs.id', 'job_states.job_id')
+      .leftJoin('participants', 'job_states.participant_id', 'participants.id')
+      .leftJoin('job_statuses', 'job_states.status_id', 'job_statuses.id')
+      .where('jobs.study_id', this.id)
+      .whereNotNull('job_states.data')
+      .groupBy('job_id')
+      .groupBy('job_states.data')
+      .groupBy('status')
+      .groupBy('timestamp')
+      .groupBy('participants.identifier')
   }
 
   /* Private functions */

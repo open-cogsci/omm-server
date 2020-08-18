@@ -86,6 +86,7 @@
               </v-tab-item>
               <v-tab-item>
                 <participants-panel
+                  :visible="ptcpPanelVisible"
                   :study="study"
                 />
               </v-tab-item>
@@ -100,6 +101,7 @@
 <script>
 import { pick, debounce, isFunction } from 'lodash'
 import { mapActions } from 'vuex'
+import { sync } from 'vuex-pathify'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -115,7 +117,6 @@ export default {
   },
   data () {
     return {
-      tab: 0,
       status: {
         savingTitle: false,
         loading: false,
@@ -163,6 +164,10 @@ export default {
     }
   },
   computed: {
+    tab: sync('studyTab'),
+    ptcpPanelVisible () {
+      return this.tab === 1
+    },
     Study () {
       return this.$store.$db().model('studies')
     },

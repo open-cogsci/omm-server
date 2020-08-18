@@ -1,5 +1,11 @@
 <template>
   <v-row>
+    <data-download-dialog
+      v-model="dialog.download"
+      :files="study.files"
+      :generating="generating"
+      @generate="generateDataFile"
+    />
     <v-col cols="12" sm="6" md="12" lg="6">
       <v-card outlined>
         <v-card-title>
@@ -17,8 +23,11 @@
         </v-card-title>
         <v-card-text class="px-0">
           <study-participants-list
+            ref="ptcpList"
+            :key="study.id"
             :participants="participants"
             :loading="loading.participants"
+            :visible="visible"
           />
         </v-card-text>
         <v-card-actions>
@@ -27,7 +36,7 @@
             v-if="participants.length"
             color="primary"
             :loading="loading.data"
-            @click="downloadStudyData"
+            @click="dialog.download = true"
           >
             <v-icon left>
               mdi-download
@@ -52,16 +61,27 @@ import { processErrors } from '@/assets/js/errorhandling'
 export default {
   components: {
     ParticipationStats: () => import('./ParticipationStats'),
-    StudyParticipantsList: () => import('./StudyParticipantsList')
+    StudyParticipantsList: () => import('./StudyParticipantsList'),
+    DataDownloadDialog: () => import('@/components/Participants/dialogs/DataDownloadDialog')
   },
   props: {
     study: {
       type: Object,
       default: () => null
+    },
+    // This prop is necessary for v-virtual-scroll to render its contents correctly.
+    // If the tab becomes active, force a rerender of its contents
+    visible: {
+      type: Boolean,
+      default: () => false
     }
   },
   data () {
     return {
+      generating: null,
+      dialog: {
+        download: false
+      },
       loading: {
         participants: false,
         stats: false,
@@ -125,14 +145,24 @@ export default {
         this.loading.stats = false
       }
     },
-    async downloadStudyData () {
+    async generateDataFile (format) {
+      this.generating = format
+      try {
+        await this.study.generateDataFile({ params: { format } })
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.generating = null
+      }
+    },
+    async downloadStudyData (format = 'csv') {
       this.loading.data = true
       try {
-        const blob = await this.study.downloadData()
+        const blob = await this.study.downloadData({ params: { format } })
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', 'data.csv')
+        link.setAttribute('download', `data.${format}`)
         document.body.appendChild(link)
         link.click()
         setTimeout(() => document.body.removeChild(link), 10 * 1000)

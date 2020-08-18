@@ -5,6 +5,7 @@
   >
     <v-virtual-scroll
       v-if="participants.length"
+      ref="scroller"
       :items="participants"
       :item-height="65"
       max-height="calc(100vh - 490px)"
