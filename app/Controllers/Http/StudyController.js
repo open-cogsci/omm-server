@@ -884,7 +884,7 @@ class StudyController {
       return response.unauthorized({ message: 'Only the study owner can add collaborators' })
     }
 
-    const user = User.findOrFail(userID)
+    const user = await User.findOrFail(userID)
     if (user.account_status !== 'active') {
       return response.badRequest({ message: 'User status does not allow collaboration' })
     }
