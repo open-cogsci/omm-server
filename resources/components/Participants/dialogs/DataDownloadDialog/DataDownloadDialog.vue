@@ -34,6 +34,14 @@
           </v-col>
         </v-row>
       </v-card-text>
+      <v-expand-transition>
+        <v-card-text v-show="!!message">
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <v-alert type="success">
+            {{ message }}
+          </v-alert>
+        </v-card-text>
+      </v-expand-transition>
       <v-card-text class="caption">
         Exporting data can take some time and therefore generated data files are cached. The next time
         the same data file is downloaded, the cached version is served to allow faster download speeds.<br>Click
@@ -84,7 +92,8 @@ export default {
           icon: 'mdi-google-spreadsheet'
         }
       ],
-      watchType: null
+      watchType: null,
+      message: null
     }
   },
   computed: {
@@ -105,6 +114,11 @@ export default {
         this.download(this.watchType)
       }
       this.watchType = null
+    },
+    generating (newVal, oldVal) {
+      if (newVal === null && oldVal && Object.keys(this.dataFiles).includes(`data-${oldVal}`)) {
+        this.showSuccessMessage(oldVal)
+      }
     }
   },
   methods: {
@@ -119,6 +133,10 @@ export default {
     download (type) {
       const url = this.dataFiles[`data-${type}`].path
       window.location.href = url
+    },
+    showSuccessMessage (type) {
+      this.message = `Succesfully (re)generated ${type} file. Click on the blue button to download it.`
+      setTimeout(() => { this.message = null }, 5000)
     }
   }
 }

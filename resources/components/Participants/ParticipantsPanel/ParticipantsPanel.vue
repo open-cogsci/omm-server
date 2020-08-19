@@ -6,7 +6,7 @@
       :generating="generating"
       @generate="generateDataFile"
     />
-    <v-col cols="12" sm="6" md="12" lg="6">
+    <v-col cols="12" sm="6" md="12" lg="6" xl="7">
       <v-card outlined>
         <v-card-title>
           Stats
@@ -16,7 +16,7 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="12" sm="6" md="12" lg="6">
+    <v-col cols="12" sm="6" md="12" lg="6" xl="5">
       <v-card outlined>
         <v-card-title>
           Participants
