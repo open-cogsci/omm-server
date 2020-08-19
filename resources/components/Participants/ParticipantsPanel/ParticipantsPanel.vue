@@ -3,7 +3,7 @@
     <data-download-dialog
       v-model="dialog.download"
       :files="study.files"
-      :generating="generating"
+      :generating="loading.data"
       @generate="generateDataFile"
     />
     <v-col cols="12" sm="6" md="12" lg="6" xl="7">
@@ -20,22 +20,24 @@
       <v-card outlined>
         <v-card-title>
           Participants
+          <v-spacer />
+          <span class="caption">% jobs completed</span>
         </v-card-title>
         <v-card-text class="px-0">
           <study-participants-list
             ref="ptcpList"
             :key="study.id"
+            :total-jobs="study.jobs_count"
             :participants="participants"
             :loading="loading.participants"
-            :visible="visible"
           />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn
-            v-if="participants.length"
+            :disabled="study.completed_jobs_count < 1"
             color="primary"
-            :loading="loading.data"
+            :loading="!!loading.data"
             @click="dialog.download = true"
           >
             <v-icon left>
@@ -78,14 +80,13 @@ export default {
   },
   data () {
     return {
-      generating: null,
       dialog: {
         download: false
       },
       loading: {
         participants: false,
         stats: false,
-        data: false
+        data: null
       },
       pagination: {
         page: 1,
@@ -146,30 +147,13 @@ export default {
       }
     },
     async generateDataFile (format) {
-      this.generating = format
+      this.loading.data = format
       try {
         await this.study.generateDataFile({ params: { format } })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
-        this.generating = null
-      }
-    },
-    async downloadStudyData (format = 'csv') {
-      this.loading.data = true
-      try {
-        const blob = await this.study.downloadData({ params: { format } })
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', `data.${format}`)
-        document.body.appendChild(link)
-        link.click()
-        setTimeout(() => document.body.removeChild(link), 10 * 1000)
-      } catch (e) {
-        processErrors(e, this.notify)
-      } finally {
-        this.loading.data = false
+        this.loading.data = null
       }
     }
   }

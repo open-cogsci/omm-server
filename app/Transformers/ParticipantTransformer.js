@@ -10,7 +10,7 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
  */
 class ParticipantTransformer extends BumblebeeTransformer {
   static get availableInclude () {
-    return ['jobs', 'studies']
+    return ['jobs', 'studies', 'completed_jobs_count']
   }
 
   transform (model) {
@@ -34,6 +34,10 @@ class ParticipantTransformer extends BumblebeeTransformer {
 
   includeStudies (participant) {
     return this.collection(participant.getRelated('studies'), 'StudyTransformer')
+  }
+
+  includeCompletedJobsCount (study) {
+    return study.$sideLoaded.completed_jobs
   }
 }
 

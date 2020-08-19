@@ -16,6 +16,9 @@
             <v-list-item-title v-text="item.name" />
             <v-list-item-subtitle v-text="item.identifier" />
           </v-list-item-content>
+          <v-list-item-avatar>
+            <job-progress v-bind="progress(item)" :size="40" />
+          </v-list-item-avatar>
         </v-list-item>
       </template>
     </v-virtual-scroll>
@@ -27,6 +30,9 @@
 
 <script>
 export default {
+  components: {
+    JobProgress: () => import('../JobProgress')
+  },
   props: {
     participants: {
       type: Array,
@@ -35,6 +41,30 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    totalJobs: {
+      type: Number,
+      default: 0
+    }
+  },
+  methods: {
+    progress (ptcp) {
+      const value = this.totalJobs > 0
+        ? parseInt(ptcp.completed_jobs_count / this.totalJobs * 100)
+        : 0
+
+      let color
+      if (value >= 80) {
+        color = 'green'
+      } else if (value < 80 && value > 50) {
+        color = 'green darken-3'
+      } else {
+        color = 'primary'
+      }
+
+      return {
+        value, color
+      }
     }
   }
 }

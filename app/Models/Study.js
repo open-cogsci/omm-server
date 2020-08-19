@@ -137,15 +137,14 @@ class Study extends Model {
    * @memberof Study
    */
   async isEditableBy (user) {
-    const results = await this.users()
+    return !!await this.users()
       .where('id', user.id)
       .where(function () {
         this
           .where('study_users.is_owner', true) // Either the user is the owner of the study
           .orWhere('study_users.access_permission_id', 2) // Or has write permissions
       })
-      .count('* as total')
-    return !!results[0].total
+      .getCount()
   }
 
   /**

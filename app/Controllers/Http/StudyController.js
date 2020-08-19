@@ -179,10 +179,16 @@ class StudyController {
       .with('variables.dtype')
       .with('users')
       .with('files')
+      .withCount('jobs')
+      .withCount('jobs as completed_jobs', (query) => {
+        query.whereHas('participants', (q) => {
+          q.wherePivot('status_id', 3)
+        })
+      })
       .firstOrFail()
 
     return transform
-      .include('variables,users,files')
+      .include('variables,users,files,completed_jobs_count,jobs_count')
       .item(study, 'StudyTransformer')
   }
 
@@ -945,7 +951,7 @@ class StudyController {
    * @returns
    * @memberof StudyController
    */
-  async generateDatafile ({ params, auth, request, response, transform }) {
+  async generateDatafile ({ params, auth, request, response }) {
     const { id } = params
     const filetype = request.input('format', 'csv')
     const allowedFormats = ['ods', 'xlsx', 'csv']

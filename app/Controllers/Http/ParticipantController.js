@@ -81,10 +81,14 @@ class ParticipantController {
       .with('studies', (q) => {
         q.where('study_id', study.id).select('id')
       })
+      .withCount('jobs as completed_jobs', (query) => {
+        query.wherePivot('status_id', 3)
+      })
       .orderBy('pivot_status_id', 'desc')
       .paginate(page, perPage)
 
-    return transform.include('studies').paginate(ptcps, 'ParticipantTransformer')
+    return transform.include('studies,completed_jobs_count')
+      .paginate(ptcps, 'ParticipantTransformer')
   }
 
   /**
