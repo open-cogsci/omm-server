@@ -57,7 +57,7 @@ export default {
       if (value >= 80) {
         color = 'green'
       } else if (value < 80 && value > 50) {
-        color = 'green darken-3'
+        color = 'green darken-2'
       } else {
         color = 'primary'
       }
