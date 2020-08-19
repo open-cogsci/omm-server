@@ -1,11 +1,13 @@
 'use strict'
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+const fs = require('fs').promises
 const { isArray } = require('lodash')
 const { formatISO9075 } = require('date-fns')
 
 const Model = use('Model')
 const Database = use('Database')
+const Helpers = use('Helpers')
 
 /**
 *  @swagger
@@ -64,6 +66,21 @@ const Database = use('Database')
 *                 $ref: '#/definitions/StudyFile'
 */
 class Study extends Model {
+  static boot () {
+    super.boot()
+
+    this.addHook('beforeDelete', async (study) => {
+      try {
+        // Remove the folder containing the study files
+        await fs.rmdir(Helpers.publicPath(`files/${study.id}`), { recursive: true })
+        return true
+      } catch (e) {
+        console.error(e)
+        return false
+      }
+    })
+  }
+
   /**
    * The study's owners
    *

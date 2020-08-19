@@ -120,6 +120,7 @@ class StudyController {
     try {
       const study = await auth.user.studies().create(data, (row) => {
         row.is_owner = true
+        row.access_permission_id = 2
       })
       await study.reload() // Refresh data otherwise some parameters are missing
       await study.load('users.userType')
@@ -345,7 +346,7 @@ class StudyController {
         message: 'You have insufficient priviliges to delete this study'
       })
     }
-    study.delete()
+    await study.delete()
     return response.noContent()
   }
 

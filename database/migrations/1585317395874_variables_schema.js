@@ -12,7 +12,7 @@ class JobFieldsSchema extends Schema {
       table.string('name')
       table.timestamps()
 
-      table.foreign('study_id').references('id').inTable('studies')
+      table.foreign('study_id').references('id').inTable('studies').onDelete('cascade')
       table.foreign('dtype_id').references('id').inTable('dtypes')
     })
   }

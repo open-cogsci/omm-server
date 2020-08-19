@@ -7,7 +7,8 @@ class FileSchema extends Schema {
   up () {
     this.create('files', (table) => {
       table.increments()
-      table.integer('study_id').unsigned().notNullable().references('id').inTable('studies')
+      table.integer('study_id').unsigned().notNullable()
+        .references('id').inTable('studies').onDelete('cascade')
       table.string('path').notNullable()
       table.string('filename').notNullable()
       table.string('type').notNullable()
