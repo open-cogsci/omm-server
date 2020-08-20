@@ -35,7 +35,10 @@ Route.group(() => {
   Route.get('/jobs/study/:study_id', 'JobController.index').as('jobs.index')
   Route.resource('jobs', 'JobController').apiOnly()
 
-  Route.get('/participants/study/:study_id', 'ParticipantController.fetchForStudy').as('participants.fetch_for_study')
+  Route.get('/participants/study/:study_id', 'ParticipantController.fetchForStudy')
+    .as('participants.fetch_for_study')
+  Route.get('/participants/ids/study/:study_id', 'ParticipantController.fetchIDsForStudy')
+    .as('participants.fetch_ids_for_study')
   Route.resource('participants', 'ParticipantController').apiOnly()
     .validator(new Map([
       [['participants.store'], ['SaveParticipant']],
@@ -47,8 +50,20 @@ Route.group(() => {
   Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
     .as('studies.upload')
   Route.post('/studies/:id/collaborator', 'StudyController.addCollaborator').as('studies.add_collaborator')
-  Route.patch('/studies/:id/collaborator', 'StudyController.updateCollaborator').as('studies.update_collaborator')
-  Route.delete('/studies/:id/collaborator/:userID', 'StudyController.removeCollaborator').as('studies.remove_collaborator')
+  Route.patch('/studies/:id/collaborator', 'StudyController.updateCollaborator')
+    .as('studies.update_collaborator')
+  Route.delete('/studies/:id/collaborator/:userID', 'StudyController.removeCollaborator')
+    .as('studies.remove_collaborator')
+
+  Route.get('/studies/:id/participants', 'StudyController.fetchParticipants')
+    .as('studies.fetch_participants')
+  Route.get('/studies/:id/participants/ids', 'StudyController.fetchParticipantIDs')
+    .as('studies.fetch_participant_ids')
+  Route.post('/studies/:id/participants', 'StudyController.assignParticipants')
+    .as('studies.assign_participants')
+  Route.delete('/studies/:id/participants', 'StudyController.revokeParticipants')
+    .as('studies.revoke_participants')
+
   Route.resource('studies', 'StudyController').apiOnly()
     .validator(new Map([
       [['studies.store'], ['SaveStudy']],
@@ -64,11 +79,15 @@ Route.group(() => {
   Route.post('/auth/email/verify/:token', 'UserController.verifyEmailAddress').as('users.verify_email')
 
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
-  Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
-  Route.get('/participants/:identifier/:studyID/currentjob_idx', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
-  Route.get('/participants/:identifier/:studyID/jobs', 'ParticipantController.fetchJobs').as('participants.fetch_jobs')
+  Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob')
+    .as('participants.fetch_job')
+  Route.get('/participants/:identifier/:studyID/currentjob_idx', 'ParticipantController.fetchJobIndex')
+    .as('participants.fetch_job_index')
+  Route.get('/participants/:identifier/:studyID/jobs', 'ParticipantController.fetchJobs')
+    .as('participants.fetch_jobs')
 
-  Route.patch('/participants/:identifier/:job_id/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
+  Route.patch('/participants/:identifier/:job_id/result', 'ParticipantController.processJobResult')
+    .as('jobs.submit_result')
   Route.patch('/jobs/:id/move/:position', 'JobController.moveToPosition').as('jobs.move_position')
 
   // CREATE:

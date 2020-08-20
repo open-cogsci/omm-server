@@ -12,7 +12,7 @@ const Helpers = use('Helpers')
 const pool = use('Workers/Sheets')
 
 const fs = require('fs')
-const isInteger = require('lodash/isInteger')
+const { isArray, isInteger } = require('lodash')
 const format = require('date-fns/format')
 
 const removeFile = Helpers.promisify(fs.unlink)
@@ -984,6 +984,131 @@ class StudyController {
       type
     })
     return { data: { id: study.id, files: [newFile] } }
+  }
+
+  /**
+   * Fetch participants for a specific study
+   *
+   * @param {*} { params, request, auth, transform }
+   * @returns
+   * @memberof ParticipantController
+   */
+  async fetchParticipants ({ params, request, auth, transform }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    const perPage = request.input('perPage', 10)
+    const page = request.input('page', 1)
+
+    const ptcps = await study.participants()
+      .with('studies', (q) => {
+        q.where('study_id', study.id).select('id')
+      })
+      .withCount('jobs as completed_jobs', (query) => {
+        query.wherePivot('status_id', 3)
+      })
+      .orderBy('pivot_status_id', 'desc')
+      .paginate(page, perPage)
+
+    const reply = await transform.include('completed_jobs_count')
+      .paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')
+    // Transform the record making study the parent record, to assure fluent handling by
+    // vuex-orm on the client-side
+    reply.data = { id: parseInt(id), participants: reply.data }
+    return reply
+  }
+
+  /**
+   * Fetch participant IDS for the study
+   *
+   * @param {*} { params, auth }
+   * @returns
+   * @memberof StudyController
+   */
+  async fetchParticipantIDs ({ params, auth }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    const assigned = await study.participants().where('active', 1).ids()
+    const total = await Participant.query().where('active', 1).getCount()
+    return { data: { assigned, total } }
+  }
+
+  /**
+   * Assign participants to a study
+   *
+   * @param {Object} { params, auth, request, response }
+   * @returns {Response}
+   * @memberof StudyController
+   */
+  async assignParticipants ({ params, auth, request, response }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({ message: 'You cannot edit this study' })
+    }
+
+    const ptcpIDs = request.input('participants')
+    if (!ptcpIDs || !isArray(ptcpIDs)) {
+      return response.badRequest({ message: 'No participants were specified' })
+    }
+    await study.participants().attach(ptcpIDs)
+    // Also assign participants to study jobs
+    const jobIDs = await study.jobs().ids()
+    const ptcpJobs = []
+    for (const jobID of jobIDs) {
+      for (const ptcpID of ptcpIDs) {
+        ptcpJobs.push({
+          job_id: jobID,
+          participant_id: ptcpID
+        })
+      }
+    }
+    await Database.table('job_states').insert(ptcpJobs)
+    return response.noContent()
+  }
+
+  /**
+   * Detach participant from a study
+   *
+   * @param {Object} { params, auth, request, response }
+   * @returns {Response}
+   * @memberof StudyController
+   */
+  async revokeParticipants ({ params, auth, request, response }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({ message: 'You cannot edit this study' })
+    }
+
+    const ptcpIDs = request.input('participants')
+    if (!ptcpIDs) {
+      return response.badRequest({ message: 'No participants were specified' })
+    }
+    await study.participants().detach(ptcpIDs)
+
+    const jobIDs = await study.jobs().ids()
+    // Also clean up noncompleted jobs
+    await Database.table('job_states')
+      .whereIn('participant_id', ptcpIDs)
+      .whereIn('job_id', jobIDs)
+      .delete()
+    return response.noContent()
   }
 }
 module.exports = StudyController

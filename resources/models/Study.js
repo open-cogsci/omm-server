@@ -48,17 +48,43 @@ export default class Study extends Model {
     }
   }
 
+  /**
+   * Fetch studies
+   *
+   * @static
+   * @param {Object} config
+   * @returns {Promise}
+   * @memberof Study
+   */
   static fetch (config) {
     return this.api().get('', config)
   }
 
-  static async fetchById (id, config) {
-    return await this.api().get(id, {
+  /**
+   * Fetch study by ID
+   *
+   * @static
+   * @param {Number} id
+   * @param {Object} config
+   * @returns {Object}
+   * @memberof Study
+   */
+  static fetchById (id, config) {
+    return this.api().get(id, {
       dataTransformer: jobTransformer,
       ...config
     })
   }
 
+  /**
+   * Creates or updates a study record
+   *
+   * @static
+   * @param {Object} data
+   * @param {Object} config
+   * @returns {Promise}
+   * @memberof Study
+   */
   static persist (data, config) {
     if (data.id) {
       return this.api().patch(`/${data.id}`, data, config)
@@ -66,14 +92,37 @@ export default class Study extends Model {
     return this.api().post('', data, config)
   }
 
+  /**
+   * Deletes a study record
+   *
+   * @param {Object} config
+   * @returns {Promise}
+   * @memberof Study
+   */
   destroy (config) {
     return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
   }
 
+  /**
+   * Archives or unarchives a study
+   *
+   * @param {*} config
+   * @returns
+   * @memberof Study
+   */
   toggleArchived (config) {
     return this.constructor.api().patch(`/${this.id}/archive`, config)
   }
 
+  /**
+   * Uploads a study file
+   *
+   * @param {String} type jobs or experiment
+   * @param {File} file
+   * @param {Object} config
+   * @returns {Promise}
+   * @memberof Study
+   */
   upload (type, file, config) {
     const formData = new FormData()
     formData.append('payload', file)
@@ -94,8 +143,8 @@ export default class Study extends Model {
   /**
    * Refresh jobs from the server
    *
-   * @param {*} config
-   * @returns Promise
+   * @param {Object} config
+   * @returns {Promise}
    * @memberof Study
    */
   refreshJobs (config) {
@@ -113,7 +162,7 @@ export default class Study extends Model {
    *
    * @param {Number} userID
    * @param {Object} config
-   * @returns
+   * @returns {Promise}
    * @memberof Study
    */
   addUser (userID, config) {
@@ -125,7 +174,7 @@ export default class Study extends Model {
    *
    * @param {Number} userID
    * @param {Object} config
-   * @returns
+   * @returns {Object}
    * @memberof Study
    */
   async deleteUser (userID, config) {
@@ -142,7 +191,7 @@ export default class Study extends Model {
    *
    * @param {Object} { userID, level }
    * @param {Object} config
-   * @returns
+   * @returns {Promise}
    * @memberof Study
    */
   setAccessLevel ({ userID, level }, config) {
@@ -173,5 +222,69 @@ export default class Study extends Model {
    */
   generateDataFile (config) {
     return this.constructor.api().get(`${this.id}/data`, config)
+  }
+
+  /**
+   * Fetch participants for this study
+   *
+   * @param {*} config
+   * @returns
+   * @memberof Study
+   */
+  async fetchParticipants (config) {
+    const reply = await this.constructor.api().get(`${this.id}/participants`, config)
+    return reply.response.data.pagination
+  }
+
+  /**
+   * Fetch IDs for the participants of the study
+   *
+   * @param {*} config
+   * @returns
+   * @memberof Study
+   */
+  async fetchParticipantIDs (config) {
+    const reply = await this.constructor.api().get(`/${this.id}/participants/ids`, {
+      save: false,
+      ...config
+    })
+    return reply.response.data.data
+  }
+
+  /**
+   * Assigns (or unassigns) participants from the study
+   *
+   * @param {Array} ids
+   * @param {Object} config
+   * @returns {Promise}
+   * @memberof Study
+   */
+  assignParticipants (ids, config) {
+    return this.constructor.api().post(`${this.id}/participants`, { participants: ids }, {
+      save: false,
+      ...config
+    })
+  }
+
+  /**
+   * Revokes participants from the study
+   *
+   * @param {Array} ids
+   * @param {Object} config
+   * @returns {Promise}
+   * @memberof Study
+   */
+  async revokeParticipants (ids, config) {
+    const response = await this.constructor.api().delete(`${this.id}/participants`, {
+      save: false,
+      params: { participants: ids },
+      ...config
+    })
+    // Remove connections locally as well
+    const participationIDs = ids.map(ptcpId => [this.id, ptcpId])
+    for (const key of participationIDs) {
+      Participation.delete(key)
+    }
+    return response
   }
 }
