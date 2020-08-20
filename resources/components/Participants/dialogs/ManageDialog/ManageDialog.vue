@@ -2,7 +2,7 @@
   <v-dialog
     persistent
     :value="value"
-    max-width="750px"
+    max-width="650px"
     @input="$emit('input', $event)"
   >
     <confirmation-dialog

@@ -12,7 +12,7 @@ const Helpers = use('Helpers')
 const pool = use('Workers/Sheets')
 
 const fs = require('fs')
-const isInteger = require('lodash/isInteger')
+const { isArray, isInteger } = require('lodash')
 const format = require('date-fns/format')
 
 const removeFile = Helpers.promisify(fs.unlink)
@@ -1059,10 +1059,22 @@ class StudyController {
     }
 
     const ptcpIDs = request.input('participants')
-    if (!ptcpIDs) {
+    if (!ptcpIDs || !isArray(ptcpIDs)) {
       return response.badRequest({ message: 'No participants were specified' })
     }
     await study.participants().attach(ptcpIDs)
+    // Also assign participants to study jobs
+    const jobIDs = await study.jobs().ids()
+    const ptcpJobs = []
+    for (const jobID of jobIDs) {
+      for (const ptcpID of ptcpIDs) {
+        ptcpJobs.push({
+          job_id: jobID,
+          participant_id: ptcpID
+        })
+      }
+    }
+    await Database.table('job_states').insert(ptcpJobs)
     return response.noContent()
   }
 
@@ -1089,6 +1101,13 @@ class StudyController {
       return response.badRequest({ message: 'No participants were specified' })
     }
     await study.participants().detach(ptcpIDs)
+
+    const jobIDs = await study.jobs().ids()
+    // Also clean up noncompleted jobs
+    await Database.table('job_states')
+      .whereIn('participant_id', ptcpIDs)
+      .whereIn('job_id', jobIDs)
+      .delete()
     return response.noContent()
   }
 }

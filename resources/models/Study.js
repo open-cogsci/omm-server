@@ -280,11 +280,11 @@ export default class Study extends Model {
       params: { participants: ids },
       ...config
     })
-    const participationIDs = ids.map(ptcpId => [this.id, ptcpId])
     // Remove connections locally as well
-    Participation.delete((participation) => {
-      return participationIDs.includes(participation.$id)
-    })
+    const participationIDs = ids.map(ptcpId => [this.id, ptcpId])
+    for (const key of participationIDs) {
+      Participation.delete(key)
+    }
     return response
   }
 }
