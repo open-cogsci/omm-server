@@ -65,7 +65,7 @@ export default {
   inject: ['theme'],
   components: {
     ParticipantsList: () => import('@/components/Participants/ParticipantsList'),
-    newParticipantDialog: () => import('@/components/Participants/NewParticipantDialog')
+    newParticipantDialog: () => import('@/components/Participants/dialogs/NewParticipantDialog')
   },
   data () {
     return {
@@ -74,7 +74,11 @@ export default {
       loading: false,
       deleting: false,
       fabVisible: false,
-      errors: {}
+      errors: {},
+      pagination: {
+        page: 1,
+        perPage: 20
+      }
     }
   },
   computed: {
@@ -102,7 +106,13 @@ export default {
     async loadParticipants () {
       this.loading = true
       try {
-        await this.Participant.fetch()
+        this.pagination = await this.Participant.fetch({
+          params: {
+            studiescount: true,
+            page: this.pagination.page,
+            perPage: this.pagination.perPage
+          }
+        })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {

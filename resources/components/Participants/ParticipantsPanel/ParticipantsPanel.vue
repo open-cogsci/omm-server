@@ -8,6 +8,8 @@
     />
     <manage-dialog
       v-model="dialog.manage"
+      :study="study"
+      @new-assignments="refreshParticipants"
     />
     <v-col cols="12" sm="6" md="12" lg="6" xl="7">
       <v-card outlined>
@@ -99,7 +101,7 @@ export default {
       pagination: {
         page: 1,
         lastPage: 1,
-        perPage: 10,
+        perPage: 20,
         total: 0
       }
     }
@@ -126,17 +128,17 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async fetchParticipants (page, perPage) {
+    async fetchParticipants (options = {}) {
       if (!this.study?.id) { return }
       this.loading.participants = true
       try {
-        this.pagination = await this.Participant.fetchForStudy(
-          this.study.id, {
-            params: {
-              page: page || this.pagination.page,
-              perPage: perPage || this.pagination.perPage
-            }
-          })
+        this.pagination = await this.study.fetchParticipants(this.study.id, {
+          params: {
+            page: this.pagination.page,
+            perPage: this.pagination.perPage
+          },
+          ...options
+        })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -163,6 +165,14 @@ export default {
       } finally {
         this.loading.data = null
       }
+    },
+    refreshParticipants () {
+      this.fetchParticipants({
+        params: {
+          page: 1,
+          perPage: this.pagination.perPage
+        }
+      })
     }
   }
 }

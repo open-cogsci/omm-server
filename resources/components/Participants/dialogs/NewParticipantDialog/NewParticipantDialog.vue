@@ -27,7 +27,7 @@
 <script>
 export default {
   components: {
-    ParticipantEditData: () => import('../ParticipantEditData')
+    ParticipantEditData: () => import('@/components/Participants/ParticipantEditData')
   },
   props: {
     value: {

@@ -57,7 +57,7 @@ class UserController {
       .with('userType')
       .orderBy('name', 'asc')
       .fetch()
-    return transform.include('user_type').collection(users, 'UserTransformer.withStudiesCount')
+    return transform.include('user_type,studies_count').collection(users, 'UserTransformer')
   }
 
   /**

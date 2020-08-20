@@ -51,44 +51,29 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async index ({ transform }) {
-    const participants = await Participant
+  async index ({ transform, request }) {
+    const query = Participant
       .query()
-      .withCount('studies')
       .orderBy('created_at', 'desc')
-      .fetch()
-    return transform.collection(participants, 'ParticipantTransformer.withStudiesCount')
-  }
 
-  /**
-   * Fetch participants for a specific study
-   *
-   * @param {*} { params, request, auth, transform }
-   * @returns
-   * @memberof ParticipantController
-   */
-  async fetchForStudy ({ params, request, auth, transform }) {
-    const { study_id: studyID } = params
-    // Check if user has permission to view this study
-    const study = await auth.user.studies()
-      .where('study_id', studyID)
-      .firstOrFail()
+    if (request.input('studiescount')) {
+      query.withCount('studies')
+      transform = transform.include('studies_count')
+    }
 
-    const perPage = request.input('perPage', 10)
-    const page = request.input('page', 1)
+    if (request.input('only_active')) {
+      query.where('active', 1)
+    }
 
-    const ptcps = await study.participants()
-      .with('studies', (q) => {
-        q.where('study_id', study.id).select('id')
-      })
-      .withCount('jobs as completed_jobs', (query) => {
-        query.wherePivot('status_id', 3)
-      })
-      .orderBy('pivot_status_id', 'desc')
-      .paginate(page, perPage)
-
-    return transform.include('studies,completed_jobs_count')
-      .paginate(ptcps, 'ParticipantTransformer')
+    if (request.input('no_paginate')) {
+      const participants = await query.fetch()
+      return transform.collection(participants, 'ParticipantTransformer')
+    } else {
+      const page = request.input('page', 1)
+      const perPage = request.input('perPage', 20)
+      const participants = await query.paginate(page, perPage)
+      return transform.paginate(participants, 'ParticipantTransformer')
+    }
   }
 
   /**

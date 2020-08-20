@@ -26,17 +26,13 @@ export default class Participant extends Model {
     }
   }
 
-  static fetch (config) {
-    return this.api().get('', config)
+  static async fetch (config) {
+    const reply = await this.api().get('', config)
+    return reply.response.data.pagination
   }
 
   static fetchById (id, config) {
     return this.api().get(id, config)
-  }
-
-  static async fetchForStudy (studyID, config) {
-    const results = await this.api().get(`/study/${studyID}`, config)
-    return results.response.data.pagination
   }
 
   static persist (data, config) {
