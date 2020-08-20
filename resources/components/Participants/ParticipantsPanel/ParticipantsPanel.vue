@@ -26,7 +26,7 @@
         <v-card-title>
           Participants
           <v-spacer />
-          <span class="caption">% jobs done</span>
+          <span class="caption">% complete</span>
         </v-card-title>
         <v-card-text class="px-0">
           <study-participants-list

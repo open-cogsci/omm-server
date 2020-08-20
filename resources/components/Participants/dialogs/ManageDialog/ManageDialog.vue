@@ -67,9 +67,30 @@
               </v-row>
             </v-form>
           </v-expand-transition>
-          <v-row dense>
+          <v-row>
             <v-col cols="12" class="text-body-2">
-              Or manually select the participants
+              Or manually select the participants:
+            </v-col>
+          </v-row>
+          <v-row dense>
+            <v-col cols="8">
+              <v-text-field
+                dense
+                outlined
+                hide-details
+                label="Filter"
+                prepend-inner-icon="mdi-magnify"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-select
+                v-model="statusFilter"
+                dense
+                outlined
+                hide-details
+                label="Status"
+                :items="['all','assigned','not assigned']"
+              />
             </v-col>
             <v-col cols="12">
               <participant-selector
@@ -127,7 +148,8 @@ export default {
       deselected: [],
       total: 0,
       loading: false,
-      applying: false
+      applying: false,
+      statusFilter: 'all'
     }
   },
   computed: {
