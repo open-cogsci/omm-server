@@ -75,6 +75,7 @@
           <v-row dense>
             <v-col cols="8">
               <v-text-field
+                v-model="searchterm"
                 dense
                 outlined
                 hide-details
@@ -120,7 +121,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { sampleSize, difference } from 'lodash'
+import { sampleSize, difference, debounce } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -146,10 +147,12 @@ export default {
       originalSelection: [],
       selected: [],
       deselected: [],
+      allIDs: [],
       total: 0,
       loading: false,
       applying: false,
-      statusFilter: 'all'
+      statusFilter: 'all',
+      searchterm: null
     }
   },
   computed: {
@@ -157,7 +160,13 @@ export default {
       return this.$store.$db().model('participants')
     },
     participants () {
-      return this.Participant.query().where('active', true).get()
+      const query = this.Participant.query().where('active', true)
+      if (this.statusFilter === 'assigned') {
+        query.whereIdIn(this.selected)
+      } else if (this.statusFilter === 'not assigned') {
+        query.whereIdIn(difference(this.allIDs, this.selected))
+      }
+      return query.get()
     },
     allSelected () {
       return this.selected.length >= this.total
@@ -168,26 +177,34 @@ export default {
       if (opened) {
         this.loading = true
         try {
-          await this.Participant.fetch({ params: { no_paginate: true, only_active: true } })
-          const { assigned, total } = await this.fetchParticipantIDs()
-          this.originalSelection = this.selected = assigned
+          this.fetchParticipants()
+          const { assigned, all, total } = await this.fetchParticipantIDs()
+          this.originalSelection = [...assigned]
+          this.selected = [...assigned]
+          this.allIDs = all
           this.total = total
         } catch (e) {
-          processErrors(e, this.notify)
+          processErrors(e, this.notify, true)
         } finally {
           this.loading = false
         }
       }
     }
   },
+  created () {
+    this.fetchParticipants = debounce(this.fetchParticipants, 250)
+  },
   methods: {
     ...mapActions('notifications', ['notify']),
+    fetchParticipants () {
+      return this.Participant.fetch({ params: { no_paginate: true, only_active: true } })
+    },
     async fetchParticipantIDs () {
       if (!this.study) { return [] }
       return await this.study.fetchParticipantIDs()
     },
     assignAll () {
-      this.selected = this.participants.map(ptcp => ptcp.id)
+      this.selected = [...this.allIDs]
     },
     assignRandom () {
       this.selected = sampleSize(

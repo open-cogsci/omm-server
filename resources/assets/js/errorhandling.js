@@ -10,7 +10,7 @@ import { isArray, isFunction } from 'lodash'
  * indicating the color of the notification to be shown
  * @returns {Object} the fields that errorred with their corresponding validation message
  */
-export function processErrors (e, notify = null) {
+export function processErrors (e, notify = null, print = false) {
   const errors = {}
   if (isArray(e?.response?.data)) {
     const validationErrors = e.response.data
@@ -29,6 +29,9 @@ export function processErrors (e, notify = null) {
       message: e?.response?.data?.error?.message || e?.response?.data?.message || e?.response?.data || e,
       color: 'error'
     })
+  }
+  if (print) {
+    console.error(e)
   }
   return errors
 }

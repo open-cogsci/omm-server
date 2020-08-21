@@ -22,7 +22,7 @@
               v-model="searchterm"
               solo
               prepend-inner-icon="mdi-magnify"
-              placeholder="Search"
+              placeholder="Search participants by name or identifier"
               hide-details
               clearable
               :loading="searching"
@@ -133,6 +133,7 @@ export default {
     * Fetch participants from server
     */
     async fetchParticipants () {
+      if (this.loading || this.searching) { return }
       try {
         const params = {
           studiescount: true,
@@ -157,6 +158,7 @@ export default {
      *  Save a participant
      */
     async saveParticipant (ptcpData) {
+      if (this.saving) { return }
       this.saving = true
       try {
         await this.Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
@@ -177,6 +179,7 @@ export default {
     * Delete a participant
     */
     async deleteParticipant (ptcpID) {
+      if (this.deleting) { return }
       this.deleting = true
       try {
         await this.Participant.find(ptcpID).destroy()
