@@ -50,16 +50,23 @@ class UserController {
     if (!auth.current.user.isAdmin) {
       return response.status(401).json({ message: 'Permission denied' })
     }
-
-    const page = request.input('page', 1)
-    const perPage = request.input('perPage', 20)
-
-    const users = await User
+    const query = User
       .query()
       .withCount('studies')
       .with('userType')
       .orderBy('name', 'asc')
-      .paginate(page, perPage)
+
+    const searchterm = request.input('q')
+    if (searchterm && searchterm.length >= 2) {
+      query.where(function () {
+        this.where('name', 'LIKE', `%${searchterm}%`)
+        this.orWhere('email', 'LIKE', `%${searchterm}%`)
+      })
+    }
+
+    const page = request.input('page', 1)
+    const perPage = request.input('perPage', 20)
+    const users = await query.paginate(page, perPage)
     return transform.include('user_type,studies_count').paginate(users, 'UserTransformer')
   }
 

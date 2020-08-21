@@ -32,7 +32,7 @@ export default class User extends Model {
   static async fetch (config) {
     const reply = await this.api().get('', config)
     const pagination = reply.response.data.pagination
-    pagination.ids = reply.entities.users.map(entity => entity.id)
+    pagination.ids = reply.entities.users?.map(entity => entity.id) || []
     return pagination
   }
 

@@ -65,6 +65,14 @@ class ParticipantController {
       query.where('active', 1)
     }
 
+    const searchterm = request.input('q')
+    if (searchterm && searchterm.length >= 2) {
+      query.where(function () {
+        this.where('name', 'LIKE', `%${searchterm}%`)
+        this.orWhere('identifier', 'LIKE', `%${searchterm}%`)
+      })
+    }
+
     if (request.input('no_paginate')) {
       const participants = await query.fetch()
       return transform.collection(participants, 'ParticipantTransformer')
