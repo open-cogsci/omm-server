@@ -46,18 +46,28 @@ class UserController {
    * @param {Response} ctx.response
    * @param {Auth} ctx.auth
    */
-  async index ({ response, transform, auth }) {
+  async index ({ request, response, transform, auth }) {
     if (!auth.current.user.isAdmin) {
       return response.status(401).json({ message: 'Permission denied' })
     }
-
-    const users = await User
+    const query = User
       .query()
       .withCount('studies')
       .with('userType')
       .orderBy('name', 'asc')
-      .fetch()
-    return transform.include('user_type,studies_count').collection(users, 'UserTransformer')
+
+    const searchterm = request.input('q')
+    if (searchterm && searchterm.length >= 2) {
+      query.where(function () {
+        this.where('name', 'LIKE', `%${searchterm}%`)
+        this.orWhere('email', 'LIKE', `%${searchterm}%`)
+      })
+    }
+
+    const page = request.input('page', 1)
+    const perPage = request.input('perPage', 20)
+    const users = await query.paginate(page, perPage)
+    return transform.include('user_type,studies_count').paginate(users, 'UserTransformer')
   }
 
   /**
