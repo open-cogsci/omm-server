@@ -170,10 +170,11 @@ export default {
         try {
           await this.Participant.fetch({ params: { no_paginate: true, only_active: true } })
           const { assigned, total } = await this.fetchParticipantIDs()
-          this.originalSelection = this.selected = assigned
+          this.originalSelection = [...assigned]
+          this.selected = [...assigned]
           this.total = total
         } catch (e) {
-          processErrors(e, this.notify)
+          processErrors(e, this.notify, true)
         } finally {
           this.loading = false
         }

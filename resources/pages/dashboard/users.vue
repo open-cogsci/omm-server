@@ -27,7 +27,7 @@
               v-model="searchterm"
               solo
               prepend-inner-icon="mdi-magnify"
-              placeholder="Search"
+              placeholder="Search users by name or email address"
               hide-details
               clearable
               :loading="searching"
@@ -145,6 +145,7 @@ export default {
     * Fetch users from server
     */
     async fetchUsers () {
+      if (this.loading || this.searching) { return }
       try {
         const params = {
           page: this.pagination.page,
@@ -178,6 +179,7 @@ export default {
      *  Save a user
      */
     async saveUser (userData) {
+      if (this.saving) { return }
       this.saving = true
       try {
         await this.User.persist(pick(userData,
@@ -199,6 +201,7 @@ export default {
     * Delete a user
     */
     async deleteUser (id) {
+      if (this.deleting) { return }
       this.deleting = true
       try {
         await this.User.find(id).destroy()
@@ -213,6 +216,7 @@ export default {
      * Resend email containing user password
      */
     async resendAccountEmail (user) {
+      if (this.resending) { return }
       this.resending = true
       try {
         if (user.last_login) {

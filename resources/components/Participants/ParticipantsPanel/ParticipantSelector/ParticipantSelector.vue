@@ -1,34 +1,36 @@
 <template>
   <v-card outlined>
-    <v-list-item-group
-      v-model="selected"
-      multiple
+    <v-virtual-scroll
+      :items="ptcps"
+      :item-height="65"
+      max-height="calc(100vh - 575px)"
+      class="v-list"
     >
-      <v-virtual-scroll
-        :items="participants"
-        :item-height="65"
-        max-height="calc(100vh - 575px)"
-      >
-        <template v-slot="{ item }">
-          <v-list-item :key="item.id" :value="item.id">
-            <v-list-item-action>
-              <v-checkbox
-                :input-value="selected.includes(item.id)"
-                color="primary"
-              />
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ item.name }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.identifier }}
-              </v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-virtual-scroll>
-    </v-list-item-group>
+      <template v-slot="{ item }">
+        <v-list-item
+          :value="item.id"
+          :class="{'blue lighten-5': item.selected}"
+          @click="selectionChange(item.id, !item.selected )"
+        >
+          <v-list-item-action>
+            <v-checkbox
+              :input-value="item.selected"
+              color="primary"
+              @click.stop=""
+              @change="val => selectionChange(item.id, val)"
+            />
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ item.name }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ item.identifier }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </template>
+    </v-virtual-scroll>
   </v-card>
 </template>
 
@@ -39,6 +41,23 @@ export default {
     participants: {
       type: Array,
       required: true
+    }
+  },
+  computed: {
+    ptcps () {
+      return this.participants.map((ptcp) => {
+        ptcp.selected = this.selected.includes(ptcp.id)
+        return ptcp
+      })
+    }
+  },
+  methods: {
+    selectionChange (id, checked) {
+      if (checked) {
+        this.selected.push(id)
+      } else {
+        this.selected.splice(this.selected.indexOf(id), 1)
+      }
     }
   }
 

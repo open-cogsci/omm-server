@@ -28,6 +28,9 @@ export default class Participant extends Model {
 
   static async fetch (config) {
     const reply = await this.api().get('', config)
+    if (!reply.response.data.pagination) {
+      return reply
+    }
     const pagination = reply.response.data.pagination
     pagination.ids = reply.entities.participants?.map(entity => entity.id) || []
     return pagination
