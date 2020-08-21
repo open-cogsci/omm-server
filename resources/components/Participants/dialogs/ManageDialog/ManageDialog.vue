@@ -44,7 +44,6 @@
                 <v-col cols="12" class="text-body-2">
                   Or randomly assign the following number of participants:
                 </v-col>
-
                 <v-col cols="6" sm="3" lg="2">
                   <v-text-field
                     v-model="N"
