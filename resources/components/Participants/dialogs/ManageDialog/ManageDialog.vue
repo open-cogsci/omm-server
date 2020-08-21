@@ -79,6 +79,7 @@
                 outlined
                 hide-details
                 label="Filter"
+                clearable
                 prepend-inner-icon="mdi-magnify"
               />
             </v-col>
@@ -165,6 +166,11 @@ export default {
       } else if (this.statusFilter === 'not assigned') {
         query.whereIdIn(difference(this.allIDs, this.selected))
       }
+      if (this.searchterm && this.searchterm.length > 2) {
+        query.where((ptcp) => {
+          return ptcp.name.includes(this.searchterm) || ptcp.identifier.includes(this.searchterm)
+        })
+      }
       return query.get()
     },
     allSelected () {
@@ -174,6 +180,7 @@ export default {
   watch: {
     async value (opened) {
       if (opened) {
+        this.searchterm = null
         this.loading = true
         try {
           this.fetchParticipants()

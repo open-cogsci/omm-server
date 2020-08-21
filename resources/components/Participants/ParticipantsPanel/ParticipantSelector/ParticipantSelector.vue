@@ -1,6 +1,7 @@
 <template>
   <v-card outlined>
     <v-virtual-scroll
+      v-if="ptcps.length"
       :items="ptcps"
       :item-height="65"
       max-height="calc(100vh - 575px)"
@@ -30,6 +31,9 @@
         </v-list-item>
       </template>
     </v-virtual-scroll>
+    <v-card-text v-else>
+      No participants to show
+    </v-card-text>
   </v-card>
 </template>
 
