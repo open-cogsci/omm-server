@@ -7,7 +7,7 @@
       <v-virtual-scroll
         :items="participants"
         :item-height="65"
-        max-height="calc(100vh - 400px)"
+        max-height="calc(100vh - 575px)"
       >
         <template v-slot="{ item }">
           <v-list-item :key="item.id" :value="item.id">

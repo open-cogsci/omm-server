@@ -1,5 +1,7 @@
 'use strict'
 
+const { sampleSize } = require('lodash')
+
 const Participant = use('App/Models/Participant')
 const Study = use('App/Models/Study')
 
@@ -15,7 +17,7 @@ const Study = use('App/Models/Study')
 
 class ParticipationSeeder {
   async run () {
-    // Don't seed any studies if there already are some.
+    // Don't seed any participations if there already are some.
     if (await Participant.getCount() === 0 || await Study.getCount() === 0) {
       return
     }
@@ -29,6 +31,21 @@ class ParticipationSeeder {
     const jobs = await study.jobs().fetch()
     for (const job of jobs.rows) {
       await job.participants().sync(ptcpIds)
+    }
+
+    for (const job of jobs.rows) {
+      const sampledPtcp = sampleSize(ptcpIds, 7)
+      for (const ptcpID of sampledPtcp) {
+        await job.participants().pivotQuery()
+          .where('participant_id', ptcpID)
+          .update({
+            status_id: 3,
+            data: JSON.stringify({
+              correct: Math.random() <= 0.5,
+              RT: parseInt(Math.random() * 1000)
+            })
+          })
+      }
     }
   }
 }

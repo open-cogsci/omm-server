@@ -54,7 +54,7 @@ class ParticipantController {
   async index ({ transform, request }) {
     const query = Participant
       .query()
-      .orderBy('created_at', 'desc')
+      .orderBy('name', 'asc')
 
     if (request.input('studiescount')) {
       query.withCount('studies')

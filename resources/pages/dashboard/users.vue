@@ -18,6 +18,16 @@
         </v-row>
         <v-row>
           <v-col cols="12">
+            <v-text-field
+              solo
+              prepend-inner-icon="mdi-magnify"
+              placeholder="Search"
+              hide-details
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
             <v-skeleton-loader
               :loading="loading"
               type="table-row-divider@10"
@@ -38,6 +48,15 @@
             </v-skeleton-loader>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-pagination
+              :value="pagination.page"
+              :length="pagination.lastPage"
+              @input="switchPage"
+            />
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
     <v-fab-transition>
@@ -51,7 +70,7 @@
         dark
         bottom
         right
-        absolute
+        fixed
         @click="dialog=true"
       >
         <v-icon>mdi-plus</v-icon>
@@ -81,7 +100,11 @@ export default {
       deleting: false,
       resending: false,
       fabVisible: false,
-      errors: {}
+      errors: {},
+      pagination: {
+        page: 1,
+        perPage: 12
+      }
     }
   },
   computed: {
@@ -92,12 +115,14 @@ export default {
       return this.User.query()
         .with(['user_type', 'studies'])
         .orderBy('name', 'asc')
+        .offset((this.pagination.page - 1) * this.pagination.perPage)
+        .limit(this.pagination.perPage)
         .get()
     }
   },
   created () {
     this.clearErrors(false)
-    this.loadUsers()
+    this.fetchUsers()
   },
   mounted () {
     this.fabVisible = true
@@ -107,10 +132,15 @@ export default {
     /*
     * Fetch users from server
     */
-    async loadUsers () {
+    async fetchUsers () {
       this.loading = true
       try {
-        await this.User.fetch()
+        this.pagination = await this.User.fetch({
+          params: {
+            page: this.pagination.page,
+            perPage: this.pagination.perPage
+          }
+        })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -179,6 +209,15 @@ export default {
         this.errors = processErrors(e, this.notify)
       } finally {
         this.resending = false
+      }
+    },
+    /*
+     * Switch page
+     */
+    switchPage (page) {
+      if (page !== this.pagination.page) {
+        this.pagination.page = page
+        this.fetchUsers()
       }
     },
     /**

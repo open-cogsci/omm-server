@@ -9,7 +9,9 @@
 | make use of Lucid models directly.
 |
 */
-
+/** @type {import('@adonisjs/lucid/src/Factory')} */
+const Factory = use('Factory')
+/** @type {import('@adonisjs/lucid/src/Model')} */
 const User = use('App/Models/User')
 
 const users = [
@@ -36,6 +38,7 @@ class UserSeeder {
       for (const user of users) {
         await User.create(user)
       }
+      return Factory.model('App/Models/User').createMany(23)
     }
   }
 }

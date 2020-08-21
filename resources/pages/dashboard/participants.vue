@@ -18,9 +18,19 @@
         </v-row>
         <v-row>
           <v-col cols="12">
+            <v-text-field
+              solo
+              prepend-inner-icon="mdi-magnify"
+              placeholder="Search"
+              hide-details
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
             <v-skeleton-loader
               :loading="loading"
-              type="table-row-divider@10"
+              type="table-row-divider@13"
             >
               <participants-list
                 ref="list"
@@ -32,6 +42,15 @@
                 @delete-participant="deleteParticipant"
               />
             </v-skeleton-loader>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-pagination
+              :value="pagination.page"
+              :length="pagination.lastPage"
+              @input="switchPage"
+            />
           </v-col>
         </v-row>
       </v-col>
@@ -47,7 +66,7 @@
         dark
         bottom
         right
-        absolute
+        fixed
         @click="dialog=true"
       >
         <v-icon>mdi-plus</v-icon>
@@ -76,8 +95,9 @@ export default {
       fabVisible: false,
       errors: {},
       pagination: {
+        ids: [],
         page: 1,
-        perPage: 20
+        perPage: 12
       }
     }
   },
@@ -88,12 +108,13 @@ export default {
     participants () {
       return this.Participant.query()
         .orderBy('name', 'asc')
+        .where('id', this.pagination.ids)
         .get()
     }
   },
   created () {
     this.clearErrors(false)
-    this.loadParticipants()
+    this.fetchParticipants()
   },
   mounted () {
     this.fabVisible = true
@@ -103,7 +124,7 @@ export default {
     /*
     * Fetch participants from server
     */
-    async loadParticipants () {
+    async fetchParticipants () {
       this.loading = true
       try {
         this.pagination = await this.Participant.fetch({
@@ -140,7 +161,7 @@ export default {
       }
     },
     /*
-    *
+    * Delete a participant
     */
     async deleteParticipant (ptcpID) {
       this.deleting = true
@@ -151,6 +172,15 @@ export default {
         this.errors = processErrors(e, this.notify)
       } finally {
         this.deleting = false
+      }
+    },
+    /*
+     * Switch page
+     */
+    switchPage (page) {
+      if (page !== this.pagination.page) {
+        this.pagination.page = page
+        this.fetchParticipants()
       }
     },
     /**
