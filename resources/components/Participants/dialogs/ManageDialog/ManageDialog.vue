@@ -146,6 +146,7 @@ export default {
       originalSelection: [],
       selected: [],
       deselected: [],
+      allIDs: [],
       total: 0,
       loading: false,
       applying: false,
@@ -157,7 +158,13 @@ export default {
       return this.$store.$db().model('participants')
     },
     participants () {
-      return this.Participant.query().where('active', true).get()
+      const query = this.Participant.query().where('active', true)
+      if (this.statusFilter === 'assigned') {
+        query.whereIdIn(this.selected)
+      } else if (this.statusFilter === 'not assigned') {
+        query.whereIdIn(difference(this.allIDs, this.selected))
+      }
+      return query.get()
     },
     allSelected () {
       return this.selected.length >= this.total
@@ -169,9 +176,10 @@ export default {
         this.loading = true
         try {
           await this.Participant.fetch({ params: { no_paginate: true, only_active: true } })
-          const { assigned, total } = await this.fetchParticipantIDs()
+          const { assigned, all, total } = await this.fetchParticipantIDs()
           this.originalSelection = [...assigned]
           this.selected = [...assigned]
+          this.allIDs = all
           this.total = total
         } catch (e) {
           processErrors(e, this.notify, true)
@@ -188,7 +196,7 @@ export default {
       return await this.study.fetchParticipantIDs()
     },
     assignAll () {
-      this.selected = this.participants.map(ptcp => ptcp.id)
+      this.selected = [...this.allIDs]
     },
     assignRandom () {
       this.selected = sampleSize(

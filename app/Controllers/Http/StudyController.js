@@ -1036,8 +1036,9 @@ class StudyController {
       .firstOrFail()
 
     const assigned = await study.participants().where('active', 1).ids()
-    const total = await Participant.query().where('active', 1).getCount()
-    return { data: { assigned, total } }
+    const all = await Participant.query().where('active', 1).ids()
+    const total = all.length
+    return { data: { assigned, all, total } }
   }
 
   /**
