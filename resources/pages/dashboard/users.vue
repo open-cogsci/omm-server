@@ -31,7 +31,7 @@
               hide-details
               clearable
               :loading="searching"
-              @input="fetchUsers"
+              @input="() => { pagination.page = 1; fetchUsers() }"
             />
           </v-col>
         </v-row>

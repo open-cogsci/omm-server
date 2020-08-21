@@ -26,7 +26,7 @@
               hide-details
               clearable
               :loading="searching"
-              @input="fetchParticipants"
+              @input="() => { pagination.page = 1; fetchParticipants() }"
             />
           </v-col>
         </v-row>
@@ -142,6 +142,7 @@ export default {
         }
         if (this.searchterm && this.searchterm.length >= 2) {
           params.q = this.searchterm
+          params.page = 1
           this.searching = true
         } else {
           this.loading = true
