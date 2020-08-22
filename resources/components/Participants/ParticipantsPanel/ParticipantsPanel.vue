@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row id="participants-panel" dense class="fill-height">
     <data-download-dialog
       v-model="dialog.download"
       :files="study.files"
@@ -21,20 +21,27 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="12" sm="6" md="12" lg="6" xl="5">
-      <v-card outlined>
+    <v-col
+      cols="12"
+      sm="6"
+      md="12"
+      lg="6"
+      xl="5"
+      class="pb-5"
+    >
+      <v-card outlined class="fill-height d-flex flex-column">
         <v-card-title>
           Participants
           <v-spacer />
           <span class="caption">% complete</span>
         </v-card-title>
-        <v-card-text class="px-0">
+        <v-card-text class="pa-0 fill-height">
           <study-participants-list
-            ref="ptcpList"
-            :key="study.id"
             :total-jobs="study.jobs_count"
             :participants="participants"
-            :loading="loading.participants"
+            :loading="loading.initial"
+            :fetching-more="loading.participants"
+            @scroll-end="loadMore"
           />
         </v-card-text>
         <v-card-actions>
@@ -94,6 +101,7 @@ export default {
         manage: false
       },
       loading: {
+        initial: false,
         participants: false,
         stats: false,
         data: null
@@ -103,7 +111,8 @@ export default {
         lastPage: 1,
         perPage: 20,
         total: 0
-      }
+      },
+      ptcpListCtrHeight: 0
     }
   },
   computed: {
@@ -123,16 +132,18 @@ export default {
       // this.fetchStats()
     }
   },
-  mounted () {
-    this.fetchParticipants()
+  async mounted () {
+    this.loading.initial = true
+    await this.fetchParticipants()
+    this.loading.initial = false
   },
   methods: {
     ...mapActions('notifications', ['notify']),
     async fetchParticipants (options = {}) {
-      if (!this.study?.id) { return }
+      if (!this.study?.id || this.loading.participants) { return }
       this.loading.participants = true
       try {
-        this.pagination = await this.study.fetchParticipants(this.study.id, {
+        this.pagination = await this.study.fetchParticipants({
           params: {
             page: this.pagination.page,
             perPage: this.pagination.perPage
@@ -173,6 +184,19 @@ export default {
           perPage: this.pagination.perPage
         }
       })
+    },
+    setPtcpListCtrHeight () {
+      this.ptcpListCtrHeight = this.$refs.ptcpListContainer?.clientHeight || 0
+    },
+    loadMore () {
+      if (this.participants.length < this.pagination.total) {
+        this.fetchParticipants({
+          params: {
+            page: this.pagination.page + 1,
+            perPage: this.pagination.perPage
+          }
+        })
+      }
     }
   }
 }

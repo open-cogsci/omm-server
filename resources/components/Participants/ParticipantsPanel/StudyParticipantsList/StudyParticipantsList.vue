@@ -2,13 +2,17 @@
   <v-skeleton-loader
     :loading="loading"
     type="list-item-two-line@5"
+    class="fill-height"
   >
+    <v-progress-linear v-if="fetchingMore" height="2" indeterminate />
     <v-virtual-scroll
       v-if="participants.length"
-      ref="scroller"
+      v-resize="setHeight"
       :items="participants"
       :item-height="65"
-      max-height="calc(100vh - 490px)"
+      :min-height="350"
+      :max-height="maxHeight"
+      @scroll.native="scrolling"
     >
       <template v-slot="{ item }">
         <v-list-item>
@@ -29,6 +33,8 @@
 </template>
 
 <script>
+import { debounce } from 'lodash'
+
 export default {
   components: {
     JobProgress: () => import('../JobProgress')
@@ -42,10 +48,23 @@ export default {
       type: Boolean,
       default: false
     },
+    fetchingMore: {
+      type: Boolean,
+      default: false
+    },
     totalJobs: {
       type: Number,
       default: 0
     }
+  },
+  data: () => ({
+    maxHeight: 400
+  }),
+  created () {
+    this.scrolling = debounce(this.scrolling, 200)
+  },
+  mounted () {
+    this.setHeight()
   },
   methods: {
     progress (ptcp) {
@@ -64,6 +83,15 @@ export default {
 
       return {
         value, color
+      }
+    },
+    setHeight () {
+      this.maxHeight = this.$el.clientHeight - 40 || 400
+    },
+    scrolling (event) {
+      const element = event.currentTarget || event.target
+      if (element && element.scrollHeight - element.scrollTop === element.clientHeight) {
+        this.$emit('scroll-end')
       }
     }
   }
