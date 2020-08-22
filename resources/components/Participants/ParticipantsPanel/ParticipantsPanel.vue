@@ -35,14 +35,11 @@
           <v-spacer />
           <span class="caption">% complete</span>
         </v-card-title>
-        <v-card-text ref="ptcpListContainer" class="pa-0 fill-height">
+        <v-card-text class="pa-0 fill-height">
           <study-participants-list
-            :key="study.id"
-            v-resize="setPtcpListCtrHeight"
             :total-jobs="study.jobs_count"
             :participants="participants"
             :loading="loading.participants"
-            :height="ptcpListCtrHeight-25"
           />
         </v-card-text>
         <v-card-actions>

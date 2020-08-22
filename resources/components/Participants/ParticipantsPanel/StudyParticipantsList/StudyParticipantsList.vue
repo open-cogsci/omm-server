@@ -2,14 +2,15 @@
   <v-skeleton-loader
     :loading="loading"
     type="list-item-two-line@5"
+    class="fill-height"
   >
     <v-virtual-scroll
       v-if="participants.length"
-      ref="scroller"
+      v-resize="setHeight"
       :items="participants"
       :item-height="65"
       :min-height="350"
-      :max-height="height"
+      :max-height="maxHeight"
     >
       <template v-slot="{ item }">
         <v-list-item>
@@ -46,11 +47,13 @@ export default {
     totalJobs: {
       type: Number,
       default: 0
-    },
-    height: {
-      type: Number,
-      default: 0
     }
+  },
+  data: () => ({
+    maxHeight: 400
+  }),
+  mounted () {
+    this.setHeight()
   },
   methods: {
     progress (ptcp) {
@@ -70,6 +73,9 @@ export default {
       return {
         value, color
       }
+    },
+    setHeight () {
+      this.maxHeight = this.$el.clientHeight - 30 || 400
     }
   }
 }
