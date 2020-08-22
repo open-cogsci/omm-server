@@ -38,10 +38,11 @@
         <v-card-text ref="ptcpListContainer" class="pa-0 fill-height">
           <study-participants-list
             :key="study.id"
+            v-resize="setPtcpListCtrHeight"
             :total-jobs="study.jobs_count"
             :participants="participants"
             :loading="loading.participants"
-            :height="ptcpListCtrHeight()-25"
+            :height="ptcpListCtrHeight-25"
           />
         </v-card-text>
         <v-card-actions>
@@ -110,7 +111,8 @@ export default {
         lastPage: 1,
         perPage: 20,
         total: 0
-      }
+      },
+      ptcpListCtrHeight: 0
     }
   },
   computed: {
@@ -132,6 +134,7 @@ export default {
   },
   mounted () {
     this.fetchParticipants()
+    this.setPtcpListCtrHeight()
   },
   methods: {
     ...mapActions('notifications', ['notify']),
@@ -181,8 +184,8 @@ export default {
         }
       })
     },
-    ptcpListCtrHeight () {
-      return this.$refs.ptcpListContainer?.clientHeight || 0
+    setPtcpListCtrHeight () {
+      this.ptcpListCtrHeight = this.$refs.ptcpListContainer?.clientHeight || 0
     }
   }
 }
