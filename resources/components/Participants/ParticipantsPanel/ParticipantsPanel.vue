@@ -39,7 +39,9 @@
           <study-participants-list
             :total-jobs="study.jobs_count"
             :participants="participants"
-            :loading="loading.participants"
+            :loading="loading.initial"
+            :fetching-more="loading.participants"
+            @scroll-end="loadMore"
           />
         </v-card-text>
         <v-card-actions>
@@ -99,6 +101,7 @@ export default {
         manage: false
       },
       loading: {
+        initial: false,
         participants: false,
         stats: false,
         data: null
@@ -129,17 +132,18 @@ export default {
       // this.fetchStats()
     }
   },
-  mounted () {
-    this.fetchParticipants()
-    this.setPtcpListCtrHeight()
+  async mounted () {
+    this.loading.initial = true
+    await this.fetchParticipants()
+    this.loading.initial = false
   },
   methods: {
     ...mapActions('notifications', ['notify']),
     async fetchParticipants (options = {}) {
-      if (!this.study?.id) { return }
+      if (!this.study?.id || this.loading.participants) { return }
       this.loading.participants = true
       try {
-        this.pagination = await this.study.fetchParticipants(this.study.id, {
+        this.pagination = await this.study.fetchParticipants({
           params: {
             page: this.pagination.page,
             perPage: this.pagination.perPage
@@ -183,6 +187,16 @@ export default {
     },
     setPtcpListCtrHeight () {
       this.ptcpListCtrHeight = this.$refs.ptcpListContainer?.clientHeight || 0
+    },
+    loadMore () {
+      if (this.participants.length < this.pagination.total) {
+        this.fetchParticipants({
+          params: {
+            page: this.pagination.page + 1,
+            perPage: this.pagination.perPage
+          }
+        })
+      }
     }
   }
 }
