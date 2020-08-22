@@ -5,7 +5,7 @@
       :items="ptcps"
       :item-height="65"
       max-height="calc(100vh - 575px)"
-      class="v-list"
+      @scroll.native="scrolling"
     >
       <template v-slot="{ item }">
         <v-list-item
@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import { debounce } from 'lodash'
 export default {
   sync: ['selected'],
   props: {
@@ -53,12 +54,21 @@ export default {
       })
     }
   },
+  created () {
+    this.scrolling = debounce(this.scrolling, 200)
+  },
   methods: {
     selectionChange (id, checked) {
       if (checked) {
         this.selected.push(id)
       } else {
         this.selected.splice(this.selected.indexOf(id), 1)
+      }
+    },
+    scrolling (event) {
+      const element = event.currentTarget || event.target
+      if (element && element.scrollHeight - element.scrollTop === element.clientHeight) {
+        this.$emit('scroll-end')
       }
     }
   }

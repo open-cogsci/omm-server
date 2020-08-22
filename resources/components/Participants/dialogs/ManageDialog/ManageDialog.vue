@@ -81,6 +81,7 @@
                 label="Filter"
                 clearable
                 prepend-inner-icon="mdi-magnify"
+                @input="() => {pagination.page = 1; fetchParticipants()}"
               />
             </v-col>
             <v-col cols="4">
@@ -94,10 +95,12 @@
               />
             </v-col>
             <v-col cols="12">
+              <v-progress-linear v-if="fetchingMore" height="2" indeterminate />
               <participant-selector
                 v-if="value"
                 :participants="participants"
                 :selected.sync="selected"
+                @scroll-end="fetchMore"
               />
             </v-col>
           </v-row>
@@ -150,9 +153,14 @@ export default {
       allIDs: [],
       total: 0,
       loading: false,
+      fetchingMore: false,
       applying: false,
       statusFilter: 'all',
-      searchterm: null
+      searchterm: null,
+      pagination: {
+        page: 1,
+        perPage: 50
+      }
     }
   },
   computed: {
@@ -202,8 +210,24 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    fetchParticipants () {
-      return this.Participant.fetch({ params: { no_paginate: true, only_active: true } })
+    async fetchParticipants (options = {}) {
+      if (this.fetchingMore) { return }
+      this.fetchingMore = true
+      try {
+        this.pagination = await this.Participant.fetch({
+          params: {
+            page: this.pagination.page,
+            perPage: this.pagination.perPage,
+            only_active: true,
+            q: this.searchterm
+          },
+          ...options
+        })
+      } catch (e) {
+        processErrors(e, this.notify, true)
+      } finally {
+        this.fetchingMore = false
+      }
     },
     async fetchParticipantIDs () {
       if (!this.study) { return [] }
@@ -254,6 +278,16 @@ export default {
         processErrors(e, this.notify)
       } finally {
         this.applyng = false
+      }
+    },
+    fetchMore () {
+      if (this.participants.length < this.pagination.total) {
+        this.fetchParticipants({
+          params: {
+            page: this.pagination.page + 1,
+            perPage: this.pagination.perPage
+          }
+        })
       }
     }
   }
