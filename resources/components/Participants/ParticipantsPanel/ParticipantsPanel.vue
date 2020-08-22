@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row id="participants-panel" dense class="fill-height">
     <data-download-dialog
       v-model="dialog.download"
       :files="study.files"
@@ -21,20 +21,27 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="12" sm="6" md="12" lg="6" xl="5">
-      <v-card outlined>
+    <v-col
+      cols="12"
+      sm="6"
+      md="12"
+      lg="6"
+      xl="5"
+      class="pb-5"
+    >
+      <v-card outlined class="fill-height d-flex flex-column">
         <v-card-title>
           Participants
           <v-spacer />
           <span class="caption">% complete</span>
         </v-card-title>
-        <v-card-text class="px-0">
+        <v-card-text ref="ptcpListContainer" class="pa-0 fill-height">
           <study-participants-list
-            ref="ptcpList"
             :key="study.id"
             :total-jobs="study.jobs_count"
             :participants="participants"
             :loading="loading.participants"
+            :height="ptcpListCtrHeight()-25"
           />
         </v-card-text>
         <v-card-actions>
@@ -173,6 +180,9 @@ export default {
           perPage: this.pagination.perPage
         }
       })
+    },
+    ptcpListCtrHeight () {
+      return this.$refs.ptcpListContainer?.clientHeight || 0
     }
   }
 }

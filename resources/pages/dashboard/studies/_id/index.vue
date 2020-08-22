@@ -1,5 +1,7 @@
 <template>
-  <fragment>
+  <v-container
+    class="py-0 my-0 fill-height align-start"
+  >
     <upload-experiment-dialog
       v-model="uploading.experiment.dialog"
       :previous-file="osexpFile"
@@ -29,73 +31,75 @@
       @remove-user="removeCollaborator"
       @set-access-level="setAccessLevel"
     />
-    <v-container class="py-0 my-0">
-      <v-row dense>
-        <v-col cols="12">
-          <study-title
-            :study="study"
-            :saving="status.savingTitle"
-            :loading="status.loading"
-            :errors.sync="errors.title"
-            :editable="userCanEdit"
-            @editted="saveTitleInfo"
-          />
-        </v-col>
-      </v-row>
-
-      <template v-if="status.loading || study">
-        <v-row no-gutters>
-          <v-col cols="12" lg="8" xl="9" class="text-md-right">
-            <study-actions
-              v-if="userCanEdit"
-              :loading="status.loading"
+    <v-row class="fill-height">
+      <v-col cols="12" class="d-flex flex-column py-0">
+        <v-row dense>
+          <v-col cols="12">
+            <study-title
               :study="study"
-              :jobs="jobs"
-              :user-is-owner="userIsOwner"
-              @clicked-delete="deleteStudy"
-              @clicked-archive="archiveStudy"
-              @clicked-upload-exp="openUploadExpDialog"
-              @clicked-upload-jobs="openUploadJobsDialog"
-              @clicked-collaborators="collaborators.dialog = true"
+              :saving="status.savingTitle"
+              :loading="status.loading"
+              :errors.sync="errors.title"
+              :editable="userCanEdit"
+              @editted="saveTitleInfo"
             />
           </v-col>
-          <v-col cols="12" lg="4" xl="3" order-lg="first">
-            <v-tabs v-model="tab">
-              <v-tab>Jobs</v-tab>
-              <v-tab>Participants</v-tab>
-            </v-tabs>
-          </v-col>
         </v-row>
-        <v-row>
-          <v-col cols="12" class="pt-6 pb-0 mb-0">
-            <v-tabs-items v-model="tab">
-              <v-tab-item>
-                <jobs-table
-                  :editable="userCanEdit"
-                  :variables="variables"
-                  :jobs="jobs"
-                  :loading="status.loading"
-                  :refreshing="status.refreshingJobs"
-                  :total-records="pagination.total"
-                  :page="pagination.page"
-                  :per-page="pagination.perPage"
-                  @update:page="updatePage"
-                  @update:per-page="updatePerPage"
-                  @update:order="updateJobsOrder"
-                />
-              </v-tab-item>
-              <v-tab-item>
-                <participants-panel
-                  :visible="ptcpPanelVisible"
-                  :study="study"
-                />
-              </v-tab-item>
-            </v-tabs-items>
-          </v-col>
-        </v-row>
-      </template>
-    </v-container>
-  </fragment>
+
+        <template v-if="status.loading || study">
+          <v-row no-gutters>
+            <v-col cols="12" lg="8" xl="9" class="text-md-right">
+              <study-actions
+                v-if="userCanEdit"
+                :loading="status.loading"
+                :study="study"
+                :jobs="jobs"
+                :user-is-owner="userIsOwner"
+                @clicked-delete="deleteStudy"
+                @clicked-archive="archiveStudy"
+                @clicked-upload-exp="openUploadExpDialog"
+                @clicked-upload-jobs="openUploadJobsDialog"
+                @clicked-collaborators="collaborators.dialog = true"
+              />
+            </v-col>
+            <v-col cols="12" lg="4" xl="3" order-lg="first">
+              <v-tabs v-model="tab">
+                <v-tab>Jobs</v-tab>
+                <v-tab>Participants</v-tab>
+              </v-tabs>
+            </v-col>
+          </v-row>
+          <v-row class="fill-height">
+            <v-col cols="12" class="pt-6 pb-0 mb-0">
+              <v-tabs-items v-model="tab" class="fill-height">
+                <v-tab-item>
+                  <jobs-table
+                    :editable="userCanEdit"
+                    :variables="variables"
+                    :jobs="jobs"
+                    :loading="status.loading"
+                    :refreshing="status.refreshingJobs"
+                    :total-records="pagination.total"
+                    :page="pagination.page"
+                    :per-page="pagination.perPage"
+                    @update:page="updatePage"
+                    @update:per-page="updatePerPage"
+                    @update:order="updateJobsOrder"
+                  />
+                </v-tab-item>
+                <v-tab-item class="fill-height">
+                  <participants-panel
+                    :visible="ptcpPanelVisible"
+                    :study="study"
+                  />
+                </v-tab-item>
+              </v-tabs-items>
+            </v-col>
+          </v-row>
+        </template>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>

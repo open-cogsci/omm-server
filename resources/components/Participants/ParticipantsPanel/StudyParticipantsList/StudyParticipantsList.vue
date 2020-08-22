@@ -8,7 +8,8 @@
       ref="scroller"
       :items="participants"
       :item-height="65"
-      max-height="calc(100vh - 490px)"
+      :min-height="350"
+      :max-height="height"
     >
       <template v-slot="{ item }">
         <v-list-item>
@@ -43,6 +44,10 @@ export default {
       default: false
     },
     totalJobs: {
+      type: Number,
+      default: 0
+    },
+    height: {
       type: Number,
       default: 0
     }

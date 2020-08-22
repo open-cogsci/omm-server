@@ -17,7 +17,6 @@
             <v-checkbox
               :input-value="item.selected"
               color="primary"
-              @click="selectionChange(item.id, !item.selected )"
             />
           </v-list-item-action>
           <v-list-item-content>
