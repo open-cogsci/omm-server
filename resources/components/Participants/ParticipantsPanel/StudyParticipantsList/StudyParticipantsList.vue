@@ -86,7 +86,7 @@ export default {
       }
     },
     setHeight () {
-      this.maxHeight = this.$el.clientHeight - 30 || 400
+      this.maxHeight = this.$el.clientHeight - 40 || 400
     },
     scrolling (event) {
       const element = event.currentTarget || event.target
