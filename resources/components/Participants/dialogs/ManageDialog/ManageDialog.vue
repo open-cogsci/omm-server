@@ -160,7 +160,7 @@ export default {
       searchterm: null,
       pagination: {
         page: 1,
-        perPage: 10,
+        perPage: 50,
         lastPage: 10
       }
     }
