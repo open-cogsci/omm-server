@@ -14,31 +14,29 @@
       </v-card-text>
 
       <v-fade-transition absolute mode="out-in">
-        <v-card-text v-if="searchField" key="search">
-          <user-searcher
-            ref="userSearcher"
-            :items="searchResults"
-            :searching="searchingUsers"
-            :users="users"
-            :saving="saving"
-            @query="$emit('query', $event)"
-            @clicked-cancel="searchField = false"
-            @clicked-add="$emit('add-user', $event)"
-          />
-        </v-card-text>
-        <v-card-text
-          v-else-if="collaborators.length"
-          key="collabs"
-          style="max-height: calc(100vh-250px);"
-        >
-          <div class="body-2">
-            This experiment is currently shared with:
-          </div>
-          <v-expand-transition>
-            <v-slide-y-transition
-              group
-              tag="v-list"
-            >
+        <smooth-reflow class="px-2">
+          <v-card-text v-if="searchField" key="search">
+            <user-searcher
+              ref="userSearcher"
+              :items="searchResults"
+              :searching="searchingUsers"
+              :users="users"
+              :saving="saving"
+              @query="$emit('query', $event)"
+              @clicked-cancel="searchField = false"
+              @clicked-add="$emit('add-user', $event)"
+            />
+          </v-card-text>
+          <v-card-text
+            v-else-if="collaborators.length"
+            key="collabs"
+            style="max-height: calc(100vh-250px);"
+          >
+            <div class="body-2">
+              This experiment is currently shared with:
+            </div>
+
+            <v-list>
               <v-list-item v-for="user of collaborators" :key="user.id">
                 <v-list-item-content>
                   <v-row no-gutters align="center">
@@ -65,12 +63,12 @@
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
-            </v-slide-y-transition>
-          </v-expand-transition>
-        </v-card-text>
-        <v-card-text v-else key="no-collabs">
-          There are no collaborators for this experiment.
-        </v-card-text>
+            </v-list>
+          </v-card-text>
+          <v-card-text v-else key="no-collabs">
+            There are no collaborators for this experiment.
+          </v-card-text>
+        </smooth-reflow>
       </v-fade-transition>
 
       <v-card-actions>
@@ -99,10 +97,10 @@
 
 <script>
 export default {
-  sync: ['search-field'],
   components: {
     UserSearcher: () => import('@/components/Users/UserSearcher')
   },
+  sync: ['search-field'],
   props: {
     value: {
       type: Boolean,

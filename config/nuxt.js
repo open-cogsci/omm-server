@@ -39,7 +39,8 @@ module.exports = {
     '~/plugins/routersync',
     '~/plugins/mdifont',
     '~/plugins/vuex-orm-axios',
-    '~/plugins/profiling'
+    '~/plugins/profiling',
+    '~/plugins/smoothreflow'
   ],
   /*
   ** Nuxt.js dev-modules

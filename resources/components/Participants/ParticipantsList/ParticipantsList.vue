@@ -74,31 +74,29 @@
       <v-expansion-panel-content>
         <v-row>
           <v-col cols="12" md="6">
-            <v-card outlined>
+            <v-card outlined class="fill-height d-flex flex-column" height="400">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Properties
               </v-card-title>
-              <div class="mt-5">
-                <v-fade-transition mode="out-in">
-                  <participant-edit-data
-                    v-if="editing === ptcp.id"
-                    :participant="ptcp"
-                    :saving="saving"
-                    :errors="errors"
-                    @clicked-cancel="editing = null"
-                    @clicked-save="$emit('update-participant', $event)"
-                    @update:errors="$emit('update:errors', $event)"
-                  />
-                  <participant-view-data
-                    v-else
-                    :participant="ptcp"
-                    :deleting="deleting"
-                    style="width: 100%"
-                    @clicked-edit="(id) => editing = id"
-                    @clicked-delete="$emit('delete-participant', $event)"
-                  />
-                </v-fade-transition>
-              </div>
+              <v-fade-transition mode="out-in" class="mt-5">
+                <participant-edit-data
+                  v-if="editing === ptcp.id"
+                  :participant="ptcp"
+                  :saving="saving"
+                  :errors="errors"
+                  @clicked-cancel="editing = null"
+                  @clicked-save="$emit('update-participant', $event)"
+                  @update:errors="$emit('update:errors', $event)"
+                />
+                <participant-view-data
+                  v-else
+                  :participant="ptcp"
+                  :deleting="deleting"
+                  style="width: 100%"
+                  @clicked-edit="(id) => editing = id"
+                  @clicked-delete="$emit('delete-participant', $event)"
+                />
+              </v-fade-transition>
             </v-card>
           </v-col>
           <v-col cols="12" md="6">

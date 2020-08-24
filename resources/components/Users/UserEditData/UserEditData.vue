@@ -1,11 +1,11 @@
 <template>
-  <fragment>
+  <div class="fill-height d-flex flex-column">
     <unsaved-changes-dialog
       v-model="dialog"
       @clicked-yes="stopEdit"
       @clicked-no="dialog = false"
     />
-    <v-card-text>
+    <v-card-text class="fill-height">
       <v-form ref="form" v-model="validates" @submit.prevent="save">
         <v-text-field
           v-model="userData.name"
@@ -69,7 +69,7 @@
         @clicked-cancel="cancel"
       />
     </v-card-actions>
-  </fragment>
+  </div>
 </template>
 
 <script>

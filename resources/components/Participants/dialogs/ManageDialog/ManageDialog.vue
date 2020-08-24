@@ -96,7 +96,9 @@
               />
             </v-col>
             <v-col cols="12">
-              <v-progress-linear v-if="fetchingMore" height="2" indeterminate />
+              <div style="height: 2px">
+                <v-progress-linear v-show="fetchingMore" height="2" indeterminate />
+              </div>
               <participant-selector
                 v-if="value"
                 :participants="participants"
