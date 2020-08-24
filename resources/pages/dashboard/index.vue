@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  components: {},
+  name: 'DashboardIndex',
   head () {
     return {
       title: 'Dashboard'
