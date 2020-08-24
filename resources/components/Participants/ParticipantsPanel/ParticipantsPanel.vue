@@ -109,7 +109,7 @@ export default {
       pagination: {
         page: 1,
         lastPage: 1,
-        perPage: 20,
+        perPage: 50,
         total: 0
       },
       ptcpListCtrHeight: 0

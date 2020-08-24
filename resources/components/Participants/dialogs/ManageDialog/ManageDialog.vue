@@ -92,10 +92,13 @@
                 hide-details
                 label="Status"
                 :items="['all','assigned','not assigned']"
+                @input="() => {pagination.page = 1; fetchParticipants()}"
               />
             </v-col>
             <v-col cols="12">
-              <v-progress-linear v-if="fetchingMore" height="2" indeterminate />
+              <div style="height: 2px">
+                <v-progress-linear v-show="fetchingMore" height="2" indeterminate />
+              </div>
               <participant-selector
                 v-if="value"
                 :participants="participants"
@@ -159,7 +162,8 @@ export default {
       searchterm: null,
       pagination: {
         page: 1,
-        perPage: 50
+        perPage: 50,
+        lastPage: 10
       }
     }
   },
@@ -214,15 +218,19 @@ export default {
       if (this.fetchingMore) { return }
       this.fetchingMore = true
       try {
-        this.pagination = await this.Participant.fetch({
-          params: {
-            page: this.pagination.page,
-            perPage: this.pagination.perPage,
-            only_active: true,
-            q: this.searchterm
-          },
-          ...options
-        })
+        const params = {
+          page: this.pagination.page,
+          perPage: this.pagination.perPage,
+          only_active: true,
+          q: this.searchterm
+        }
+        if (this.statusFilter !== 'all') {
+          const filterParam = this.statusFilter === 'assigned'
+            ? 'assigned_to_study'
+            : 'not_assigned_to_study'
+          params[filterParam] = this.study.id
+        }
+        this.pagination = await this.Participant.fetch({ params, ...options })
       } catch (e) {
         processErrors(e, this.notify, true)
       } finally {
@@ -281,7 +289,7 @@ export default {
       }
     },
     fetchMore () {
-      if (this.participants.length < this.pagination.total) {
+      if (this.pagination.page < this.pagination.lastPage) {
         this.fetchParticipants({
           params: {
             page: this.pagination.page + 1,

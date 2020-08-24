@@ -65,6 +65,20 @@ class ParticipantController {
       query.where('active', 1)
     }
 
+    const assignedTo = request.input('assigned_to_study')
+    if (assignedTo) {
+      query.whereHas('studies', (q) => {
+        q.where('studies.id', assignedTo)
+      })
+    }
+
+    const notAssignedTo = request.input('not_assigned_to_study')
+    if (notAssignedTo) {
+      query.whereDoesntHave('studies', (q) => {
+        q.where('studies.id', notAssignedTo)
+      })
+    }
+
     const searchterm = request.input('q')
     if (searchterm && searchterm.length >= 2) {
       query.where(function () {

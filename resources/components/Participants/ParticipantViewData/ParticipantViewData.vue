@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-card-text>
+  <div class="fill-height d-flex flex-column">
+    <v-card-text class="fill-height">
       <v-row
         v-for="(value, field) in listable(participant)"
         :key="field"
