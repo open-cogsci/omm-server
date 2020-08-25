@@ -15,18 +15,18 @@
           style="min-height:126px"
         >
           <v-row align="center">
-            <v-col cols="12" sm="10">
-              File currently on server:<br>
+            <v-col cols="12" sm="9">
+              {{ $t('studies.dialogs.base_upload.current_file') }}:<br>
               <span class="body-1 primary--text">
                 <a :href="previousFile.path" target="_blank">{{ previousFile.filename }}</a>
               </span>
-              <span class="caption">(uploaded at {{ previousFile.created_at }})</span>
+              <span class="caption">({{ $t('studies.dialogs.base_upload.uploaded_at') }} {{ previousFile.created_at }})</span>
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-if="message" class="pt-5" :class="message.type" v-html="message.content" />
             </v-col>
-            <v-col cols="12" sm="2">
+            <v-col cols="12" sm="3" class="text-sm-right">
               <v-btn color="primary" @click="replaceFile = true">
-                Replace
+                {{ $t('buttons.replace') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -39,7 +39,7 @@
           <v-form>
             <v-file-input
               v-model="file"
-              label="File to Upload"
+              :label="$t('studies.dialogs.base_upload.file_to_upload')"
               show-size
               :accept="acceptedFileTypes"
               truncate-length="50"
@@ -53,14 +53,14 @@
               <slot name="status">
                 <div v-if="progress">
                   <v-alert v-if="progress === 100" type="success">
-                    Upload complete
+                    {{ $t('studies.dialogs.base_upload.upload_complete') }}
                   </v-alert>
                   <div v-else-if="progress >= 0 && progress < 100">
-                    Uploading file ({{ parseInt(progress) }}%):<br>
+                    {{ $t('studies.dialogs.base_upload.uploading_file') }} ({{ parseInt(progress) }}%):<br>
                     <v-progress-linear :value="progress" :color="progress === 100 ? 'success': 'primary'" />
                   </div>
                   <v-alert v-else-if="progress === -1" type="error">
-                    Error uploading file
+                    {{ $t('studies.dialogs.base_upload.error_uploading') }}
                   </v-alert>
                 </div>
               </slot>
@@ -75,12 +75,12 @@
           text
           @click="$emit('input', false)"
         >
-          Close
+          {{ $t('buttons.close') }}
         </v-btn>
         <save-cancel-buttons
           v-else
           save-icon="mdi-upload"
-          save-text="upload"
+          :save-text="$t('buttons.upload')"
           :save-disabled="!file"
           :saving="uploadStatus.inProgress"
           @clicked-save="$emit('upload', file)"

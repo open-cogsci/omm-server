@@ -32,7 +32,7 @@
             >
               <tr v-if="!(items.length || headers.length)" key="no-items" class="text-center">
                 <td>
-                  No jobs to show. Have you already uploaded a jobs file?
+                  {{ $t('studies.jobs_table.no_jobs') }}
                 </td>
               </tr>
               <tr

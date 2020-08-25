@@ -34,7 +34,7 @@
           <v-btn
             :disabled="!validates"
             :loading="saving"
-            class="success"
+            color="primary"
             @click="$emit('clicked-save', entries)"
             v-text="$t('password_reset.buttons.change')"
           />

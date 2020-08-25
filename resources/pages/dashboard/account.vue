@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="12">
           <h1 class="display-1 font-weight-light">
-            Your account
+            {{ $t('layout.appbar.account') }}
           </h1>
         </v-col>
       </v-row>
@@ -14,7 +14,7 @@
           <v-card>
             <v-card-title>
               <v-col cols="12">
-                Your details
+                {{ $t('account.details.title') }}
               </v-col>
             </v-card-title>
             <v-card-text>
@@ -26,7 +26,7 @@
                         v-model="user.name"
                         :rules="validation.name"
                         :error-messages="errors.name"
-                        label="Name"
+                        :label="$t('account.details.name')"
                         validate-on-blur
                         @input="errors.name = ''"
                       />
@@ -36,7 +36,7 @@
                         v-model="user.email"
                         :rules="validation.email"
                         :error-messages="errors.email"
-                        label="Email"
+                        :label="$t('account.details.email')"
                         validate-on-blur
                         @input="errors.email = ''"
                       >
@@ -49,8 +49,8 @@
                                 mdi-alert
                               </v-icon>
                             </template>
-                            This email address has not yet been verified.<br>
-                            Please do so using the link that has been sent to it.
+                            <!-- eslint-disable-next-line vue/no-v-html -->
+                            <span v-html="$t('account.details.unverified_email')" />
                           </v-tooltip>
                         </template>
                       </v-text-field>
@@ -63,15 +63,15 @@
                         :loading="resending"
                         @click="resendVerificationEmail"
                       >
-                        Resend verification email
+                        {{ $t('account.buttons.resend_verification_mail') }}
                       </v-btn>
                       <v-btn
                         :disabled="!detailsFormValid"
                         :loading="savingDetails"
-                        class="success"
+                        color="primary"
                         @click="saveDetails"
                       >
-                        Save
+                        {{ $t('buttons.save') }}
                       </v-btn>
                     </v-col>
                   </v-row>
@@ -85,7 +85,7 @@
           <v-card>
             <v-card-title>
               <v-col cols="12">
-                Change your password
+                {{ $t('account.change_password') }}
               </v-col>
             </v-card-title>
             <v-card-text>

@@ -17,7 +17,7 @@
         <v-row class="align-self-start">
           <v-col cols="12">
             <h1 class="display-1 font-weight-light">
-              Users
+              {{ $t('layout.nav.users') }}
             </h1>
           </v-col>
         </v-row>
@@ -27,7 +27,7 @@
               v-model="searchterm"
               solo
               prepend-inner-icon="mdi-magnify"
-              placeholder="Search users by name or email address"
+              :placeholder="$t('users.search')"
               hide-details
               clearable
               :loading="searching"

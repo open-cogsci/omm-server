@@ -1,27 +1,27 @@
 export default {
-  subheader: 'Hello! Please set your password below:',
+  subheader: 'Hallo! Stel je wachtwoord in:',
   fields: {
     old_password: {
-      label: 'Old password',
+      label: 'Je oude wachtwoord',
       validation: {
-        empty: 'Please provide your current password.'
+        empty: 'Voer je huidige wachtwoord in.'
       }
     },
     password: {
-      label: 'New password',
+      label: 'Je nieuwe wachtwoord',
       validation: {
-        empty: 'Please provide a new password.'
+        empty: 'Voer je nieuwe wachtwoord in.'
       }
     },
     password_confirmation: {
-      label: 'Repeat the password above',
+      label: 'Herhaal je nieuwe wachtwoord',
       validation: {
-        empty: 'Please confirm your password',
-        mismatch: 'Mismatch with password above.'
+        empty: 'Bevestig je wachtwoord',
+        mismatch: 'Wachtwoorden komen niet overeen'
       }
     }
   },
   buttons: {
-    change: 'Change password'
+    change: 'Wijzig wachtwoord'
   }
 }

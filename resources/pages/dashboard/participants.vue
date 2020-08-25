@@ -12,7 +12,7 @@
         <v-row>
           <v-col cols="12">
             <h1 class="text-h5 text-md-h4 font-weight-light">
-              Participants
+              {{ $t('layout.nav.participants') }}
             </h1>
           </v-col>
         </v-row>
@@ -22,7 +22,7 @@
               v-model="searchterm"
               solo
               prepend-inner-icon="mdi-magnify"
-              placeholder="Search participants by name or identifier"
+              :placeholder="$t('participants.search')"
               hide-details
               clearable
               :loading="searching"

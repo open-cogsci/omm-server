@@ -6,13 +6,14 @@
     @input="$emit('input', $event)"
   >
     <v-card>
-      <v-card-title>Add a new Participant</v-card-title>
+      <v-card-title>{{ $t('participants.dialogs.new.title') }}</v-card-title>
       <v-card-text class="body-1 font-weight-light">
-        Please enter the information below
+        {{ $t('participants.dialogs.new.subtitle') }}
       </v-card-text>
       <v-fade-transition mode="out-in">
         <participant-edit-data
           ref="form"
+          class="px-2"
           :saving="saving"
           :errors="errors"
           @clicked-cancel="$emit('input', false)"

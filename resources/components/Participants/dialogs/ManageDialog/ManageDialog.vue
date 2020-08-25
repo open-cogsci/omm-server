@@ -14,9 +14,9 @@
       any results will be erased. Are you sure you want to continue?
     </confirmation-dialog>
     <v-card>
-      <v-card-title>Manage participants</v-card-title>
+      <v-card-title>{{ $t('study_participants.dialogs.manage.title') }}</v-card-title>
       <v-card-text class="body-1 font-weight-light">
-        Assign participants to this study by choosing one of the following options:
+        {{ $t('study_participants.dialogs.manage.subtitle') }}:
       </v-card-text>
       <v-card-text>
         <v-skeleton-loader
@@ -27,14 +27,14 @@
             <v-col cols="12">
               <v-btn :disabled="allSelected" @click="assignAll">
                 <span v-if="!selected.length">
-                  Assign all participants
+                  {{ $t('study_participants.dialogs.manage.buttons.assign_all') }}
                 </span>
                 <span v-else>
-                  Assign remaining participants
+                  {{ $t('study_participants.dialogs.manage.buttons.assign_remaining') }}
                 </span>
               </v-btn>
               <span v-if="allSelected" class="ml-3 info--text">
-                No more participants available
+                {{ $t('study_participants.dialogs.manage.no_available_ptcps') }}
               </span>
             </v-col>
           </v-row>
@@ -42,7 +42,7 @@
             <v-form v-show="!selected.length" v-model="randomValid">
               <v-row align="start" dense>
                 <v-col cols="12" class="text-body-2">
-                  Or randomly assign the following number of participants:
+                  {{ $t('study_participants.dialogs.manage.assign_random') }}
                 </v-col>
                 <v-col cols="6" sm="3" lg="2">
                   <v-text-field
@@ -53,14 +53,14 @@
                     solo
                     min="1"
                     :max="participants.length || 1"
-                    :rules="[v => v >= 1 || 'Please provide']"
+                    :rules="[v => v >= 1 || $t('study_participants.dialogs.manage.provide') ]"
                     single-line
                     type="number"
                   />
                 </v-col>
                 <v-col>
                   <v-btn :disabled="!randomValid || allSelected" @click="assignRandom">
-                    Assign
+                    {{ $t('study_participants.dialogs.manage.buttons.assign') }}
                   </v-btn>
                 </v-col>
               </v-row>
@@ -68,7 +68,7 @@
           </v-expand-transition>
           <v-row>
             <v-col cols="12" class="text-body-2">
-              Or manually select the participants:
+              {{ $t('study_participants.dialogs.manage.manually_select') }}:
             </v-col>
           </v-row>
           <v-row dense>
@@ -78,7 +78,7 @@
                 dense
                 outlined
                 hide-details
-                label="Filter"
+                :label="$t('study_participants.dialogs.manage.filter.label')"
                 clearable
                 prepend-inner-icon="mdi-magnify"
                 @input="() => {pagination.page = 1; fetchParticipants()}"
@@ -90,8 +90,8 @@
                 dense
                 outlined
                 hide-details
-                label="Status"
-                :items="['all','assigned','not assigned']"
+                :label="$t('study_participants.dialogs.manage.filter.status')"
+                :items="filterItems"
                 @input="() => {pagination.page = 1; fetchParticipants()}"
               />
             </v-col>
@@ -112,13 +112,13 @@
       <v-card-actions>
         <v-spacer />
         <v-btn text @click="$emit('input', false)">
-          Close
+          {{ $t('buttons.close') }}
         </v-btn>
         <v-btn text color="success" :loading="applying" @click="checkBeforeApplying">
           <v-icon left>
             mdi-check
           </v-icon>
-          Apply
+          {{ $t('buttons.apply') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -187,6 +187,22 @@ export default {
     },
     allSelected () {
       return this.selected.length >= this.total
+    },
+    filterItems () {
+      return [
+        {
+          value: 'all',
+          text: this.$t('study_participants.dialogs.manage.filter.all')
+        },
+        {
+          value: 'assigned',
+          text: this.$t('study_participants.dialogs.manage.filter.assigned')
+        },
+        {
+          value: 'not assigned',
+          text: this.$t('study_participants.dialogs.manage.filter.not_assigned')
+        }
+      ]
     }
   },
   watch: {

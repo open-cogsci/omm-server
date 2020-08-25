@@ -2,9 +2,8 @@
   <base-upload-dialog
     max-width="750px"
     persistent
-    title="Upload experiment file"
-    subtitle="You can upload an OpenSesame osexp file using the box below. If you upload a file while one
-        is already present on the server, the previous file will be overwritten."
+    :title="$t('studies.dialogs.upload_experiment.title')"
+    :subtitle="$t('studies.dialogs.upload_experiment.subtitle')"
     accepted-file-types=".osexp"
     v-bind="$props"
     v-on="$listeners"

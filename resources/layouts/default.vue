@@ -56,8 +56,9 @@
           </v-list-item>
         </template>
       </v-list>
-      <v-divider />
-      <language-switcher />
+      <template v-slot:append>
+        <language-switcher />
+      </template>
     </v-navigation-drawer>
     <v-app-bar
       :clipped-left="clipped"
@@ -161,9 +162,14 @@ export default {
       title: 'OpenMonkeyMind'
     }
   },
+  watch: {
+    '$i18n.locale' (newLocale) {
+      this.$vuetify.lang.current = newLocale
+    }
+  },
   async created () {
     // Perform some bootstrapping. These requests are made only once when the app is loaded.
-
+    this.$vuetify.lang.current = this.$i18n.locale
     // Get possible user types
     try {
       await UserType.fetch()

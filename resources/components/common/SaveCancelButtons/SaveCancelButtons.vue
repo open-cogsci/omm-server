@@ -7,7 +7,7 @@
     >
       <v-icon left>
         mdi-cancel
-      </v-icon> Cancel
+      </v-icon> {{ $t('buttons.cancel') }}
     </v-btn>
     <v-btn
       v-if="!saveHidden"
@@ -18,7 +18,7 @@
       @click="$emit('clicked-save')"
     >
       <v-icon left v-text="saveIcon" />
-      {{ saveText }}
+      {{ saveTextFallback }}
     </v-btn>
   </fragment>
 </template>
@@ -40,7 +40,7 @@ export default {
     },
     saveText: {
       type: String,
-      default: 'Save'
+      default: ''
     },
     saveIcon: {
       type: String,
@@ -49,6 +49,11 @@ export default {
     cancelDisabled: {
       type: Boolean,
       default: false
+    }
+  },
+  computed: {
+    saveTextFallback () {
+      return this.saveText || this.$t('buttons.save')
     }
   }
 }

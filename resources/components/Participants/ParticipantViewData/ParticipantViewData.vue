@@ -8,10 +8,10 @@
         class="body-1"
       >
         <v-col cols="6" md="4" class="font-weight-medium">
-          {{ field | label }}:
+          {{ label(field) }}:
         </v-col>
         <v-col cols="6" md="8">
-          {{ value | convertBools }}
+          {{ convertBools(value) }}
         </v-col>
       </v-row>
     </v-card-text>
@@ -30,12 +30,13 @@
             >
               <v-icon left>
                 mdi-delete
-              </v-icon> Delete<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;participant</span>
+              </v-icon>
+              <span v-text="$t('participants.buttons.delete')" />
             </v-btn>
           </div>
         </template>
-        <span>A participant can no longer be deleted when it is associated with a study.<br>
-          Deactivate the participant instead.</span>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <span v-html="$t('participants.tooltips.delete')" />
       </v-tooltip>
       <v-btn
         v-else
@@ -45,29 +46,24 @@
       >
         <v-icon left>
           mdi-delete
-        </v-icon> Delete<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;participant</span>
+        </v-icon>
+        <span v-text="$t('participants.buttons.delete')" />
       </v-btn>
 
       <v-btn text color="primary" @click="$emit('clicked-edit', participant.id)">
         <v-icon left>
           mdi-pencil
-        </v-icon> Edit<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;properties</span>
+        </v-icon>
+        <span v-text="$t('participants.buttons.edit')" />
       </v-btn>
     </v-card-actions>
   </div>
 </template>
 
 <script>
-import { upperFirst, lowerCase, pick } from 'lodash'
+import { pick } from 'lodash'
 
 export default {
-  filters: {
-    label: val => upperFirst(lowerCase(val)),
-    convertBools: (val) => {
-      if (typeof val !== 'boolean') { return val }
-      return val ? 'Yes' : 'No'
-    }
-  },
   props: {
     participant: {
       type: Object,
@@ -75,7 +71,16 @@ export default {
     }
   },
   methods: {
-    listable: ptcp => pick(ptcp, ['name', 'identifier', 'active', 'created_at', 'updated_at'])
+    listable: ptcp => pick(ptcp, ['name', 'identifier', 'active', 'created_at', 'updated_at']),
+    label (val) {
+      return this.$t(`participants.${val}`)
+    },
+    convertBools (val) {
+      if (typeof val !== 'boolean') { return val }
+      return val
+        ? this.$t('common.yes')
+        : this.$t('common.no')
+    }
   }
 }
 </script>

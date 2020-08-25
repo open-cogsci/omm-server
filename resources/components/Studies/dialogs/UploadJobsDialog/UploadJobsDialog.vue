@@ -2,8 +2,8 @@
   <base-upload-dialog
     max-width="750px"
     persistent
-    title="Upload jobs"
-    subtitle="Supply your jobs in a tabular format (e.g excel or csv)"
+    :title="$t('studies.dialogs.upload_jobs.title')"
+    :subtitle="$t('studies.dialogs.upload_jobs.subtitle')"
     accepted-file-types=".csv,.xls,.xlsx"
     :message="warning"
     v-bind="$props"
