@@ -69,7 +69,7 @@
       <v-expansion-panel-content>
         <v-row>
           <v-col cols="12" md="6">
-            <v-card outlined class="fill-height d-flex flex-column" height="450">
+            <v-card outlined class="d-flex flex-column" height="400">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Properties
               </v-card-title>
@@ -98,7 +98,7 @@
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
-            <v-card outlined class="fill-height">
+            <v-card outlined>
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 Studies
               </v-card-title>
@@ -115,7 +115,7 @@
                     v-if="user.studies.length"
                     :items="user.studies"
                     :item-height="65"
-                    height="392"
+                    height="340"
                   >
                     <template v-slot="{ item }">
                       <v-list-item>

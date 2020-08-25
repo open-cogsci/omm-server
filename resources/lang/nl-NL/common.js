@@ -7,5 +7,6 @@ export default {
     }
   },
   yes: 'Ja',
-  no: 'Nee'
+  no: 'Nee',
+  never: 'nooit'
 }
