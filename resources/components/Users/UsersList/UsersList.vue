@@ -30,7 +30,7 @@
                   {{ user.email }}
                 </v-col>
                 <v-col cols="3">
-                  {{ user.user_type.name }}
+                  {{ $t(`users.types.${user.user_type.name}`) }}
                 </v-col>
                 <v-col cols="2">
                   <v-tooltip left>
@@ -43,23 +43,18 @@
                         mdi-flask
                       </v-icon>
                     </template>
-                    Studies
+                    {{ $t('layout.nav.studies') }}
                   </v-tooltip>{{ user.studies_count }}
                 </v-col>
                 <v-col cols="2" class="text-center">
-                  <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span
-                        class="font-weight-light"
-                        :class="statusColor(user.account_status)"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        {{ user.account_status }}
-                      </span>
-                    </template>
-                    Status
-                  </v-tooltip>
+                  <span
+                    class="font-weight-light"
+                    :class="statusColor(user.account_status)"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    {{ $t(`users.status.${user.account_status}`) }}
+                  </span>
                 </v-col>
               </v-row>
             </v-fade-transition>
@@ -71,7 +66,7 @@
           <v-col cols="12" md="6">
             <v-card outlined class="fill-height d-flex flex-column" height="450">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Properties
+                {{ $t('common.properties') }}
               </v-card-title>
 
               <v-fade-transition mode="out-in" class="mt-5">
@@ -100,7 +95,7 @@
           <v-col cols="12" md="6">
             <v-card outlined class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Studies
+                {{ $t('layout.nav.studies') }}
               </v-card-title>
               <v-card-text class="pa-0">
                 <v-skeleton-loader
@@ -119,7 +114,7 @@
                   >
                     <template v-slot="{ item }">
                       <v-list-item>
-                        <v-list-item-content class="px-3">
+                        <v-list-item-content>
                           <v-list-item-title v-text="item.name" />
                           <v-list-item-subtitle v-text="item.description" />
                         </v-list-item-content>
@@ -134,6 +129,14 @@
                       <v-divider :key="`divider-${item.id}`" />
                     </template>
                   </v-virtual-scroll>
+
+                  <v-list-item v-else>
+                    <v-list-item-content>
+                      <v-list-item-title class="font-weight-light text-center">
+                        {{ $t(`users.no_studies`) }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>

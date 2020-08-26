@@ -7,5 +7,6 @@ export default {
     }
   },
   yes: 'Yes',
-  no: 'No'
+  no: 'No',
+  properties: 'Properties'
 }
