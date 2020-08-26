@@ -1111,5 +1111,32 @@ class StudyController {
       .delete()
     return response.noContent()
   }
+
+  /**
+   * Provides stats about the current status of the study
+   *
+   * @param {Object} { params, auth }
+   * @return {Object} JSON data with stats
+   * @memberof StudyController
+   */
+  async participationStats ({ params, auth }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('id', id)
+      .withCount('participants')
+      .withCount('participants as finished_participants', (query) => {
+        query.wherePivot('status_id', 3)
+      })
+      .firstOrFail()
+
+    const data = {
+      progress: {
+        finished: study.$sideLoaded.finished_participants,
+        total: study.$sideLoaded.participants_count
+      }
+    }
+    return { data }
+  }
 }
 module.exports = StudyController

@@ -287,4 +287,16 @@ export default class Study extends Model {
     }
     return response
   }
+
+  /**
+   * Gets participation stats for this study
+   *
+   * @param {*} config
+   * @returns
+   * @memberof Study
+   */
+  async fetchParticipationStats (config) {
+    const reply = await this.constructor.api().get(`${this.id}/stats`, config)
+    return reply.response.data.data
+  }
 }

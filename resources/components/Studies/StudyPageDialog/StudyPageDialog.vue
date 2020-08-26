@@ -13,7 +13,7 @@
         </v-btn>
         <v-toolbar-title>Study</v-toolbar-title>
       </v-toolbar>
-      <v-card-text>
+      <v-card-text class="px-0">
         <slot />
       </v-card-text>
     </v-card>

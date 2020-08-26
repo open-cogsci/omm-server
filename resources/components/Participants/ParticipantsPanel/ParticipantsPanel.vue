@@ -1,5 +1,5 @@
 <template>
-  <v-row id="participants-panel" dense class="fill-height">
+  <v-row id="participants-panel" class="fill-height">
     <data-download-dialog
       v-model="dialog.download"
       :files="study.files"
@@ -11,20 +11,23 @@
       :study="study"
       @new-assignments="refreshParticipants"
     />
-    <v-col cols="12" sm="6" md="12" lg="6" xl="7">
-      <v-card outlined>
+    <v-col
+      cols="12"
+      lg="6"
+      xl="7"
+      class="pb-5"
+    >
+      <v-card outlined class="fill-height d-flex flex-column">
         <v-card-title>
           {{ $t('study_participants.stats.title') }}
         </v-card-title>
         <v-card-text>
-          <participation-stats />
+          <participation-stats :data="stats" />
         </v-card-text>
       </v-card>
     </v-col>
     <v-col
       cols="12"
-      sm="6"
-      md="12"
       lg="6"
       xl="5"
       class="pb-5"
@@ -114,7 +117,8 @@ export default {
         perPage: 50,
         total: 0
       },
-      ptcpListCtrHeight: 0
+      ptcpListCtrHeight: 0,
+      stats: {}
     }
   },
   computed: {
@@ -131,12 +135,13 @@ export default {
         return
       }
       this.fetchParticipants()
-      // this.fetchStats()
+      this.fetchStats()
     }
   },
   async mounted () {
     this.loading.initial = true
     await this.fetchParticipants()
+    await this.fetchStats()
     this.loading.initial = false
   },
   methods: {
@@ -162,7 +167,7 @@ export default {
       if (!this.study?.id) { return }
       this.loading.stats = true
       try {
-        await this.study.fetchParticipationStats()
+        this.stats = await this.study.fetchParticipationStats()
       } catch (e) {
         processErrors(e, this.notify)
       } finally {

@@ -41,5 +41,6 @@ export default {
 <style lang="scss">
   .limit-height {
     height: calc(100% + 24px);
+    overflow: auto;
   }
 </style>

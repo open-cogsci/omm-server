@@ -732,7 +732,9 @@ class ParticipantController {
       .firstOrFail()
 
     let data = request.input('data')
-    const previousData = ptcp.getRelated('jobs').first()?.getRelated('pivot').data
+    const job = ptcp.getRelated('jobs').first()
+    const study = await job.study().first()
+    const previousData = job.getRelated('pivot')?.data
     // Check if data has already been stored
     if (previousData) {
       if (isObject(data)) {
@@ -755,13 +757,11 @@ class ParticipantController {
       return response.unprocessableEntity({ message: 'Data cannot be converted to JSON' })
     }
 
-    try {
-      await ptcp.jobs().pivotQuery()
-        .where('job_id', jobID)
-        .update({ data, status_id: 3 })
-    } catch (e) {
-      return response.badRequest({ message: 'Unable to persist data' })
-    }
+    await ptcp.jobs().pivotQuery()
+      .where('job_id', jobID)
+      .update({ data, status_id: 3 })
+    await study.checkIfFinished(ptcp.id)
+
     return response.noContent()
   }
 }

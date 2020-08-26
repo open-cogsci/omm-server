@@ -1,7 +1,5 @@
 <template>
-  <v-container
-    class="py-0 my-0 fill-height align-start"
-  >
+  <v-container class="py-0 my-0 fill-height align-start">
     <upload-experiment-dialog
       v-model="uploading.experiment.dialog"
       :previous-file="osexpFile"
@@ -31,7 +29,7 @@
       @remove-user="removeCollaborator"
       @set-access-level="setAccessLevel"
     />
-    <v-row class="fill-height">
+    <v-row class="fill-height" no-gutters>
       <v-col cols="12" class="d-flex flex-column py-0">
         <v-row dense>
           <v-col cols="12">

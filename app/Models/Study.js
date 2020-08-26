@@ -4,6 +4,7 @@
 const fs = require('fs').promises
 const { isArray } = require('lodash')
 const { formatISO9075 } = require('date-fns')
+const { isNumber } = require('lodash')
 
 const Model = use('Model')
 const Database = use('Database')
@@ -172,11 +173,10 @@ class Study extends Model {
    * @memberof Study
    */
   async isOwnedBy (user) {
-    const results = await this.users()
+    return !!await this.users()
       .where('id', user.id)
       .where('study_users.is_owner', true) // Either the user is the owner of the study
-      .count('* as total')
-    return !!results[0].total
+      .getCount()
   }
 
   /**
@@ -312,6 +312,47 @@ class Study extends Model {
       .groupBy('status')
       .groupBy('timestamp')
       .groupBy('participants.identifier')
+  }
+
+  /**
+   * Checks if a study is finished. If ptcpID is supplied, it will check if that
+   * particular participant has done all jobs for the study. If this parameter is ommitted
+   * it will check if there are open jobs for any participant.
+   *
+   * @param {Number} [ptcpID=null]
+   * @param {boolean} [updateStatus=true]
+   * @return {Boolean} Whether the study is finished or not
+   * @memberof Study
+   */
+  async checkIfFinished (ptcpID = null, updateStatus = true) {
+    if (ptcpID && !isNumber(ptcpID)) {
+      throw new Error('Participant ID should be null or number')
+    }
+    const query = this.participants()
+    if (ptcpID) {
+      query.where('participants.id', ptcpID)
+    }
+    query.whereHas('jobs', (q) => {
+      q.whereInPivot('status_id', [1, 2])
+    })
+
+    const finished = !await query.getCount()
+
+    // If the study is finished, update the participant's status
+    if (ptcpID && updateStatus) {
+      let statusID
+
+      if (finished) {
+        statusID = 3
+      } else {
+        statusID = 2
+      }
+      await this.participants()
+        .pivotQuery()
+        .where('participant_id', ptcpID)
+        .update({ status_id: statusID })
+    }
+    return finished
   }
 
   /* Private functions */
