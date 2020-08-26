@@ -2,7 +2,7 @@ import { Model } from '@vuex-orm/core'
 import UserType from './UserType'
 import Study from './Study'
 import StudyUser from './StudyUser'
-import { USERS, API_PREFIX } from '@/assets/js/endpoints'
+import { USERS, SET_LOCALE, RESEND_VERIFICATION } from '@/assets/js/endpoints'
 
 export default class User extends Model {
   static entity = 'users'
@@ -57,6 +57,14 @@ export default class User extends Model {
     return results.response.data?.data || []
   }
 
+  static setLocale (locale, config) {
+    return this.api().patch(SET_LOCALE, { locale }, {
+      ...config,
+      save: false,
+      baseURL: null
+    })
+  }
+
   resendAccountEmail (config) {
     return this.constructor.api().post('/resend_account_email', { id: this.id }, {
       save: false,
@@ -65,10 +73,10 @@ export default class User extends Model {
   }
 
   resendActivationEmail (config) {
-    return this.constructor.api().post('/auth/email/resend', { id: this.id }, {
+    return this.constructor.api().post(RESEND_VERIFICATION, { id: this.id }, {
+      ...config,
       save: false,
-      baseURL: API_PREFIX,
-      ...config
+      baseURL: null
     })
   }
 

@@ -12,6 +12,7 @@ class UserSchema extends Schema {
       table.string('email', 255).notNullable().unique()
       table.string('password', 60).notNullable()
       table.string('account_status').notNullable().default('pending')
+      table.string('locale', 2).notNullable().default('en')
       table.datetime('last_login')
       table.timestamps()
 

@@ -2,21 +2,21 @@ export default {
   signin: 'Log alstublieft in',
   fields: {
     email: {
-      label: 'E-mail address',
+      label: 'E-mailadres',
       validation: {
-        empty: 'Please provide your email address.',
-        invalid: 'This e-mail address is invalid.'
+        empty: 'Vul uw emailadres in.',
+        invalid: 'Dit emailadres is ongeldig.'
       }
     },
     password: {
-      label: 'Password',
+      label: 'Wachtwoord',
       validation: {
-        empty: 'Please provide a password.'
+        empty: 'Vul een wachtwoord in.'
       }
     }
   },
   buttons: {
-    recover: 'Recover password',
-    signin: 'Sign in'
+    recover: 'Herstel wachtwoord',
+    signin: 'Inloggen'
   }
 }

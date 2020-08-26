@@ -13,3 +13,4 @@ export const UPDATE_ACCOUNT = `${API_PREFIX}/auth/user`
 export const UPDATE_PASSWORD = `${API_PREFIX}/auth/password`
 export const VERIFY_EMAIL = `${API_PREFIX}/auth/email/verify`
 export const RESEND_VERIFICATION = `${API_PREFIX}/auth/email/resend`
+export const SET_LOCALE = `${API_PREFIX}/auth/user/locale`

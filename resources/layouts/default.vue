@@ -57,7 +57,7 @@
         </template>
       </v-list>
       <template v-slot:append>
-        <language-switcher />
+        <language-switcher @switched-locale="saveLocaleForUser" />
       </template>
     </v-navigation-drawer>
     <v-app-bar
@@ -162,6 +162,17 @@ export default {
       title: 'OpenMonkeyMind'
     }
   },
+  computed: {
+    User () {
+      return this.$store.$db().model('users')
+    },
+    UserType () {
+      return this.$store.$db().model('user_types')
+    },
+    currentUser () {
+      return this.User.find(this.$auth.user.id)
+    }
+  },
   watch: {
     '$i18n.locale' (newLocale) {
       this.$vuetify.lang.current = newLocale
@@ -174,6 +185,7 @@ export default {
     try {
       await UserType.fetch()
       User.insertOrUpdate({ data: this.$auth.user })
+      this.updateLocale()
     } catch (e) {
       processErrors(e, this.notify)
     }
@@ -185,6 +197,18 @@ export default {
         await this.$auth.logout()
       } catch (e) {
         this.error = e + ''
+      }
+    },
+    async saveLocaleForUser (locale) {
+      try {
+        await this.User.setLocale(locale)
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
+    },
+    updateLocale () {
+      if (this.$auth.user.locale !== this.$i18n?.locale) {
+        this.$router.replace(this.switchLocalePath(this.$auth.user.locale))
       }
     }
   },

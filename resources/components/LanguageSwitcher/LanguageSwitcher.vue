@@ -54,6 +54,7 @@ export default {
       },
       set (val) {
         this.$router.push(this.switchLocalePath(val))
+        this.$emit('switched-locale', val)
       }
 
     }

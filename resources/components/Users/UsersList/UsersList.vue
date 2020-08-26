@@ -50,8 +50,6 @@
                   <span
                     class="font-weight-light"
                     :class="statusColor(user.account_status)"
-                    v-bind="attrs"
-                    v-on="on"
                   >
                     {{ $t(`users.status.${user.account_status}`) }}
                   </span>

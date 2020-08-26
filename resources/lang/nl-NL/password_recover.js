@@ -1,19 +1,19 @@
 export default {
-  subheader: 'Send a password reset link to the provided e-mail address.',
+  subheader: 'Stuur een resetlink naar het onderstaande emailadres.',
   fields: {
     email: {
-      label: 'Email address',
+      label: 'Emailadres',
       validation: {
-        empty: 'Please provide your email address.',
-        invalid: 'This e-mail address is invalid.'
+        empty: 'Vul uw emailadres in.',
+        invalid: 'Dit emailadres is ongeldig.'
       }
     }
   },
   buttons: {
-    signin: 'Sign in',
-    email: 'Send email'
+    signin: 'Inloggen',
+    email: 'Verstuur email'
   },
   messages: {
-    received: 'Check your email for a reset link.'
+    received: 'Controleer je email voor de resetlink.'
   }
 }

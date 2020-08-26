@@ -214,7 +214,9 @@ class UserController {
    */
   async update ({ params, request, response, auth, transform }) {
     const user = await User.findOrFail(params.id)
-    const data = request.only(['name', 'email', 'account_status', 'user_type_id', 'password'])
+    const data = request.only(
+      ['name', 'email', 'account_status', 'user_type_id', 'password']
+    )
     if (isEmpty(data.password)) {
       delete data.password
     }
@@ -241,6 +243,17 @@ class UserController {
       })
     }
     return transform.item(user, 'UserTransformer')
+  }
+
+  async setLocale ({ request, response, auth }) {
+    const locale = request.input('locale')
+    const allowedLocales = ['en', 'nl', 'fr']
+    if (!allowedLocales.includes(locale)) {
+      response.badRequest({ message: `Unknown locale '${locale}'. Allowed values are ${allowedLocales}` })
+    }
+    auth.user.locale = locale
+    await auth.user.save()
+    return response.noContent()
   }
 
   /**

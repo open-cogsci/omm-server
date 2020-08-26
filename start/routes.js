@@ -28,6 +28,7 @@ Route.group(() => {
 
   Route.get('/auth/user', 'UserController.me').as('users.me')
   Route.put('/auth/user', 'UserController.updateMe').as('users.update_me').validator('SaveUser')
+  Route.patch('/auth/user/locale', 'UserController.setLocale').as('users.set_locale')
   Route.put('/auth/password', 'UserController.changePassword').as('users.password')
   Route.post('/auth/logout', 'UserController.logout').as('logout')
   Route.post('/auth/email/resend', 'UserController.resendVerificationEmail').as('users.resend_verification_email')
