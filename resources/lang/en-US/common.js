@@ -8,5 +8,6 @@ export default {
   },
   yes: 'Yes',
   no: 'No',
-  never: 'never'
+  never: 'never',
+  properties: 'Properties'
 }
