@@ -3,16 +3,11 @@ export default {
   identifier: 'Identifier',
   participations: 'Participations',
   status: 'Status',
-  properties: 'Properties',
   name: 'Name',
   active: 'Active',
   inactive: 'Inactive',
   created_at: 'Created at',
   updated_at: 'Updated at',
-  buttons: {
-    edit: 'Edit',
-    delete: 'Delete'
-  },
   tooltips: {
     delete: `A participant can no longer be deleted when it is associated with a study.<br>
              Deactivate the participant instead.`

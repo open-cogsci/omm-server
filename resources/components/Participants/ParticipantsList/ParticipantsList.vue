@@ -60,9 +60,9 @@
                         v-bind="attrs"
                         v-on="on"
                       >
-                        {{ ptcp.active
+                        {{ (ptcp.active
                           ? $t('participants.active')
-                          : $t('participants.inactive') }}
+                          : $t('participants.inactive')) | lowercase }}
                       </span>
                     </template>
                     {{ $t('participants.status') }}
@@ -78,7 +78,7 @@
           <v-col cols="12" md="6">
             <v-card outlined class="fill-height d-flex flex-column" height="400">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                {{ $t('participants.properties') }}
+                {{ $t('common.properties') }}
               </v-card-title>
               <v-fade-transition mode="out-in" class="mt-5">
                 <participant-edit-data
@@ -116,10 +116,15 @@
 </template>
 
 <script>
+import { lowerCase } from 'lodash'
+
 export default {
   components: {
     ParticipantViewData: () => import('@/components/Participants/ParticipantViewData'),
     ParticipantEditData: () => import('@/components/Participants/ParticipantEditData')
+  },
+  filters: {
+    lowercase: val => lowerCase(val)
   },
   props: {
     participants: {

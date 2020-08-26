@@ -30,12 +30,12 @@
             >
               <v-icon left>
                 mdi-delete
-              </v-icon> Delete<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;user</span>
+              </v-icon>{{ $t('common.delete') }}
             </v-btn>
           </div>
         </template>
-        <span>A user can no longer be deleted when it is associated with a study.<br>
-          Deactivate the user instead.</span>
+        <!--  eslint-disable-next-line vue/no-v-html -->
+        <span v-html="$t('users.prevent_delete')" />
       </v-tooltip>
       <v-btn
         v-else
@@ -45,13 +45,13 @@
       >
         <v-icon left>
           mdi-delete
-        </v-icon> Delete<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;user</span>
+        </v-icon>{{ $t('common.delete') }}
       </v-btn>
 
       <v-btn text color="primary" @click="$emit('clicked-edit', user.id)">
         <v-icon left>
           mdi-pencil
-        </v-icon> Edit<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;properties</span>
+        </v-icon>{{ $t('common.edit') }}
       </v-btn>
     </v-card-actions>
   </div>
@@ -80,6 +80,9 @@ export default {
       }
       if (isObject(val)) {
         return val.name
+      }
+      if (field === 'account_status') {
+        return this.$t(`users.status.${val}`)
       }
       if (field === 'last_login') {
         if (!val) { return this.$t('common.never') }

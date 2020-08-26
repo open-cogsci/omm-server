@@ -3,16 +3,11 @@ export default {
   identifier: 'Identifier',
   participations: 'Deelnames',
   status: 'Status',
-  properties: 'Eigenschappen',
   name: 'Naam',
   active: 'Actief',
   inactive: 'Inactief',
   created_at: 'Aangemaakt op',
   updated_at: 'Gewijzigd op',
-  buttons: {
-    edit: 'Wijzig',
-    delete: 'Verwijder'
-  },
   tooltips: {
     delete: `Een participant kan niet langer verwijderd worden wanneer deze met een studie is geassocieerd.<br>
              Deactiveer de participant in plaats hiervan.`

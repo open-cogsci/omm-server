@@ -31,7 +31,7 @@
               <v-icon left>
                 mdi-delete
               </v-icon>
-              <span v-text="$t('participants.buttons.delete')" />
+              <span v-text="$t('common.delete')" />
             </v-btn>
           </div>
         </template>
@@ -47,14 +47,14 @@
         <v-icon left>
           mdi-delete
         </v-icon>
-        <span v-text="$t('participants.buttons.delete')" />
+        <span v-text="$t('common.delete')" />
       </v-btn>
 
       <v-btn text color="primary" @click="$emit('clicked-edit', participant.id)">
         <v-icon left>
           mdi-pencil
         </v-icon>
-        <span v-text="$t('participants.buttons.edit')" />
+        <span v-text="$t('common.edit')" />
       </v-btn>
     </v-card-actions>
   </div>

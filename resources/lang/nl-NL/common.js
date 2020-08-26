@@ -8,5 +8,8 @@ export default {
   },
   yes: 'Ja',
   no: 'Nee',
-  never: 'nooit'
+  never: 'nooit',
+  properties: 'Eigenschappen',
+  edit: 'Wijzig',
+  delete: 'Verwijder'
 }

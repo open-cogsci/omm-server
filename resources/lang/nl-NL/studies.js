@@ -27,7 +27,7 @@ export default {
     delete: 'Verwijderen'
   },
   jobs_table: {
-    no_jobs: 'Geen taken om te tonen. Is er al een takenbestand geupload?'
+    no_jobs: 'Geen taken om te tonen. Is er al een takenbestand geüpload?'
   },
   dialogs: {
     confirmation: {

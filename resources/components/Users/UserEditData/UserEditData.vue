@@ -12,19 +12,19 @@
           :rules="validation.name"
           :counter="maxNameLength"
           :error-messages="errors.name"
-          label="Name"
+          :label="$t('users.fields.name.label')"
           @input="removeErrors('name')"
         />
         <v-text-field
           v-model="userData.email"
           :rules="validation.email"
           :error-messages="errors.email"
-          label="Email address"
+          :label="$t('users.fields.email.label')"
           @input="removeErrors('email')"
         />
         <v-select
           v-model="userData.user_type_id"
-          label="User type"
+          :label="$t('users.fields.user_type.label')"
           item-text="name"
           item-value="id"
           :error-messages="errors.user_type_id"
@@ -43,15 +43,15 @@
               <v-icon left>
                 mdi-email
               </v-icon>
-              <span v-if="user.last_login">Resend verification email</span>
-              <span v-else>Resend activation email</span>
+              <span v-if="user.last_login" v-text="$t('users.buttons.resend_verification_email')" />
+              <span v-else v-text="$t('users.buttons.resend_activation_email')" />
             </v-btn>
           </v-col>
           <v-col v-else-if="user.id" cols="12">
             <v-switch
               v-model="userData.account_status"
               class="mt-0"
-              :label="userData.account_status | upperFirst"
+              :label="$t(`users.status.${userData.account_status}`)"
               false-value="inactive"
               true-value="active"
               :disabled="user.id === $auth.user.id"
@@ -123,13 +123,13 @@ export default {
       maxNameLength: 50,
       validation: {
         name: [
-          v => !isEmpty(v) || 'Name cannot be empty',
+          v => !isEmpty(v) || this.$t('users.fields.name.errors.notEmpty'),
           v => isLength(v, { max: this.maxNameLength }) ||
-          `This field has a maximum of ${this.maxNameLength} characters`
+            this.$t('users.fields.name.errors.maxLength') + ` ${this.maxNameLength}`
         ],
         email: [
-          v => !isEmpty(v) || 'email cannot be empty',
-          v => isEmail(v) || 'Invalid email address'
+          v => !isEmpty(v) || this.$t('users.fields.email.errors.notEmpty'),
+          v => isEmail(v) || this.$t('users.fields.email.errors.invalid')
         ]
       }
     }

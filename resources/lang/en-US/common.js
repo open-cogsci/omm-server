@@ -9,5 +9,7 @@ export default {
   yes: 'Yes',
   no: 'No',
   never: 'never',
-  properties: 'Properties'
+  properties: 'Properties',
+  edit: 'Edit',
+  delete: 'Delete'
 }
