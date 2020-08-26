@@ -3,16 +3,16 @@
     <v-toolbar color="primary" dark flat class="flex-grow-0">
       <v-spacer />
       <v-toolbar-title class="headline">
-        Studies
+        {{ $t('layout.nav.studies') }}
       </v-toolbar-title>
       <v-spacer />
       <template v-slot:extension>
         <v-tabs v-model="openTab" grow centered slider-color="yellow">
           <v-tab :href="`#tab-current`">
-            Current
+            {{ $t('studies.list.current') }}
           </v-tab>
           <v-tab :href="`#tab-archived`">
-            Archived
+            {{ $t('studies.list.archived') }}
           </v-tab>
         </v-tabs>
       </template>

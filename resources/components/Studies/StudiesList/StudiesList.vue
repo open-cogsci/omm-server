@@ -10,7 +10,7 @@
           <v-icon>mdi-plus</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>Add a new study</v-list-item-title>
+          <v-list-item-title v-text="$t('studies.list.add')" />
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -31,7 +31,7 @@
         class="py-0 three-line"
       >
         <template v-slot="{ item }">
-          <v-list-item three-line :to="`/dashboard/studies/${item.id}`" nuxt>
+          <v-list-item three-line :to="localePath(`/dashboard/studies/${item.id}`)" nuxt>
             <v-list-item-content class="px-3">
               <v-list-item-title v-text="item.name" />
               <v-list-item-subtitle v-text="item.description" />

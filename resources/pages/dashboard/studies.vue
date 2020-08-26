@@ -6,7 +6,7 @@
     <v-col v-if="$vuetify.breakpoint.mdAndUp" cols="12" md="8" xl="9">
       <nuxt-child />
     </v-col>
-    <study-page-dialog v-model="dialog" else>
+    <study-page-dialog v-else v-model="dialog">
       <nuxt-child />
     </study-page-dialog>
   </v-row>

@@ -7,10 +7,10 @@
   >
     <v-card>
       <v-card-title>
-        Collaborators
+        {{ $t('studies.dialogs.collaborators.title') }}
       </v-card-title>
       <v-card-text class="body-1 font-weight-light">
-        Share this experiment with other users
+        {{ $t('studies.dialogs.collaborators.subtitle') }}
       </v-card-text>
 
       <v-fade-transition absolute mode="out-in">
@@ -33,7 +33,7 @@
             style="max-height: calc(100vh-250px);"
           >
             <div class="body-2">
-              This experiment is currently shared with:
+              {{ $t('studies.dialogs.collaborators.currently_shared') }}:
             </div>
 
             <v-list>
@@ -66,7 +66,7 @@
             </v-list>
           </v-card-text>
           <v-card-text v-else key="no-collabs">
-            There are no collaborators for this experiment.
+            {{ $t('studies.dialogs.collaborators.no_collaborators') }}.
           </v-card-text>
         </smooth-reflow>
       </v-fade-transition>
@@ -81,14 +81,14 @@
           <v-icon left>
             mdi-plus
           </v-icon>
-          Add colloborator
+          {{ $t('studies.dialogs.collaborators.add') }}
         </v-btn>
         <v-spacer />
         <v-btn
           text
           @click="cancel"
         >
-          Close
+          {{ $t('buttons.close') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -141,8 +141,18 @@ export default {
     },
     accessLevels () {
       return [
-        { value: 1, text: this.$vuetify.breakpoint.smAndUp ? 'Can view' : 'View' },
-        { value: 2, text: this.$vuetify.breakpoint.smAndUp ? 'Can edit' : 'Edit' }
+        {
+          value: 1,
+          text: this.$vuetify.breakpoint.smAndUp
+            ? this.$t('studies.dialogs.collaborators.can_view')
+            : this.$t('studies.dialogs.collaborators.can_view_short')
+        },
+        {
+          value: 2,
+          text: this.$vuetify.breakpoint.smAndUp
+            ? this.$t('studies.dialogs.collaborators.can_edit')
+            : this.$t('studies.dialogs.collaborators.can_edit_short')
+        }
       ]
     }
   },

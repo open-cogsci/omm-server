@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="dialog" v-bind="$attrs" persistent max-width="500" v-on="$listeners">
+  <v-dialog :value="dialog" v-bind="$attrs" persistent max-width="600" v-on="$listeners">
     <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
@@ -16,10 +16,10 @@
         <v-card-actions>
           <v-spacer />
           <v-btn text @click="$emit('clicked-no')">
-            No, take me back
+            {{ $t('buttons.reject') }}
           </v-btn>
           <v-btn text color="primary" @click="$emit('clicked-yes')">
-            Yes, I am sure
+            {{ $t('buttons.confirm') }}
           </v-btn>
         </v-card-actions>
       </v-card>

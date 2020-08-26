@@ -14,7 +14,7 @@
     <v-col cols="12" sm="6" md="12" lg="6" xl="7">
       <v-card outlined>
         <v-card-title>
-          Stats
+          {{ $t('study_participants.stats.title') }}
         </v-card-title>
         <v-card-text>
           <participation-stats />
@@ -31,9 +31,11 @@
     >
       <v-card outlined class="fill-height d-flex flex-column">
         <v-card-title>
-          Participants
+          {{ $t('study_participants.participants.title') }}
           <v-spacer />
-          <span class="caption">% complete</span>
+          <span class="caption">
+            {{ $t('study_participants.participants.perc_complete') }}
+          </span>
         </v-card-title>
         <v-card-text class="pa-0 fill-height">
           <study-participants-list
@@ -55,7 +57,7 @@
             <v-icon left>
               mdi-download
             </v-icon>
-            Data
+            {{ $t('study_participants.participants.data') }}
           </v-btn>
           <v-btn
             color="primary"
@@ -64,7 +66,7 @@
             <v-icon left>
               mdi-account-group
             </v-icon>
-            Manage
+            {{ $t('study_participants.participants.manage') }}
           </v-btn>
         </v-card-actions>
       </v-card>

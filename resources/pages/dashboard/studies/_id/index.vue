@@ -64,8 +64,8 @@
             </v-col>
             <v-col cols="12" lg="4" xl="3" order-lg="first">
               <v-tabs v-model="tab">
-                <v-tab>Jobs</v-tab>
-                <v-tab>Participants</v-tab>
+                <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
               </v-tabs>
             </v-col>
           </v-row>
@@ -274,7 +274,7 @@ export default {
     async deleteStudy () {
       try {
         await this.study.destroy()
-        this.notify({ message: 'Study deleted', color: 'success' })
+        this.notify({ message: this.$t('studies.notifications.deleted'), color: 'success' })
         this.$router.replace(this.localePath({ name: 'dashboard-studies' }))
       } catch (e) {
         processErrors(e, this.notify)
@@ -290,7 +290,7 @@ export default {
     async archiveStudy () {
       try {
         await this.study.toggleArchived()
-        this.notify({ message: 'Study status changed', color: 'success' })
+        this.notify({ message: this.$t('studies.notifications.archived'), color: 'success' })
       } catch (e) {
         processErrors(e, this.notify)
       }
@@ -322,10 +322,7 @@ export default {
 
       if (type === 'jobs') {
         try {
-          this.notify({
-            message: 'Refreshing jobs',
-            color: 'info'
-          })
+          this.notify({ message: this.$t('studies.notifications.refreshing_jobs'), color: 'info' })
           this.refreshingJobs = true
           await this.study.refreshJobs()
         } catch (e) {
@@ -374,7 +371,7 @@ export default {
     },
     cancelUpload (item) {
       if (isFunction(this.uploading[item].cancel)) {
-        this.uploading[item].cancel('Upload canceled')
+        this.uploading[item].cancel(this.$t('studies.notifications.upload_canceled'))
       }
     },
     openUploadExpDialog () {

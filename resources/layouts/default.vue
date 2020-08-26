@@ -34,7 +34,7 @@
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title class="font-weight-light">
-              Collapse menu
+              {{ $t('layout.drawer.collapse') }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -51,11 +51,14 @@
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title v-text="item.title" />
+              <v-list-item-title v-text="$t(item.title)" />
             </v-list-item-content>
           </v-list-item>
         </template>
       </v-list>
+      <template v-slot:append>
+        <language-switcher />
+      </template>
     </v-navigation-drawer>
     <v-app-bar
       :clipped-left="clipped"
@@ -90,13 +93,17 @@
             <v-list-item-icon>
               <v-icon>mdi-account</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Account</v-list-item-title>
+            <v-list-item-title>
+              {{ $t('layout.appbar.account') }}
+            </v-list-item-title>
           </v-list-item>
           <v-list-item @click="logout">
             <v-list-item-icon>
               <v-icon>mdi-logout</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Sign out</v-list-item-title>
+            <v-list-item-title>
+              {{ $t('layout.appbar.signout') }}
+            </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -120,7 +127,8 @@ import UserType from '@/models/UserType'
 export default {
   name: 'DefaultLayout',
   components: {
-    NotificationBox: () => import('@/components/NotificationBox')
+    NotificationBox: () => import('@/components/NotificationBox'),
+    LanguageSwitcher: () => import('@/components/LanguageSwitcher')
   },
   data () {
     return {
@@ -130,22 +138,22 @@ export default {
       items: [
         {
           icon: 'mdi-view-dashboard',
-          title: 'Dashboard',
+          title: 'layout.nav.dashboard',
           to: '/dashboard'
         },
         {
           icon: 'mdi-flask',
-          title: 'Studies',
+          title: 'layout.nav.studies',
           to: '/dashboard/studies'
         },
         {
           icon: 'mdi-baby-face',
-          title: 'Participants',
+          title: 'layout.nav.participants',
           to: '/dashboard/participants'
         },
         {
           icon: 'mdi-account-group',
-          title: 'Users',
+          title: 'layout.nav.users',
           to: '/dashboard/users',
           admin: true
         }
@@ -154,9 +162,14 @@ export default {
       title: 'OpenMonkeyMind'
     }
   },
+  watch: {
+    '$i18n.locale' (newLocale) {
+      this.$vuetify.lang.current = newLocale
+    }
+  },
   async created () {
     // Perform some bootstrapping. These requests are made only once when the app is loaded.
-
+    this.$vuetify.lang.current = this.$i18n.locale
     // Get possible user types
     try {
       await UserType.fetch()

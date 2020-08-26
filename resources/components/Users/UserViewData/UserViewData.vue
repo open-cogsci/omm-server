@@ -4,14 +4,14 @@
       <v-row
         v-for="(value, field) in listable(user)"
         :key="field"
-        :dense="$vuetify.breakpoint.xsOnly"
+        dense
         class="body-1"
       >
         <v-col cols="5" md="4" class="font-weight-medium">
-          {{ field | label }}:
+          {{ label(field) }}:
         </v-col>
         <v-col cols="7" md="8" class="text-truncate">
-          {{ value | convertIfNecessary }}
+          {{ convertIfNecessary(value, field) }}
         </v-col>
       </v-row>
     </v-card-text>
@@ -30,12 +30,12 @@
             >
               <v-icon left>
                 mdi-delete
-              </v-icon> Delete<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;user</span>
+              </v-icon>{{ $t('common.delete') }}
             </v-btn>
           </div>
         </template>
-        <span>A user can no longer be deleted when it is associated with a study.<br>
-          Deactivate the user instead.</span>
+        <!--  eslint-disable-next-line vue/no-v-html -->
+        <span v-html="$t('users.prevent_delete')" />
       </v-tooltip>
       <v-btn
         v-else
@@ -45,34 +45,23 @@
       >
         <v-icon left>
           mdi-delete
-        </v-icon> Delete<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;user</span>
+        </v-icon>{{ $t('common.delete') }}
       </v-btn>
 
       <v-btn text color="primary" @click="$emit('clicked-edit', user.id)">
         <v-icon left>
           mdi-pencil
-        </v-icon> Edit<span class="d-none d-sm-flex d-md-none d-lg-flex">&nbsp;properties</span>
+        </v-icon>{{ $t('common.edit') }}
       </v-btn>
     </v-card-actions>
   </div>
 </template>
 
 <script>
-import { upperFirst, lowerCase, pick, isObject } from 'lodash'
+import { pick, isObject } from 'lodash'
+import { isValid, parseJSON, formatRelative } from 'date-fns'
 
 export default {
-  filters: {
-    label: val => upperFirst(lowerCase(val)),
-    convertIfNecessary: (val) => {
-      if (typeof val === 'boolean') {
-        return val ? 'Yes' : 'No'
-      }
-      if (isObject(val)) {
-        return val.name
-      }
-      return val
-    }
-  },
   props: {
     user: {
       type: Object,
@@ -81,7 +70,29 @@ export default {
   },
   methods: {
     listable: ptcp => pick(ptcp,
-      ['name', 'email', 'user_type', 'account_status', 'created_at', 'updated_at'])
+      ['name', 'email', 'user_type', 'account_status', 'last_login', 'created_at', 'updated_at']),
+    label (val) {
+      return this.$t(`users.labels.${val}`)
+    },
+    convertIfNecessary (val, field) {
+      if (typeof val === 'boolean') {
+        return val ? this.$t('common.yes') : this.$t('common.no')
+      }
+      if (isObject(val)) {
+        return val.name
+      }
+      if (field === 'account_status') {
+        return this.$t(`users.status.${val}`)
+      }
+      if (field === 'last_login') {
+        if (!val) { return this.$t('common.never') }
+        const parsed = parseJSON(val)
+        if (isValid(parsed)) {
+          return formatRelative(parsed, Date.now())
+        }
+      }
+      return val
+    }
   }
 }
 </script>

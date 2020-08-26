@@ -17,7 +17,7 @@
         <v-row class="align-self-start">
           <v-col cols="12">
             <h1 class="display-1 font-weight-light">
-              Users
+              {{ $t('layout.nav.users') }}
             </h1>
           </v-col>
         </v-row>
@@ -27,7 +27,7 @@
               v-model="searchterm"
               solo
               prepend-inner-icon="mdi-magnify"
-              placeholder="Search users by name or email address"
+              :placeholder="$t('users.search')"
               hide-details
               clearable
               :loading="searching"
@@ -184,7 +184,7 @@ export default {
       try {
         await this.User.persist(pick(userData,
           ['$id', 'id', 'name', 'email', 'password', 'user_type_id', 'account_status']))
-        this.notify({ message: 'User has been saved', color: 'success' })
+        this.notify({ message: this.$t('users.messages.saved'), color: 'success' })
         if (userData.id) {
           this.$refs.list.clearEditing()
         } else {
@@ -205,7 +205,7 @@ export default {
       this.deleting = true
       try {
         await this.User.find(id).destroy()
-        this.notify({ message: 'User has been deleted', color: 'success' })
+        this.notify({ message: this.$t('users.messages.deleted'), color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       } finally {
@@ -221,10 +221,10 @@ export default {
       try {
         if (user.last_login) {
           await user.resendActivationEmail()
-          this.notify({ message: 'Activation e-mail has been resent', color: 'success' })
+          this.notify({ message: this.$t('users.messages.activation_resent'), color: 'success' })
         } else {
           await user.resendAccountEmail()
-          this.notify({ message: 'Account info e-mail has been resent', color: 'success' })
+          this.notify({ message: this.$t('users.messages.account_info_resent'), color: 'success' })
         }
       } catch (e) {
         this.errors = processErrors(e, this.notify)

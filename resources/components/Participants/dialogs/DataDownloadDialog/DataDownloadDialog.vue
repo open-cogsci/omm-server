@@ -5,9 +5,9 @@
     @input="$emit('input', $event)"
   >
     <v-card>
-      <v-card-title>Download data</v-card-title>
+      <v-card-title>{{ $t('study_participants.dialogs.data.title') }}</v-card-title>
       <v-card-text class="body-1 font-weight-light">
-        Choose a file format below.
+        {{ $t('study_participants.dialogs.data.subtitle') }}
       </v-card-text>
       <v-card-text>
         <v-row>
@@ -29,7 +29,7 @@
               :disabled="generating && generating !== button.type"
               @click="$emit('generate', button.type)"
             >
-              Regenerate
+              {{ $t('study_participants.dialogs.data.buttons.regenerate') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -42,16 +42,12 @@
           </v-alert>
         </v-card-text>
       </v-expand-transition>
-      <v-card-text class="caption">
-        Exporting data can take some time and therefore generated data files are cached. The next time
-        the same data file is downloaded, the cached version is served to allow faster download speeds.<br>Click
-        on <strong>regenerate</strong> to refresh the cached data if it is no longer up-to-date
-        (e.g. after new data has been collected).
-      </v-card-text>
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <v-card-text class="caption" v-html="$t('study_participants.dialogs.data.explanation')" />
       <v-card-actions>
         <v-spacer />
         <v-btn text @click="$emit('input', false)">
-          Close
+          {{ $t('buttons.close') }}
         </v-btn>
       </v-card-actions>
     </v-card>

@@ -12,19 +12,19 @@
           :rules="validation.name"
           :counter="maxNameLength"
           :error-messages="errors.name"
-          label="Name"
+          :label="$t('participants.fields.name.label')"
           @input="removeErrors('name')"
         />
         <v-text-field
           v-model="ptcp.identifier"
           :rules="validation.identifier"
           :error-messages="errors.identifier"
-          label="Identifier"
+          :label="$t('participants.fields.identifier.label')"
           @input="removeErrors('identifier')"
         />
         <v-switch
           v-model="ptcp.active"
-          label="Active"
+          :label="ptcp.active ? $t('participants.active') : $t('participants.inactive')"
         />
       </v-form>
     </v-card-text>
@@ -79,12 +79,12 @@ export default {
       maxNameLength: 50,
       validation: {
         name: [
-          v => !isEmpty(v) || 'Name cannot be empty',
+          v => !isEmpty(v) || this.$t('participants.fields.name.errors.notEmpty'),
           v => isLength(v, { max: this.maxNameLength }) ||
-          `This field has a maximum of ${this.maxNameLength} characters`
+            this.$t('participants.fields.name.errors.maxLength') + this.maxNameLength
         ],
         identifier: [
-          v => !isEmpty(v) || 'identifier cannot be empty'
+          v => !isEmpty(v) || this.$t('participants.fields.identifier.errors.notEmpty')
         ]
       }
     }

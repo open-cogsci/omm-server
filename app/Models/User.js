@@ -80,6 +80,10 @@ class User extends Model {
     return ['password']
   }
 
+  static get dates () {
+    return super.dates.concat(['last_login'])
+  }
+
   get isAdmin () {
     return this.$attributes.user_type_id === 1
   }

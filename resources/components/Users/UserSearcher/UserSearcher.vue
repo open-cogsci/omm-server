@@ -9,7 +9,7 @@
         :filter="userFilter"
         outlined
         prepend-icon="mdi-account-search"
-        label="Search user"
+        :label="$t('studies.dialogs.collaborators.search')"
         hide-no-data
         hide-selected
         hide-details

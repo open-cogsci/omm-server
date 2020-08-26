@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable vue/no-v-html  -->
   <v-skeleton-loader
     :loading="loading"
     type="actions"
@@ -11,7 +12,7 @@
         <v-icon left :color="osexpPresent?'black':'white'">
           mdi-upload
         </v-icon>
-        experiment
+        {{ $t('studies.actions.upload_experiment') }}
       </v-btn>
       <v-btn
         :color="jobsPresent?'default':'success'"
@@ -20,7 +21,7 @@
         <v-icon left :color="jobsPresent?'black':'white'">
           mdi-upload
         </v-icon>
-        jobs
+        {{ $t('studies.actions.upload_jobs') }}
       </v-btn>
     </v-item-group>
 
@@ -31,7 +32,9 @@
         <v-icon v-bind="shareIconAttrs">
           mdi-share-variant
         </v-icon>
-        <span class="d-none d-sm-inline">Sharing</span>
+        <span class="d-none d-sm-inline">
+          {{ $t('studies.actions.sharing') }}
+        </span>
       </v-btn>
     </v-item-group>
 
@@ -50,28 +53,16 @@
               {{ study && study.active ? 'mdi-archive' : 'mdi-archive-arrow-up' }}
             </v-icon>
             <span class="d-none d-sm-inline d-lg-none d-xl-inline">
-              {{ study && study.active ? 'Archive' : 'Reactivate' }}
+              {{ study && study.active ? $t('studies.actions.archive') : $t('studies.actions.reactivate') }}
             </span>
           </v-btn>
         </template>
         <template v-slot:title>
-          <span v-if="study && study.active">You are about to archive this study</span>
-          <span v-else>You are about to reactivate this study</span>
+          <span v-if="study && study.active" v-text="$t('studies.dialogs.confirmation.archive.title')" />
+          <span v-else v-text="$t('studies.dialogs.confirmation.reactivate.title')" />
         </template>
-        <div v-if="study && study.active">
-          <p>
-            After you have archived this study, it is no longer is available for participants.
-            Any reports about the study will also be removed from your dashboard.
-          </p>
-          <p>Are you sure you want to archive this study?</p>
-        </div>
-        <div v-else>
-          <p>
-            After you have reactivated this study, it will be discoverable for participants again.
-            Any reports about the study will added to your dashboard.
-          </p>
-          <p>Are you sure you want to reactivate this study?</p>
-        </div>
+        <div v-if="study && study.active" v-html="$t('studies.dialogs.confirmation.archive.body')" />
+        <div v-else v-html="$t('studies.dialogs.confirmation.reactivate.body')" />
       </confirmation-dialog>
 
       <confirmation-dialog
@@ -88,16 +79,15 @@
             <v-icon v-bind="delArchiveIconAttrs">
               mdi-delete
             </v-icon>
-            <span class="d-none d-sm-inline d-lg-none d-xl-inline">Delete</span>
+            <span class="d-none d-sm-inline d-lg-none d-xl-inline">
+              {{ $t('studies.actions.delete') }}
+            </span>
           </v-btn>
         </template>
         <template v-slot:title>
-          You are about to <span class="error--text">&nbsp;delete&nbsp;</span> this study
+          <span v-html="$t('studies.dialogs.confirmation.delete.title')" />
         </template>
-        <p><strong>Deleting this study will also erase all its participations and associated data entries.</strong></p>
-        <p>
-          Are you sure you want to do this?
-        </p>
+        <div v-html="$t('studies.dialogs.confirmation.delete.body')" />
       </confirmation-dialog>
     </v-item-group>
   </v-skeleton-loader>

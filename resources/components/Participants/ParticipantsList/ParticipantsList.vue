@@ -33,7 +33,7 @@
                         mdi-tag
                       </v-icon>
                     </template>
-                    Identifier
+                    {{ $t('participants.identifier') }}
                   </v-tooltip>
                   {{ ptcp.identifier }}
                 </v-col>
@@ -48,7 +48,7 @@
                         mdi-flask
                       </v-icon>
                     </template>
-                    Participations
+                    {{ $t('participants.participations') }}
                   </v-tooltip>{{ ptcp.studies_count }}
                 </v-col>
                 <v-col cols="2" class="text-center">
@@ -60,10 +60,12 @@
                         v-bind="attrs"
                         v-on="on"
                       >
-                        {{ ptcp.active ? 'active':'inactive' }}
+                        {{ (ptcp.active
+                          ? $t('participants.active')
+                          : $t('participants.inactive')) | lowercase }}
                       </span>
                     </template>
-                    Status
+                    {{ $t('participants.status') }}
                   </v-tooltip>
                 </v-col>
               </v-row>
@@ -76,7 +78,7 @@
           <v-col cols="12" md="6">
             <v-card outlined class="fill-height d-flex flex-column" height="400">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Properties
+                {{ $t('common.properties') }}
               </v-card-title>
               <v-fade-transition mode="out-in" class="mt-5">
                 <participant-edit-data
@@ -102,7 +104,7 @@
           <v-col cols="12" md="6">
             <v-card outlined class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Participations
+                {{ $t('participants.participations') }}
               </v-card-title>
               <v-card-text />
             </v-card>
@@ -114,10 +116,15 @@
 </template>
 
 <script>
+import { lowerCase } from 'lodash'
+
 export default {
   components: {
     ParticipantViewData: () => import('@/components/Participants/ParticipantViewData'),
     ParticipantEditData: () => import('@/components/Participants/ParticipantEditData')
+  },
+  filters: {
+    lowercase: val => lowerCase(val)
   },
   props: {
     participants: {

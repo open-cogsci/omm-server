@@ -21,6 +21,9 @@ export default {
       }
     }
   },
+  messages: {
+    success: 'Your password has been reset.'
+  },
   buttons: {
     change: 'Change password'
   }
