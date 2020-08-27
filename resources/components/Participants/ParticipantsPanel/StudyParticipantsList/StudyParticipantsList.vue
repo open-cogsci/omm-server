@@ -27,7 +27,7 @@
       </template>
     </v-virtual-scroll>
     <h3 v-else class="px-4 font-weight-light">
-      No participants to show
+      {{ $t('study_participants.participants.none') }}
     </h3>
   </v-skeleton-loader>
 </template>

@@ -1,4 +1,8 @@
 export default {
+  overview: 'Overview',
+  progress: 'Study progress',
+  trend: 'Participation trend',
+  complete: 'Complete',
   participants: {
     total: 'Participants',
     pending: 'Pending',

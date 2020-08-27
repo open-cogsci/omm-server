@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12" sm="6">
       <p class="text-subtitle-2 secondary--text">
-        Overview
+        {{ $t('stats.overview') }}
       </p>
       <v-row v-for="line of overview" :key="line.label" :class="line.classes" no-gutters>
         <v-col v-bind="labelColSizes">
@@ -15,7 +15,7 @@
     </v-col>
     <v-col cols="12" sm="6" class="text-center">
       <p class="text-subtitle-2 secondary--text text-left text-sm-center">
-        Study progress
+        {{ $t('stats.progress') }}
       </p>
       <v-progress-circular
         class="text-center"
@@ -30,7 +30,7 @@
             {{ studyProgress }}<span class="caption">%</span>
           </div>
           <div class="caption">
-            Complete
+            {{ $t('stats.complete') }}
           </div>
         </div>
       </v-progress-circular>
@@ -38,7 +38,7 @@
 
     <v-col cols="12">
       <p class="text-subtitle-2 secondary--text">
-        Participation trend
+        {{ $t('stats.trend') }}
       </p>
       <v-sparkline
         v-bind="sparkline"
