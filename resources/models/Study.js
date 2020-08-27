@@ -70,10 +70,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   static fetchById (id, config) {
-    return this.api().get(id, {
-      dataTransformer: jobTransformer,
-      ...config
-    })
+    return this.api().get(`/${id}`, config)
   }
 
   /**
@@ -138,23 +135,6 @@ export default class Study extends Model {
         ...config
       }
     )
-  }
-
-  /**
-   * Refresh jobs from the server
-   *
-   * @param {Object} config
-   * @returns {Promise}
-   * @memberof Study
-   */
-  refreshJobs (config) {
-    return this.constructor.api().get(`${this.id}/jobs/refresh`, {
-      dataTransformer: jobTransformer,
-      persistOptions: {
-        create: ['jobs', 'variables']
-      },
-      ...config
-    })
   }
 
   /**
@@ -296,7 +276,10 @@ export default class Study extends Model {
    * @memberof Study
    */
   async fetchParticipationStats (config) {
-    const reply = await this.constructor.api().get(`${this.id}/stats`, config)
+    const reply = await this.constructor.api().get(`${this.id}/stats`, {
+      save: false,
+      ...config
+    })
     return reply.response.data.data
   }
 }

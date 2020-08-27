@@ -106,6 +106,15 @@ import { mapActions } from 'vuex'
 import { sync } from 'vuex-pathify'
 import { processErrors } from '@/assets/js/errorhandling'
 
+const defaultPagination = {
+  page: 1,
+  lastPage: 1,
+  perPage: 10,
+  total: 0,
+  pageStart: 0,
+  pageStop: 10
+}
+
 export default {
   name: 'Study',
   components: {
@@ -130,14 +139,7 @@ export default {
           description: ''
         }
       },
-      pagination: {
-        page: 1,
-        lastPage: 1,
-        perPage: 10,
-        total: 0,
-        pageStart: 0,
-        pageStop: 10
-      },
+      pagination: { ...defaultPagination },
       collaborators: {
         dialog: false,
         searchField: false,
@@ -220,18 +222,22 @@ export default {
   },
   methods: {
     ...mapActions('notifications', ['notify']),
-    async fetchStudy (studyID) {
+    async fetchStudy (studyID, options) {
       try {
-        await this.Study.fetchById(studyID)
+        await this.Study.fetchById(studyID, options)
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(e, this.notify, true)
       }
     },
-    async fetchJobs (studyID) {
+    async fetchJobs (studyID, options) {
       this.refreshingJobs = true
       try {
         const response = await this.Job.fetchByStudyId(
-          studyID, { params: pick(this.pagination, ['page', 'perPage']) }
+          studyID,
+          {
+            params: pick(this.pagination, ['page', 'perPage']),
+            ...options
+          }
         )
         const serverPagination = response.response.data.pagination
         const pageStart = (serverPagination.page - 1) * serverPagination.perPage
@@ -319,15 +325,17 @@ export default {
       }
 
       if (type === 'jobs') {
-        try {
-          this.notify({ message: this.$t('studies.notifications.refreshing_jobs'), color: 'info' })
-          this.refreshingJobs = true
-          await this.study.refreshJobs()
-        } catch (e) {
-          processErrors(e, this.notify)
-        } finally {
-          this.refreshingJobs = false
-        }
+        this.notify({
+          message: this.$t('studies.notifications.refreshing_jobs'),
+          color: 'info'
+        })
+        this.resetPagination()
+        await this.fetchStudy(this.study.id, {
+          persistOptions: {
+            create: ['variables']
+          }
+        })
+        this.fetchJobs(this.study.id, { refresh: true })
       }
     },
     async searchUsers (val) {
@@ -389,14 +397,7 @@ export default {
       this.fetchJobs(this.study.id)
     },
     resetPagination () {
-      this.pagination = {
-        page: 1,
-        lastPage: 1,
-        perPage: 10,
-        total: 0,
-        pageStart: 0,
-        pageStop: 10
-      }
+      this.pagination = { ...defaultPagination }
     }
   },
   validate ({ params }) {

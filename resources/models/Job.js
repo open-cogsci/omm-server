@@ -39,9 +39,14 @@ export default class Job extends Model {
   }
 
   static fetchByStudyId (studyID, config) {
+    const { refresh, ...cfg } = config
+    if (refresh) {
+      this.delete(record => record.study_id === studyID)
+    }
+
     return this.api().get(`/study/${studyID}`, {
       dataTransformer: ({ data }) => data.data.map(jobTransformer),
-      ...config
+      ...cfg
     })
   }
 
