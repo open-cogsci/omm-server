@@ -37,6 +37,7 @@ export default class Study extends Model {
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),
+      finished_participants_count: this.number(0),
       participants_count: this.number(0),
       jobs_count: this.number(0),
       completed_jobs_count: this.number(0),

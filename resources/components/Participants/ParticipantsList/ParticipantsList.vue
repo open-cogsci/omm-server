@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import { lowerCase } from 'lodash'
+import { lowerCase, isNumber } from 'lodash'
 
 export default {
   components: {
@@ -146,8 +146,15 @@ export default {
   },
   data () {
     return {
-      panel: [],
+      panel: null,
       editing: null
+    }
+  },
+  watch: {
+    panel (val) {
+      if (isNumber(val)) {
+        this.$emit('load-participant', this.participants[val].id)
+      }
     }
   },
   methods: {

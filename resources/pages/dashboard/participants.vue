@@ -44,6 +44,7 @@
                 :errors.sync="errors"
                 @update-participant="saveParticipant"
                 @delete-participant="deleteParticipant"
+                @load-participant="loadParticipant"
               />
             </v-skeleton-loader>
           </v-col>
@@ -97,6 +98,7 @@ export default {
       dialog: false,
       saving: false,
       loading: false,
+      loadingParticipant: 0,
       deleting: false,
       fabVisible: false,
       errors: {},
@@ -154,6 +156,16 @@ export default {
         this.searching = false
         this.loading = false
       }
+    },
+    /** Load a single participant */
+    async loadParticipant (id) {
+      this.loadingParticipant = id
+      try {
+        await this.Participant.fetchById(id)
+      } catch (e) {
+        this.errors = processErrors(e, this.notify)
+      }
+      this.loadingParticipant = 0
     },
     /**
      *  Save a participant

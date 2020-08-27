@@ -188,20 +188,23 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, response, transform }) {
+  async show ({ params, transform }) {
+    const { id } = params
+
     const ptcp = await Participant
       .query()
-      .where('id', params.id)
-      .with('studies.jobs.variables.dtype')
-      .first()
-
-    if (ptcp === null) {
-      response.notFound({ error: { message: `Participant with ID:${params.id} could not be found` } })
-      return
-    }
+      .where('id', id)
+      .with('studies', (query) => {
+        query.withCount('jobs')
+        // query.withCount('jobs as completed_jobs', (query) => {
+        //   query.wherePivot('status_id', 3)
+        //     .wherePivot('participant_id')
+        // })
+      })
+      .firstOrFail()
 
     return transform
-      .include('studies.jobs.variables.dtype')
+      // .include('studies.jobs.variables.dtype')
       .item(ptcp, 'ParticipantTransformer')
   }
 

@@ -37,7 +37,7 @@ export default class Participant extends Model {
   }
 
   static fetchById (id, config) {
-    return this.api().get(id, config)
+    return this.api().get(`/${id}`, config)
   }
 
   static persist (data, config) {
