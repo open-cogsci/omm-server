@@ -175,13 +175,15 @@ export default {
       if (this.saving) { return }
       this.saving = true
       try {
-        await this.Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
+        const newRecord = await this.Participant.persist(
+          pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
         this.notify({ message: 'Participant has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()
         } else {
           this.dialog = false
           this.$refs.dialog.clear()
+          this.pagination.ids.unshift(newRecord.response.data.data.id)
         }
       } catch (e) {
         this.errors = processErrors(e, this.notify)

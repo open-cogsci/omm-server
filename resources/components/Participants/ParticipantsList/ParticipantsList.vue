@@ -147,7 +147,7 @@
                   <v-list-item v-else>
                     <v-list-item-content>
                       <v-list-item-title class="font-weight-light text-center">
-                        {{ $t(`participants.no_studies`) }}
+                        {{ $t('participants.no_studies') }}
                       </v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>

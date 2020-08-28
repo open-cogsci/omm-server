@@ -8,6 +8,7 @@ export default {
   inactive: 'Inactive',
   created_at: 'Created at',
   updated_at: 'Updated at',
+  no_studies: 'Not assigned to any study',
   tooltips: {
     delete: `A participant can no longer be deleted when it is associated with a study.<br>
              Deactivate the participant instead.`
