@@ -5,6 +5,7 @@ const isObject = require('lodash/isObject')
 const formatISO9075 = require('date-fns/formatISO9075')
 
 const Participant = use('App/Models/Participant')
+const { keyBy } = require('lodash')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -188,23 +189,27 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, transform }) {
+  async show ({ params, request, transform }) {
     const { id } = params
 
     const ptcp = await Participant
       .query()
       .where('id', id)
-      .with('studies', (query) => {
-        query.withCount('jobs')
-        // query.withCount('jobs as completed_jobs', (query) => {
-        //   query.wherePivot('status_id', 3)
-        //     .wherePivot('participant_id')
-        // })
-      })
+      .with('studies')
       .firstOrFail()
 
+    if (request.input('study_progress')) {
+      const studyProgress = await ptcp.getStudiesProgress()
+      const stats = keyBy(studyProgress, 'id')
+      ptcp.$relations.studies.rows = ptcp.$relations.studies.rows.map((study) => {
+        study.$relations.pivot.$attributes.jobs_count = stats[study.id].jobs_count
+        study.$relations.pivot.$attributes.completed_jobs_count = stats[study.id].completed_jobs_count
+        return study
+      })
+    }
+
     return transform
-      .include('studies.jobs_count')
+      .include('studies')
       .item(ptcp, 'ParticipantTransformer')
   }
 
@@ -213,7 +218,7 @@ class ParticipantController {
   * /participants/{id}:
   *   put:
   *     tags:
-  *       - Participants
+  *       - ParticipantsS
   *     security:
   *       - JWT: []
   *     summary: >

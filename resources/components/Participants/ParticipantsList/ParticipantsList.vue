@@ -132,7 +132,7 @@
                             <v-tooltip bottom>
                               <template v-slot:activator="{on, attrs}">
                                 <div class="d-inline-block" v-bind="attrs" v-on="on">
-                                  <progress-circle :value="progress(item)" />
+                                  <progress-circle :value="progress(item.id, ptcp.id)" />
                                 </div>
                               </template>
                               {{ $t('stats.progress') }}
@@ -201,6 +201,11 @@ export default {
       editing: null
     }
   },
+  computed: {
+    Participation () {
+      return this.$store.$db().model('participations')
+    }
+  },
   watch: {
     panel (val) {
       if (isNumber(val)) {
@@ -212,10 +217,14 @@ export default {
     clearEditing () {
       this.editing = null
     },
-    progress (item) {
-      return 50
-      // if (!item.participants_count) { return 0 }
-      // return item.finished_participants_count / item.participants_count * 100
+    progress (studyID, ptcpID) {
+      // This is such an ugly hack, but inevitable with the belongsToMany bug that vuex-orm
+      // experiences. Once that is fixed, this hoop is no longer necessary
+      const edge = this.Participation.find([studyID, ptcpID])
+      if (!edge.jobs_count) {
+        return 0
+      }
+      return parseInt(edge.completed_jobs_count / edge.jobs_count * 100)
     }
   }
 }

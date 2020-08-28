@@ -40,7 +40,6 @@ export default class Study extends Model {
       finished_participants_count: this.number(0),
       participants_count: this.number(0),
       jobs_count: this.number(0),
-      completed_jobs_count: this.number(0),
       users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id'),
       jobs: this.hasMany(Job, 'study_id'),
       variables: this.hasMany(Variable, 'study_id'),

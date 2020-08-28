@@ -162,7 +162,9 @@ export default {
     async loadParticipant (id) {
       this.loadingParticipant = id
       try {
-        await this.Participant.fetchById(id)
+        await this.Participant.fetchById(id, {
+          params: { study_progress: true }
+        })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       }
