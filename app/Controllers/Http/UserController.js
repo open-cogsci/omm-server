@@ -309,12 +309,14 @@ class UserController {
         builder
           .wherePivot('is_owner', true)
           .withCount('participants')
-          // Somehow, the pivot fields below are also included after the withCount() call
-          // Remove them here to tidy up the response.
-          .setHidden(['access_permission_id', 'is_owner', 'study_id', 'user_id'])
+          .withCount('participants as finished_participants', (query) => {
+            query.wherePivot('status_id', 3)
+          })
       })
       .firstOrFail()
-    return transform.include('studies.participants_count,user_type').item(user, 'UserTransformer')
+    return transform
+      .include('studies.participants_count,studies.finished_participants_count,user_type')
+      .item(user, 'UserTransformer')
   }
 
   /**

@@ -47,6 +47,7 @@ Route.group(() => {
     ]))
 
   Route.get('/studies/:id/data', 'StudyController.generateDatafile').as('studies.generate_datafile')
+  Route.get('/studies/:id/stats', 'StudyController.participationStats').as('studies.participation_stats')
   Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
   Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
     .as('studies.upload')

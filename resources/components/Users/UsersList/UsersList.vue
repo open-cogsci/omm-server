@@ -1,9 +1,5 @@
 <template>
-  <v-expansion-panels
-    v-model="panel"
-    popout
-    hover
-  >
+  <v-expansion-panels v-model="panel" popout hover>
     <v-expansion-panel v-for="user in users" :key="user.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
@@ -91,7 +87,7 @@
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
-            <v-card outlined>
+            <v-card outlined class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 {{ $t('layout.nav.studies') }}
               </v-card-title>
@@ -106,7 +102,7 @@
                   <div />
                   <v-virtual-scroll
                     v-if="user.studies.length"
-                    :items="user.studies"
+                    :items="user.studies.filter(study => study.pivot.is_owner)"
                     :item-height="65"
                     height="340"
                   >
@@ -118,9 +114,27 @@
                         </v-list-item-content>
                         <v-list-item-action>
                           <v-list-item-action-text class="info--text">
-                            <v-icon color="info">
-                              mdi-baby-face
-                            </v-icon> <span>{{ item.participants_count }}</span>
+                            <div>
+                              <v-tooltip bottom>
+                                <template v-slot:activator="{on, attrs}">
+                                  <div class="d-inline-block" v-bind="attrs" v-on="on">
+                                    <span>{{ item.participants_count }}</span>
+                                    <v-icon color="info">
+                                      mdi-baby-face
+                                    </v-icon>
+                                  </div>
+                                </template>
+                                {{ $t('layout.nav.participants') }}
+                              </v-tooltip>
+                              <v-tooltip bottom>
+                                <template v-slot:activator="{on, attrs}">
+                                  <div class="d-inline-block" v-bind="attrs" v-on="on">
+                                    <progress-circle :value="progress(item)" />
+                                  </div>
+                                </template>
+                                {{ $t('stats.progress') }}
+                              </v-tooltip>
+                            </div>
                           </v-list-item-action-text>
                         </v-list-item-action>
                       </v-list-item>
@@ -151,7 +165,8 @@ import { isNumber } from 'lodash'
 export default {
   components: {
     UserViewData: () => import('@/components/Users/UserViewData'),
-    UserEditData: () => import('@/components/Users/UserEditData')
+    UserEditData: () => import('@/components/Users/UserEditData'),
+    ProgressCircle: () => import('@/components/common/ProgressCircle')
   },
   props: {
     users: {
@@ -202,6 +217,10 @@ export default {
         pending: 'orange--text',
         inactive: 'red--text'
       }[status]
+    },
+    progress (item) {
+      if (!item.participants_count) { return 0 }
+      return item.finished_participants_count / item.participants_count * 100
     }
   }
 }

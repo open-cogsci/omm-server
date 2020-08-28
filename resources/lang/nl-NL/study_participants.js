@@ -6,7 +6,8 @@ export default {
     title: 'Participanten',
     perc_complete: '% compleet',
     data: 'Data',
-    manage: 'Beheren'
+    manage: 'Beheren',
+    none: 'Geen participanten toegewezen'
   },
   dialogs: {
     manage: {

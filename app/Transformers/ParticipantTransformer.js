@@ -21,18 +21,15 @@ class ParticipantTransformer extends BumblebeeTransformer {
     }
   }
 
-  transformWithStudiesCount (model) {
-    return {
-      ...this.transform(model),
-      studies_count: model.$sideLoaded.studies_count
-    }
-  }
-
   transformPaginatedUnderStudy (model) {
-    return {
+    const data = {
       ...this.transform(model),
       pivot: model.$relations?.studies?.rows[0].$relations.pivot.toObject()
     }
+    if (model.$sideLoaded.completed_jobs) {
+      data.pivot.completed_jobs_count = model.$sideLoaded.completed_jobs
+    }
+    return data
   }
 
   includeJobs (model) {

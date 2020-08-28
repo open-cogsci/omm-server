@@ -12,8 +12,8 @@ const Helpers = use('Helpers')
 const pool = use('Workers/Sheets')
 
 const fs = require('fs')
-const { isArray, isInteger } = require('lodash')
-const format = require('date-fns/format')
+const { isArray, isInteger, range } = require('lodash')
+const { format, differenceInCalendarDays } = require('date-fns')
 
 const removeFile = Helpers.promisify(fs.unlink)
 
@@ -180,6 +180,7 @@ class StudyController {
       .with('variables.dtype')
       .with('users')
       .with('files')
+      .withCount('participants')
       .withCount('jobs')
       .withCount('jobs as completed_jobs', (query) => {
         query.whereHas('participants', (q) => {
@@ -189,7 +190,7 @@ class StudyController {
       .firstOrFail()
 
     return transform
-      .include('variables,users,files,completed_jobs_count,jobs_count')
+      .include('variables,users,files,completed_jobs_count,jobs_count,participants_count')
       .item(study, 'StudyTransformer')
   }
 
@@ -576,8 +577,8 @@ class StudyController {
         .where('position', '>=', index)
         .orderBy('position', 'desc')
         .increment('position', jobsData.length)
-        // Get a list of IDS of participants associated with the study to associate these participants
-        // with the new jobs too in the next step.
+      // Get a list of IDS of participants associated with the study to associate these participants
+      // with the new jobs too in the next step.
       const ptcpIDs = study.getRelated('participants').rows.map(ptcp => ptcp.id)
 
       // Assign positions to jobs and assign them to participants of study too.
@@ -601,6 +602,13 @@ class StudyController {
       }
       return response.status(code).json({ message: e.toString() })
     }
+
+    // Set participants with status 'finished' back started (since new jobs have been added)
+    await study.participants()
+      .pivotQuery()
+      .where('status_id', 3)
+      .update({ status_id: 2 })
+
     return transform.collection(jobs, 'JobTransformer')
   }
 
@@ -679,29 +687,6 @@ class StudyController {
     const study = await query.firstOrFail()
     const jobs = study.getRelated('jobs')
     return transform.include('participants').collection(jobs, 'JobTransformer')
-  }
-
-  /**
-   * Refresh the jobs of a study (for after uploading a new jobs file)
-   *
-   * @param {*} { params, auth, transform }
-   * @returns
-   * @memberof StudyController
-   */
-  async refreshJobs ({ params, auth, transform }) {
-    const { id } = params
-
-    // Fetch the study, or throw an error if it isn't found.
-    const study = await auth.user
-      .studies()
-      .where('id', id)
-      .with('jobs.variables.dtype')
-      .with('variables.dtype')
-      .firstOrFail()
-
-    return transform
-      .include('jobs,variables')
-      .item(study, 'StudyTransformer')
   }
 
   /**
@@ -1008,13 +993,12 @@ class StudyController {
         q.where('study_id', study.id).select('id')
       })
       .withCount('jobs as completed_jobs', (query) => {
-        query.wherePivot('status_id', 3)
+        query.where('study_id', study.id).wherePivot('status_id', 3)
       })
       .orderBy('pivot_status_id', 'desc')
       .paginate(page, perPage)
 
-    const reply = await transform.include('completed_jobs_count')
-      .paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')
+    const reply = await transform.paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')
     // Transform the record making study the parent record, to assure fluent handling by
     // vuex-orm on the client-side
     reply.data = { id: parseInt(id), participants: reply.data }
@@ -1110,6 +1094,101 @@ class StudyController {
       .whereIn('job_id', jobIDs)
       .delete()
     return response.noContent()
+  }
+
+  /**
+   * Provides stats about the current status of the study
+   *
+   * @param {Object} { params, auth }
+   * @return {Object} JSON data with stats
+   * @memberof StudyController
+   */
+  async participationStats ({ params, auth, request }) {
+    const { id } = params
+    const bins = request.input('bins', 20)
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('id', id)
+      .withCount('participants')
+      .withCount('participants as finished_participants', (query) => {
+        query.wherePivot('status_id', 3)
+      })
+      .withCount('participants as started_participants', (query) => {
+        query.wherePivot('status_id', 2)
+      })
+      .withCount('participants as pending_participants', (query) => {
+        query.wherePivot('status_id', 1)
+      })
+      .firstOrFail()
+
+    const ptcpTrend = (await Database.raw(`
+      select sum(c) as amount, bin, updated_at from
+      (SELECT
+          job_states.updated_at,
+          count(*) as c,
+          FLOOR(
+            PERCENT_RANK() OVER (
+                ORDER BY job_states.updated_at ASC
+            ) * ?) as bin
+      FROM
+          job_states
+      LEFT JOIN jobs ON job_states.job_id = jobs.id
+      WHERE status_id = 3 AND jobs.study_id = ?
+      GROUP BY job_states.updated_at) as bins
+      group by bin, updated_at
+      `, [bins, study.id]))[0]
+
+    // Initialize an empty object with all the bins having value 0. This is necessary
+    // because the database only returns bin numbers that actually have a value and omits
+    // empty bins.
+    const baseTrend = range(bins).reduce((result, val) => {
+      result[val] = 0
+      return result
+    }, {})
+
+    // Merge the real bin values into the empty array to get the complete array
+    const values = Object.values({
+      ...baseTrend,
+      ...ptcpTrend.reduce((result, entry) => {
+        result[entry.bin] = parseInt(entry.amount)
+        return result
+      }, {})
+    })
+
+    // Obtain the dates of the first occurence and the last occurence.
+    const labels = { ...baseTrend }
+    if (ptcpTrend.length > 0) {
+      const first = ptcpTrend[0]
+      const last = ptcpTrend.slice(-1)[0]
+      const dayFormat = 'd MMM'
+      const timeFormat = 'HH:mm'
+
+      // If all participations are on the same day, show the time at the ends of the axis
+      // with the day in the center. Otherwise, just show the first and last day at the ends
+      // of the axis
+      if (differenceInCalendarDays(last.updated_at, first.updated_at) === 0) {
+        labels[0] = format(first.updated_at, timeFormat)
+        labels[Math.floor(bins / 2)] = format(first.updated_at, dayFormat)
+        labels[bins] = format(last.updated_at, timeFormat)
+      } else {
+        labels[0] = format(first.updated_at, dayFormat)
+        labels[bins] = format(last.updated_at, dayFormat)
+      }
+    }
+
+    const data = {
+      participants: {
+        pending: study.$sideLoaded.pending_participants,
+        in_progress: study.$sideLoaded.started_participants,
+        finished: study.$sideLoaded.finished_participants,
+        total: study.$sideLoaded.participants_count
+      },
+      trend: {
+        values,
+        labels: Object.values(labels).map(label => label || ' ')
+      }
+    }
+    return { data }
   }
 }
 module.exports = StudyController

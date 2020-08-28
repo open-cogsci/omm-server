@@ -1,9 +1,9 @@
 <template>
   <v-row class="limit-height">
-    <v-col cols="12" md="4" xl="3" class="py-0">
+    <v-col cols="12" md="4" lg="3" class="py-0">
       <studies-tabs />
     </v-col>
-    <v-col v-if="$vuetify.breakpoint.mdAndUp" cols="12" md="8" xl="9">
+    <v-col v-if="$vuetify.breakpoint.mdAndUp" cols="12" md="8" lg="9">
       <nuxt-child />
     </v-col>
     <study-page-dialog v-else v-model="dialog">
@@ -41,5 +41,6 @@ export default {
 <style lang="scss">
   .limit-height {
     height: calc(100% + 24px);
+    overflow: auto;
   }
 </style>

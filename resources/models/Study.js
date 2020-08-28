@@ -37,9 +37,9 @@ export default class Study extends Model {
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),
+      finished_participants_count: this.number(0),
       participants_count: this.number(0),
       jobs_count: this.number(0),
-      completed_jobs_count: this.number(0),
       users: this.belongsToMany(User, StudyUser, 'study_id', 'user_id'),
       jobs: this.hasMany(Job, 'study_id'),
       variables: this.hasMany(Variable, 'study_id'),
@@ -70,10 +70,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   static fetchById (id, config) {
-    return this.api().get(id, {
-      dataTransformer: jobTransformer,
-      ...config
-    })
+    return this.api().get(`/${id}`, config)
   }
 
   /**
@@ -138,23 +135,6 @@ export default class Study extends Model {
         ...config
       }
     )
-  }
-
-  /**
-   * Refresh jobs from the server
-   *
-   * @param {Object} config
-   * @returns {Promise}
-   * @memberof Study
-   */
-  refreshJobs (config) {
-    return this.constructor.api().get(`${this.id}/jobs/refresh`, {
-      dataTransformer: jobTransformer,
-      persistOptions: {
-        create: ['jobs', 'variables']
-      },
-      ...config
-    })
   }
 
   /**
@@ -286,5 +266,20 @@ export default class Study extends Model {
       Participation.delete(key)
     }
     return response
+  }
+
+  /**
+   * Gets participation stats for this study
+   *
+   * @param {*} config
+   * @returns
+   * @memberof Study
+   */
+  async fetchParticipationStats (config) {
+    const reply = await this.constructor.api().get(`${this.id}/stats`, {
+      save: false,
+      ...config
+    })
+    return reply.response.data.data
   }
 }

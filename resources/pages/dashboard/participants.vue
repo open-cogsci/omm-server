@@ -44,6 +44,7 @@
                 :errors.sync="errors"
                 @update-participant="saveParticipant"
                 @delete-participant="deleteParticipant"
+                @load-participant="loadParticipant"
               />
             </v-skeleton-loader>
           </v-col>
@@ -97,6 +98,7 @@ export default {
       dialog: false,
       saving: false,
       loading: false,
+      loadingParticipant: 0,
       deleting: false,
       fabVisible: false,
       errors: {},
@@ -113,6 +115,7 @@ export default {
     },
     participants () {
       return this.Participant.query()
+        .with('studies')
         .orderBy('name', 'asc')
         .where('id', this.pagination.ids)
         .get()
@@ -155,6 +158,18 @@ export default {
         this.loading = false
       }
     },
+    /** Load a single participant */
+    async loadParticipant (id) {
+      this.loadingParticipant = id
+      try {
+        await this.Participant.fetchById(id, {
+          params: { study_progress: true }
+        })
+      } catch (e) {
+        this.errors = processErrors(e, this.notify)
+      }
+      this.loadingParticipant = 0
+    },
     /**
      *  Save a participant
      */
@@ -162,13 +177,15 @@ export default {
       if (this.saving) { return }
       this.saving = true
       try {
-        await this.Participant.persist(pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
+        const newRecord = await this.Participant.persist(
+          pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
         this.notify({ message: 'Participant has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()
         } else {
           this.dialog = false
           this.$refs.dialog.clear()
+          this.pagination.ids.unshift(newRecord.response.data.data.id)
         }
       } catch (e) {
         this.errors = processErrors(e, this.notify)

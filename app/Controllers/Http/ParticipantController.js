@@ -5,6 +5,7 @@ const isObject = require('lodash/isObject')
 const formatISO9075 = require('date-fns/formatISO9075')
 
 const Participant = use('App/Models/Participant')
+const { keyBy } = require('lodash')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -188,20 +189,27 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, response, transform }) {
+  async show ({ params, request, transform }) {
+    const { id } = params
+
     const ptcp = await Participant
       .query()
-      .where('id', params.id)
-      .with('studies.jobs.variables.dtype')
-      .first()
+      .where('id', id)
+      .with('studies')
+      .firstOrFail()
 
-    if (ptcp === null) {
-      response.notFound({ error: { message: `Participant with ID:${params.id} could not be found` } })
-      return
+    if (request.input('study_progress')) {
+      const studyProgress = await ptcp.getStudiesProgress()
+      const stats = keyBy(studyProgress, 'id')
+      ptcp.$relations.studies.rows = ptcp.$relations.studies.rows.map((study) => {
+        study.$relations.pivot.$attributes.jobs_count = stats[study.id].jobs_count
+        study.$relations.pivot.$attributes.completed_jobs_count = stats[study.id].completed_jobs_count
+        return study
+      })
     }
 
     return transform
-      .include('studies.jobs.variables.dtype')
+      .include('studies')
       .item(ptcp, 'ParticipantTransformer')
   }
 
@@ -210,7 +218,7 @@ class ParticipantController {
   * /participants/{id}:
   *   put:
   *     tags:
-  *       - Participants
+  *       - ParticipantsS
   *     security:
   *       - JWT: []
   *     summary: >
@@ -732,7 +740,9 @@ class ParticipantController {
       .firstOrFail()
 
     let data = request.input('data')
-    const previousData = ptcp.getRelated('jobs').first()?.getRelated('pivot').data
+    const job = ptcp.getRelated('jobs').first()
+    const study = await job.study().first()
+    const previousData = job.getRelated('pivot')?.data
     // Check if data has already been stored
     if (previousData) {
       if (isObject(data)) {
@@ -755,13 +765,11 @@ class ParticipantController {
       return response.unprocessableEntity({ message: 'Data cannot be converted to JSON' })
     }
 
-    try {
-      await ptcp.jobs().pivotQuery()
-        .where('job_id', jobID)
-        .update({ data, status_id: 3 })
-    } catch (e) {
-      return response.badRequest({ message: 'Unable to persist data' })
-    }
+    await ptcp.jobs().pivotQuery()
+      .where('job_id', jobID)
+      .update({ data, status_id: 3 })
+    await study.checkIfFinished(ptcp.id)
+
     return response.noContent()
   }
 }

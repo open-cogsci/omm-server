@@ -6,7 +6,8 @@ export default {
     title: 'Participants',
     perc_complete: '% complete',
     data: 'Data',
-    manage: 'Manage'
+    manage: 'Manage',
+    none: 'No participants assigned'
   },
   dialogs: {
     manage: {

@@ -11,7 +11,7 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
 class StudyTransformer extends BumblebeeTransformer {
   static get availableInclude () {
     return ['users', 'jobs', 'variables', 'participants', 'participants_count',
-      'jobs_count', 'completed_jobs_count', 'files']
+      'finished_participants_count', 'jobs_count', 'files']
   }
 
   transform (model) {
@@ -49,8 +49,8 @@ class StudyTransformer extends BumblebeeTransformer {
     return study.$sideLoaded.jobs_count
   }
 
-  includeCompletedJobsCount (study) {
-    return study.$sideLoaded.completed_jobs
+  includeFinishedParticipantsCount (study) {
+    return study.$sideLoaded.finished_participants
   }
 }
 

@@ -31,6 +31,7 @@ export function processErrors (e, notify = null, print = false) {
     })
   }
   if (print) {
+    // eslint-disable-next-line no-console
     console.error(e)
   }
   return errors

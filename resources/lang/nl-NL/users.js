@@ -6,7 +6,7 @@ export default {
     administrator: 'administrator'
   },
   status: {
-    pending: 'wacht op activatie',
+    pending: 'te activeren',
     active: 'geactiveerd',
     inactive: 'gedeactiveerd'
   },

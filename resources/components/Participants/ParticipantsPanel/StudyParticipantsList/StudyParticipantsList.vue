@@ -21,13 +21,13 @@
             <v-list-item-subtitle v-text="item.identifier" />
           </v-list-item-content>
           <v-list-item-avatar>
-            <job-progress v-bind="progress(item)" :size="40" />
+            <progress-circle v-bind="progress(item)" :size="40" />
           </v-list-item-avatar>
         </v-list-item>
       </template>
     </v-virtual-scroll>
     <h3 v-else class="px-4 font-weight-light">
-      No participants to show
+      {{ $t('study_participants.participants.none') }}
     </h3>
   </v-skeleton-loader>
 </template>
@@ -37,7 +37,7 @@ import { debounce } from 'lodash'
 
 export default {
   components: {
-    JobProgress: () => import('../JobProgress')
+    ProgressCircle: () => import('@/components/common/ProgressCircle')
   },
   props: {
     participants: {
@@ -68,21 +68,10 @@ export default {
   },
   methods: {
     progress (ptcp) {
-      const value = this.totalJobs > 0
-        ? parseInt(ptcp.completed_jobs_count / this.totalJobs * 100)
-        : 0
-
-      let color
-      if (value >= 80) {
-        color = 'green'
-      } else if (value < 80 && value > 50) {
-        color = 'green darken-2'
-      } else {
-        color = 'primary'
-      }
-
       return {
-        value, color
+        value: this.totalJobs > 0
+          ? parseInt((ptcp.pivot?.completed_jobs_count ?? 0) / this.totalJobs * 100)
+          : 0
       }
     },
     setHeight () {
