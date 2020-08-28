@@ -9,7 +9,7 @@
     <manage-dialog
       v-model="dialog.manage"
       :study="study"
-      @new-assignments="refreshParticipants"
+      @new-assignments="refresh"
     />
     <v-col
       cols="12"
@@ -184,13 +184,14 @@ export default {
         this.loading.data = null
       }
     },
-    refreshParticipants () {
+    refresh () {
       this.fetchParticipants({
         params: {
           page: 1,
           perPage: this.pagination.perPage
         }
       })
+      this.fetchStats()
     },
     setPtcpListCtrHeight () {
       this.ptcpListCtrHeight = this.$refs.ptcpListContainer?.clientHeight || 0

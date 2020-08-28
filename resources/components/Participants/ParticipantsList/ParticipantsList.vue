@@ -106,7 +106,53 @@
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 {{ $t('participants.participations') }}
               </v-card-title>
-              <v-card-text />
+              <v-card-text class="pa-0">
+                <v-skeleton-loader
+                  :loading="loadingParticipant === ptcp.id"
+                  type="divided-list-item@5"
+                  :types="{'divided-list-item': 'list-item-two-line, divider'}"
+                >
+                  <!-- With only a virtual scroll here, the skeleton loader never leaves the
+                  loading state. Therefore there also is an empty div -->
+                  <div />
+                  <v-virtual-scroll
+                    v-if="ptcp.studies.length"
+                    :items="ptcp.studies"
+                    :item-height="65"
+                    height="340"
+                  >
+                    <template v-slot="{ item }">
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-list-item-title v-text="item.name" />
+                          <v-list-item-subtitle v-text="item.description" />
+                        </v-list-item-content>
+                        <v-list-item-action>
+                          <v-list-item-action-text class="info--text">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{on, attrs}">
+                                <div class="d-inline-block" v-bind="attrs" v-on="on">
+                                  <progress-circle :value="progress(item)" />
+                                </div>
+                              </template>
+                              {{ $t('stats.progress') }}
+                            </v-tooltip>
+                          </v-list-item-action-text>
+                        </v-list-item-action>
+                      </v-list-item>
+                      <v-divider :key="`divider-${item.id}`" />
+                    </template>
+                  </v-virtual-scroll>
+
+                  <v-list-item v-else>
+                    <v-list-item-content>
+                      <v-list-item-title class="font-weight-light text-center">
+                        {{ $t(`participants.no_studies`) }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-skeleton-loader>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -121,7 +167,8 @@ import { lowerCase, isNumber } from 'lodash'
 export default {
   components: {
     ParticipantViewData: () => import('@/components/Participants/ParticipantViewData'),
-    ParticipantEditData: () => import('@/components/Participants/ParticipantEditData')
+    ParticipantEditData: () => import('@/components/Participants/ParticipantEditData'),
+    ProgressCircle: () => import('@/components/common/ProgressCircle')
   },
   filters: {
     lowercase: val => lowerCase(val)
@@ -138,6 +185,10 @@ export default {
     deleting: {
       type: Boolean,
       default: false
+    },
+    loadingParticipant: {
+      type: Number,
+      default: 0
     },
     errors: {
       type: Object,
@@ -160,6 +211,11 @@ export default {
   methods: {
     clearEditing () {
       this.editing = null
+    },
+    progress (item) {
+      return 50
+      // if (!item.participants_count) { return 0 }
+      // return item.finished_participants_count / item.participants_count * 100
     }
   }
 }

@@ -993,13 +993,12 @@ class StudyController {
         q.where('study_id', study.id).select('id')
       })
       .withCount('jobs as completed_jobs', (query) => {
-        query.wherePivot('status_id', 3)
+        query.where('study_id', study.id).wherePivot('status_id', 3)
       })
       .orderBy('pivot_status_id', 'desc')
       .paginate(page, perPage)
 
-    const reply = await transform.include('completed_jobs_count')
-      .paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')
+    const reply = await transform.paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')
     // Transform the record making study the parent record, to assure fluent handling by
     // vuex-orm on the client-side
     reply.data = { id: parseInt(id), participants: reply.data }

@@ -10,6 +10,7 @@ export default class Participation extends Model {
       study_id: this.attr(null),
       participant_id: this.attr(null),
       status_id: this.attr(null),
+      completed_jobs_count: this.number(0),
       created_at: this.attr(null),
       updated_at: this.attr(null)
     }

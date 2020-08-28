@@ -204,7 +204,7 @@ class ParticipantController {
       .firstOrFail()
 
     return transform
-      // .include('studies.jobs.variables.dtype')
+      .include('studies.jobs_count')
       .item(ptcp, 'ParticipantTransformer')
   }
 

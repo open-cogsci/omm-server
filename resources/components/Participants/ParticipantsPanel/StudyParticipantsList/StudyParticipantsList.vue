@@ -70,7 +70,7 @@ export default {
     progress (ptcp) {
       return {
         value: this.totalJobs > 0
-          ? parseInt(ptcp.completed_jobs_count / this.totalJobs * 100)
+          ? parseInt((ptcp.pivot?.completed_jobs_count ?? 0) / this.totalJobs * 100)
           : 0
       }
     },

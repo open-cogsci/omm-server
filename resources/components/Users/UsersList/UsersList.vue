@@ -1,9 +1,5 @@
 <template>
-  <v-expansion-panels
-    v-model="panel"
-    popout
-    hover
-  >
+  <v-expansion-panels v-model="panel" popout hover>
     <v-expansion-panel v-for="user in users" :key="user.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
