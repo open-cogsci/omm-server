@@ -73,7 +73,10 @@ Route.group(() => {
     ]))
   Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
 
-  Route.get('/participations/trend', 'DashboardController.participationTrend').as('stats.participation_trend')
+  Route.get('/participations/trend', 'DashboardController.participationTrend')
+    .as('stats.participation_trend')
+  Route.get('/participations/mostfrequent', 'DashboardController.mostFrequentParticipations')
+    .as('stats.most_frequent_participations')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {

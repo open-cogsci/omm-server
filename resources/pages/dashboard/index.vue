@@ -30,9 +30,9 @@
         <v-row style="max-height: 50%">
           <v-col cols="12" sm="6">
             <v-card class="fill-height">
-              <v-card-title>Participation trend</v-card-title>
+              <v-card-title>7 day participation trend</v-card-title>
               <v-card-title class="font-weight-light text-subtitle-1 text-md-h6">
-                Trend of participations to all of your studies over at most 7 days.
+                to all of your studies taken together.
               </v-card-title>
               <v-card-text>
                 <v-skeleton-loader :loading="loading.trend" type="card" transition="fade-transition">

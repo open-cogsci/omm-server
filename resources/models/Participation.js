@@ -27,4 +27,12 @@ export default class Participation extends Model {
     })
     return reply.response.data.data.trend
   }
+
+  static async mostFrequent (config) {
+    const reply = await this.api().get('/participations/mostfrequent', {
+      ...config,
+      save: false
+    })
+    return reply.response.data.data
+  }
 }
