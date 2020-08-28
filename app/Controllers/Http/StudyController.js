@@ -12,10 +12,11 @@ const Helpers = use('Helpers')
 const pool = use('Workers/Sheets')
 
 const fs = require('fs')
-const { isArray, isInteger, range } = require('lodash')
-const { format, differenceInCalendarDays } = require('date-fns')
+const { isArray, isInteger } = require('lodash')
+const { format } = require('date-fns')
 
 const removeFile = Helpers.promisify(fs.unlink)
+const processTrend = require('../../Util/trend')
 
 /**
  * Resourceful controller for interacting with studies
@@ -1122,59 +1123,24 @@ class StudyController {
       .firstOrFail()
 
     const ptcpTrend = (await Database.raw(`
-      select sum(c) as amount, bin, updated_at from
-      (SELECT
+      SELECT SUM(c) AS amount, bin, updated_at
+      FROM (
+        SELECT
           job_states.updated_at,
-          count(*) as c,
+          count(*) AS c,
           FLOOR(
             PERCENT_RANK() OVER (
                 ORDER BY job_states.updated_at ASC
             ) * ?) as bin
-      FROM
-          job_states
-      LEFT JOIN jobs ON job_states.job_id = jobs.id
-      WHERE status_id = 3 AND jobs.study_id = ?
-      GROUP BY job_states.updated_at) as bins
-      group by bin, updated_at
+        FROM job_states
+        LEFT JOIN jobs ON job_states.job_id = jobs.id
+        WHERE status_id = 3 AND jobs.study_id = ?
+        GROUP BY job_states.updated_at
+      ) as bins
+      GROUP BY bin, updated_at
       `, [bins, study.id]))[0]
 
-    // Initialize an empty object with all the bins having value 0. This is necessary
-    // because the database only returns bin numbers that actually have a value and omits
-    // empty bins.
-    const baseTrend = range(bins).reduce((result, val) => {
-      result[val] = 0
-      return result
-    }, {})
-
-    // Merge the real bin values into the empty array to get the complete array
-    const values = Object.values({
-      ...baseTrend,
-      ...ptcpTrend.reduce((result, entry) => {
-        result[entry.bin] = parseInt(entry.amount)
-        return result
-      }, {})
-    })
-
-    // Obtain the dates of the first occurence and the last occurence.
-    const labels = { ...baseTrend }
-    if (ptcpTrend.length > 0) {
-      const first = ptcpTrend[0]
-      const last = ptcpTrend.slice(-1)[0]
-      const dayFormat = 'd MMM'
-      const timeFormat = 'HH:mm'
-
-      // If all participations are on the same day, show the time at the ends of the axis
-      // with the day in the center. Otherwise, just show the first and last day at the ends
-      // of the axis
-      if (differenceInCalendarDays(last.updated_at, first.updated_at) === 0) {
-        labels[0] = format(first.updated_at, timeFormat)
-        labels[Math.floor(bins / 2)] = format(first.updated_at, dayFormat)
-        labels[bins] = format(last.updated_at, timeFormat)
-      } else {
-        labels[0] = format(first.updated_at, dayFormat)
-        labels[bins] = format(last.updated_at, dayFormat)
-      }
-    }
+    const trend = processTrend(bins, ptcpTrend)
 
     const data = {
       participants: {
@@ -1183,10 +1149,7 @@ class StudyController {
         finished: study.$sideLoaded.finished_participants,
         total: study.$sideLoaded.participants_count
       },
-      trend: {
-        values,
-        labels: Object.values(labels).map(label => label || ' ')
-      }
+      trend
     }
     return { data }
   }

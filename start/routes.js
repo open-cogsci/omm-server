@@ -72,6 +72,8 @@ Route.group(() => {
       [['studies.update'], ['SaveStudy']]
     ]))
   Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
+
+  Route.get('/participations/trend', 'DashboardController.participationTrend').as('stats.participation_trend')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {

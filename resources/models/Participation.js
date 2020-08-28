@@ -1,9 +1,12 @@
 import { Model } from '@vuex-orm/core'
-
+import { API_PREFIX } from '@/assets/js/endpoints'
 export default class Participation extends Model {
   static entity = 'participations'
-
   static primaryKey = ['study_id', 'participant_id']
+
+  static apiConfig = {
+    baseURL: API_PREFIX
+  }
 
   static fields () {
     return {
@@ -15,5 +18,13 @@ export default class Participation extends Model {
       created_at: this.attr(null),
       updated_at: this.attr(null)
     }
+  }
+
+  static async trend (config) {
+    const reply = await this.api().get('/participations/trend', {
+      ...config,
+      save: false
+    })
+    return reply.response.data.data.trend
   }
 }
