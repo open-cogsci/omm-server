@@ -102,7 +102,7 @@
                   <div />
                   <v-virtual-scroll
                     v-if="user.studies.length"
-                    :items="user.studies"
+                    :items="user.studies.filter(study => study.pivot.is_owner)"
                     :item-height="65"
                     height="340"
                   >
