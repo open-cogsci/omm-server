@@ -6,13 +6,12 @@
     @input="$emit('input', $event)"
   >
     <v-card>
-      <v-card-title>Add a new user</v-card-title>
-      <v-card-text class="body-1 font-weight-light">
-        Please enter the information below
-      </v-card-text>
+      <v-card-title v-text="$t('users.dialogs.new.title')" />
+      <v-card-text class="body-1 font-weight-light" v-text="$t('users.dialogs.new.subtitle')" />
       <v-fade-transition mode="out-in">
         <user-edit-data
           ref="form"
+          class="px-2"
           :saving="saving"
           :errors="errors"
           @clicked-cancel="$emit('input', false)"

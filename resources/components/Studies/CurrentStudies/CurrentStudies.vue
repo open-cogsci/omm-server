@@ -84,7 +84,10 @@ export default {
           name: newStudyData.name,
           description: newStudyData.description
         })
-        this.notify({ message: 'Study has been added', color: 'success' })
+        this.notify({
+          message: this.$t('studies.notifications.created'),
+          color: 'success'
+        })
         this.dialog = false
         this.$refs.dialog.clear()
       } catch (e) {

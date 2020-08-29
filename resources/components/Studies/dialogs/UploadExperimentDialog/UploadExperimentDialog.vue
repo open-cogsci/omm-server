@@ -1,56 +1,32 @@
 <template>
-  <v-dialog
-    :value="value"
+  <base-upload-dialog
     max-width="750px"
-    @input="$emit('input', $event)"
-  >
-    <v-card>
-      <v-card-title>
-        Upload experiment
-      </v-card-title>
-      <v-card-text class="body-1 font-weight-light">
-        Provide an osexp file
-      </v-card-text>
-      <v-card-text>
-        Upload here
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <save-cancel-buttons
-          :saving="saving"
-          @clicked-save="save"
-          @clicked-cancel="cancel"
-        />
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+    persistent
+    :title="$t('studies.dialogs.upload_experiment.title')"
+    :subtitle="$t('studies.dialogs.upload_experiment.subtitle')"
+    accepted-file-types=".osexp"
+    v-bind="$props"
+    v-on="$listeners"
+  />
 </template>
 
 <script>
 export default {
   components: {
-    SaveCancelButtons: () => import('@/components/common/SaveCancelButtons')
+    BaseUploadDialog: () => import('../BaseUploadDialog')
   },
   props: {
     value: {
       type: Boolean,
       default: false
     },
-    formValid: {
-      type: Boolean,
-      default: true
+    uploadStatus: {
+      type: Object,
+      default: () => ({})
     },
-    saving: {
-      type: Boolean,
-      default: false
-    }
-  },
-  methods: {
-    cancel () {
-      this.$emit('input', false)
-    },
-    save () {
-
+    previousFile: {
+      type: Object,
+      default: () => ({})
     }
   }
 }

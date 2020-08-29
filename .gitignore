@@ -91,3 +91,6 @@ sw.*
 
 # Database
 database/*.sqlite
+
+# File uploads
+public/files/**

@@ -19,6 +19,7 @@ const API_PREFIX = '/api/v1'
 Route.group(() => {
   Route.get('/users/types', 'UserController.userTypes')
   Route.post('/users/resend_account_email', 'UserController.resendAccountEmail').as('users.resend_account_email')
+  Route.post('/users/search', 'UserController.search').as('users.search')
   Route.resource('users', 'UserController').apiOnly()
     .validator(new Map([
       [['users.store'], ['SaveUser']],
@@ -27,22 +28,59 @@ Route.group(() => {
 
   Route.get('/auth/user', 'UserController.me').as('users.me')
   Route.put('/auth/user', 'UserController.updateMe').as('users.update_me').validator('SaveUser')
+  Route.patch('/auth/user/locale', 'UserController.setLocale').as('users.set_locale')
   Route.put('/auth/password', 'UserController.changePassword').as('users.password')
   Route.post('/auth/logout', 'UserController.logout').as('logout')
   Route.post('/auth/email/resend', 'UserController.resendVerificationEmail').as('users.resend_verification_email')
 
+  Route.get('/jobs/study/:study_id', 'JobController.index').as('jobs.index')
   Route.resource('jobs', 'JobController').apiOnly()
+
+  Route.get('/participants/study/:study_id', 'ParticipantController.fetchForStudy')
+    .as('participants.fetch_for_study')
+  Route.get('/participants/ids/study/:study_id', 'ParticipantController.fetchIDsForStudy')
+    .as('participants.fetch_ids_for_study')
   Route.resource('participants', 'ParticipantController').apiOnly()
     .validator(new Map([
       [['participants.store'], ['SaveParticipant']],
       [['participants.update'], ['SaveParticipant']]
     ]))
+
+  Route.get('/studies/:id/data', 'StudyController.generateDatafile').as('studies.generate_datafile')
+  Route.get('/studies/:id/stats', 'StudyController.participationStats').as('studies.participation_stats')
+  Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
+  Route.post('/studies/:id/upload/:type', 'StudyController.uploadFile')
+    .as('studies.upload')
+  Route.post('/studies/:id/collaborator', 'StudyController.addCollaborator').as('studies.add_collaborator')
+  Route.patch('/studies/:id/collaborator', 'StudyController.updateCollaborator')
+    .as('studies.update_collaborator')
+  Route.delete('/studies/:id/collaborator/:userID', 'StudyController.removeCollaborator')
+    .as('studies.remove_collaborator')
+
+  Route.get('/studies/:id/participants', 'StudyController.fetchParticipants')
+    .as('studies.fetch_participants')
+  Route.get('/studies/:id/participants/ids', 'StudyController.fetchParticipantIDs')
+    .as('studies.fetch_participant_ids')
+  Route.post('/studies/:id/participants', 'StudyController.assignParticipants')
+    .as('studies.assign_participants')
+  Route.delete('/studies/:id/participants', 'StudyController.revokeParticipants')
+    .as('studies.revoke_participants')
+
   Route.resource('studies', 'StudyController').apiOnly()
     .validator(new Map([
       [['studies.store'], ['SaveStudy']],
       [['studies.update'], ['SaveStudy']]
     ]))
-  Route.patch('/studies/:id/archive', 'StudyController.archive').as('studies.archive')
+  Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
+
+  Route.get('/participations/trend', 'DashboardController.participationTrend')
+    .as('stats.participation_trend')
+  Route.get('/participations/most_recent', 'DashboardController.mostRecentParticipations')
+    .as('stats.most_recent_participations')
+  Route.get('/participations/most_active_studies', 'DashboardController.mostActiveStudies')
+    .as('stats.most_active_studies')
+  Route.get('/participations/most_active_participants', 'DashboardController.mostActiveParticipants')
+    .as('stats.most_active_participants')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {
@@ -52,11 +90,15 @@ Route.group(() => {
   Route.post('/auth/email/verify/:token', 'UserController.verifyEmailAddress').as('users.verify_email')
 
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
-  Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob').as('participants.fetch_job')
-  Route.get('/participants/:identifier/:studyID/currentjob_idx', 'ParticipantController.fetchJobIndex').as('participants.fetch_job_index')
-  Route.get('/participants/:identifier/:studyID/jobs', 'ParticipantController.fetchJobs').as('participants.fetch_jobs')
+  Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob')
+    .as('participants.fetch_job')
+  Route.get('/participants/:identifier/:studyID/currentjob_idx', 'ParticipantController.fetchJobIndex')
+    .as('participants.fetch_job_index')
+  Route.get('/participants/:identifier/:studyID/jobs', 'ParticipantController.fetchJobs')
+    .as('participants.fetch_jobs')
 
-  Route.patch('/participants/:identifier/:jobID/result', 'ParticipantController.processJobResult').as('jobs.submit_result')
+  Route.patch('/participants/:identifier/:job_id/result', 'ParticipantController.processJobResult')
+    .as('jobs.submit_result')
   Route.patch('/jobs/:id/move/:position', 'JobController.moveToPosition').as('jobs.move_position')
 
   // CREATE:

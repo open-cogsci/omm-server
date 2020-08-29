@@ -14,7 +14,7 @@
           mdi-check
         </v-icon>
       </template>
-      Save changes
+      {{ $t('buttons.save') }}
     </v-tooltip>
                   &nbsp;
     <v-tooltip bottom>
@@ -26,7 +26,7 @@
           mdi-cancel
         </v-icon>
       </template>
-      Discard changes
+      {{ $t('buttons.discard') }}
     </v-tooltip>
   </fragment>
 </template>

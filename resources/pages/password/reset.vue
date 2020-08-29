@@ -75,7 +75,7 @@ export default {
         const uri = `${RESET_PASSWORD}/${encodeURIComponent(token)}`
         await this.$axios.post(uri, data, cfg)
         this.status = {
-          message: 'Your password has been reset.',
+          message: this.$t('password_reset.message.success'),
           type: 'success'
         }
         this.$refs.pwForm.reset()

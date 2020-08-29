@@ -5,6 +5,7 @@ const isObject = require('lodash/isObject')
 const formatISO9075 = require('date-fns/formatISO9075')
 
 const Participant = use('App/Models/Participant')
+const { keyBy } = require('lodash')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -51,13 +52,51 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async index ({ transform }) {
-    const participants = await Participant
+  async index ({ transform, request }) {
+    const query = Participant
       .query()
-      .withCount('studies')
-      .orderBy('created_at', 'desc')
-      .fetch()
-    return transform.collection(participants, 'ParticipantTransformer.withStudiesCount')
+      .orderBy('name', 'asc')
+
+    if (request.input('studiescount')) {
+      query.withCount('studies')
+      transform = transform.include('studies_count')
+    }
+
+    if (request.input('only_active')) {
+      query.where('active', 1)
+    }
+
+    const assignedTo = request.input('assigned_to_study')
+    if (assignedTo) {
+      query.whereHas('studies', (q) => {
+        q.where('studies.id', assignedTo)
+      })
+    }
+
+    const notAssignedTo = request.input('not_assigned_to_study')
+    if (notAssignedTo) {
+      query.whereDoesntHave('studies', (q) => {
+        q.where('studies.id', notAssignedTo)
+      })
+    }
+
+    const searchterm = request.input('q')
+    if (searchterm && searchterm.length >= 2) {
+      query.where(function () {
+        this.where('name', 'LIKE', `%${searchterm}%`)
+        this.orWhere('identifier', 'LIKE', `%${searchterm}%`)
+      })
+    }
+
+    if (request.input('no_paginate')) {
+      const participants = await query.fetch()
+      return transform.collection(participants, 'ParticipantTransformer')
+    } else {
+      const page = request.input('page', 1)
+      const perPage = request.input('perPage', 20)
+      const participants = await query.paginate(page, perPage)
+      return transform.paginate(participants, 'ParticipantTransformer')
+    }
   }
 
   /**
@@ -150,20 +189,27 @@ class ParticipantController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async show ({ params, response, transform }) {
+  async show ({ params, request, transform }) {
+    const { id } = params
+
     const ptcp = await Participant
       .query()
-      .where('id', params.id)
-      .with('studies.jobs.variables.dtype')
-      .first()
+      .where('id', id)
+      .with('studies')
+      .firstOrFail()
 
-    if (ptcp === null) {
-      response.notFound({ error: { message: `Participant with ID:${params.id} could not be found` } })
-      return
+    if (request.input('study_progress')) {
+      const studyProgress = await ptcp.getStudiesProgress()
+      const stats = keyBy(studyProgress, 'id')
+      ptcp.$relations.studies.rows = ptcp.$relations.studies.rows.map((study) => {
+        study.$relations.pivot.$attributes.jobs_count = stats[study.id].jobs_count
+        study.$relations.pivot.$attributes.completed_jobs_count = stats[study.id].completed_jobs_count
+        return study
+      })
     }
 
     return transform
-      .include('studies.jobs.variables.dtype')
+      .include('studies')
       .item(ptcp, 'ParticipantTransformer')
   }
 
@@ -172,7 +218,7 @@ class ParticipantController {
   * /participants/{id}:
   *   put:
   *     tags:
-  *       - Participants
+  *       - ParticipantsS
   *     security:
   *       - JWT: []
   *     summary: >
@@ -316,21 +362,28 @@ class ParticipantController {
   *     tags:
   *       - Studies
   *     summary: >
-  *         When a participant enters a cubicle, the omm client announces this to the server, and the server replies by
-  *         sending the study information.
+  *         When a participant enters a cubicle, the omm client announces this to the server,
+  *         and the server replies by sending the study information.
   *     parameters:
   *       - in: path
   *         name: identifier
   *         required: true
   *         type: string
-  *         description: The identifier code of the participant transmitted by its chip.
+  *         description: The identifier code of the participant.
   *     responses:
   *       200:
   *         description: Sends the study to perform, including a download link for the osexp file.
   *         schema:
   *           properties:
   *             data:
-  *               $ref: '#/definitions/Study'
+  *               allOf:
+  *                 - $ref: '#/definitions/Study'
+  *                 - type: object
+  *                   properties:
+  *                     files:
+  *                       type: array
+  *                       items:
+  *                         $ref: '#/definitions/StudyFile'
   *       400:
   *         description: The specified identifier is invalid (e.g. not the expected dtype).
   *       404:
@@ -357,6 +410,7 @@ class ParticipantController {
     try {
       // First find studies that are in progress, then select pending studies.
       study = await ptcp.studies()
+        .with('files')
         .whereInPivot('status_id', [1, 2])
         .orderBy('status_id', 'desc')
         .orderBy('created_at', 'asc')
@@ -379,7 +433,7 @@ class ParticipantController {
       }
     }
 
-    return transform.item(study, 'StudyTransformer')
+    return transform.include('files').item(study, 'StudyTransformer')
   }
 
   /**
@@ -633,7 +687,7 @@ class ParticipantController {
 
   /**
   * @swagger
-  * /participants/{identifier}/{id}/result:
+  * /participants/{identifier}/{job_id}/result:
   *   patch:
   *     tags:
   *       - Jobs
@@ -646,7 +700,7 @@ class ParticipantController {
   *         type: string
   *         description: The identifier of the participant for which the result is submitted.
   *       - in: path
-  *         name: id
+  *         name: job_id
   *         required: true
   *         type: integer
   *         description: The ID of the job which the results belong to.
@@ -676,7 +730,7 @@ class ParticipantController {
   *         description: Unexpected error
   */
   async processJobResult ({ params, request, response }) {
-    const { jobID, identifier } = params
+    const { job_id: jobID, identifier } = params
 
     const ptcp = await Participant.query()
       .where('identifier', identifier)
@@ -686,7 +740,9 @@ class ParticipantController {
       .firstOrFail()
 
     let data = request.input('data')
-    const previousData = ptcp.getRelated('jobs').first()?.getRelated('pivot').data
+    const job = ptcp.getRelated('jobs').first()
+    const study = await job.study().first()
+    const previousData = job.getRelated('pivot')?.data
     // Check if data has already been stored
     if (previousData) {
       if (isObject(data)) {
@@ -709,13 +765,11 @@ class ParticipantController {
       return response.unprocessableEntity({ message: 'Data cannot be converted to JSON' })
     }
 
-    try {
-      await ptcp.jobs().pivotQuery()
-        .where('job_id', jobID)
-        .update({ data, status_id: 3 })
-    } catch (e) {
-      return response.badRequest({ message: 'Unable to persist data' })
-    }
+    await ptcp.jobs().pivotQuery()
+      .where('job_id', jobID)
+      .update({ data, status_id: 3 })
+    await study.checkIfFinished(ptcp.id)
+
     return response.noContent()
   }
 }

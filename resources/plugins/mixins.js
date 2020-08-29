@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import camelCase from 'lodash/camelCase'
 
 Vue.mixin({
   beforeCreate () {
@@ -12,7 +13,7 @@ Vue.mixin({
         if (!attrs.includes(key)) {
           Vue.util.warn(`Missing required sync-prop: "${key}"`, this)
         }
-        this.$options.computed[key] = {
+        this.$options.computed[camelCase(key)] = {
           get () {
             return this.$attrs[key]
           },

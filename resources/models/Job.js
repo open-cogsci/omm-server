@@ -1,10 +1,15 @@
 import { Model } from '@vuex-orm/core'
-
+import { cloneDeep, keyBy } from 'lodash'
 import Study from './Study'
-import Variable from './Variable'
-import JobVariable from './JobVariable'
 
 import { JOBS } from '@/assets/js/endpoints'
+
+export const jobTransformer = (job) => {
+  if (job.variables?.length) {
+    job.variables = keyBy(job.variables, 'name')
+  }
+  return job
+}
 
 export default class Job extends Model {
   static entity = 'jobs'
@@ -13,8 +18,36 @@ export default class Job extends Model {
     baseURL: JOBS
   }
 
+  static fields () {
+    return {
+      id: this.number(null),
+      position: this.number(''),
+      study_id: this.number(null),
+      created_at: this.attr(''),
+      updated_at: this.attr(''),
+      deleted_at: this.attr(''),
+      study: this.belongsTo(Study, 'study_id'),
+      variables: this.attr([])
+    }
+  }
+
   static fetchById (id, config) {
-    return this.api().get(id, config)
+    return this.api().get(id, {
+      dataTransformer: ({ data }) => jobTransformer(data.data),
+      ...config
+    })
+  }
+
+  static fetchByStudyId (studyID, config) {
+    const { refresh, ...cfg } = config
+    if (refresh) {
+      this.delete(record => record.study_id === studyID)
+    }
+
+    return this.api().get(`/study/${studyID}`, {
+      dataTransformer: ({ data }) => data.data.map(jobTransformer),
+      ...cfg
+    })
   }
 
   static persist (data, config) {
@@ -32,16 +65,29 @@ export default class Job extends Model {
     return this.constructor.api().patch(`/${this.id}/move/${newPosition}`, config)
   }
 
-  static fields () {
-    return {
-      id: this.number(null),
-      position: this.number(''),
-      study_id: this.number(null),
-      created_at: this.attr(''),
-      updated_at: this.attr(''),
-      deleted_at: this.attr(''),
-      study: this.belongsTo(Study, 'study_id'),
-      variables: this.belongsToMany(Variable, JobVariable, 'job_id', 'variable_id')
-    }
+  setVariableValue (variableID, value, config) {
+    // First update the local store to immediately reflect changes in the GUI
+    this.constructor.update({
+      where: this.id,
+      data (job) {
+        const varRecord = cloneDeep(Object.values(job.variables).find(variable => variable.id === variableID))
+        const variablesClone = cloneDeep(job.variables)
+        varRecord.pivot.value = value
+        variablesClone[varRecord.name] = varRecord
+        job.variables = variablesClone
+      }
+    })
+    // Then remotely
+    return this.constructor.api().patch(
+      `/${this.id}`,
+      {
+        variable_id: variableID,
+        value
+      },
+      {
+        dataTransformer: jobTransformer,
+        ...config
+      }
+    )
   }
 }

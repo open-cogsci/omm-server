@@ -10,7 +10,7 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
  */
 class ParticipantTransformer extends BumblebeeTransformer {
   static get availableInclude () {
-    return ['jobs', 'studies']
+    return ['jobs', 'studies', 'studies_count', 'completed_jobs_count']
   }
 
   transform (model) {
@@ -21,19 +21,31 @@ class ParticipantTransformer extends BumblebeeTransformer {
     }
   }
 
-  transformWithStudiesCount (participant) {
-    return {
-      ...this.transform(participant),
-      studies_count: participant.$sideLoaded.studies_count
+  transformPaginatedUnderStudy (model) {
+    const data = {
+      ...this.transform(model),
+      pivot: model.$relations?.studies?.rows[0].$relations.pivot.toObject()
     }
+    if (model.$sideLoaded.completed_jobs) {
+      data.pivot.completed_jobs_count = model.$sideLoaded.completed_jobs
+    }
+    return data
   }
 
-  includeJobs (participant) {
-    return this.collection(participant.getRelated('jobs'), 'JobTransformer')
+  includeJobs (model) {
+    return this.collection(model.getRelated('jobs'), 'JobTransformer')
   }
 
-  includeStudies (participant) {
-    return this.collection(participant.getRelated('studies'), 'StudyTransformer')
+  includeStudies (model) {
+    return this.collection(model.getRelated('studies'), 'StudyTransformer')
+  }
+
+  includeStudiesCount (model) {
+    return model.$sideLoaded.studies_count
+  }
+
+  includeCompletedJobsCount (model) {
+    return model.$sideLoaded.completed_jobs
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="fill-height align-start">
     <new-user-dialog
       ref="dialog"
       v-model="dialog"
@@ -7,17 +7,36 @@
       :errors.sync="errors"
       @save-user="saveUser"
     />
-    <v-row>
-      <v-col cols="12" xl="8" offset-xl="2">
-        <v-row>
+    <v-row class="fill-height">
+      <v-col
+        cols="12"
+        xl="8"
+        offset-xl="2"
+        class="d-flex flex-column py-0"
+      >
+        <v-row class="align-self-start">
           <v-col cols="12">
             <h1 class="display-1 font-weight-light">
-              Users
+              {{ $t('layout.nav.users') }}
             </h1>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12">
+            <v-text-field
+              v-model="searchterm"
+              solo
+              prepend-inner-icon="mdi-magnify"
+              :placeholder="$t('users.search')"
+              hide-details
+              clearable
+              :loading="searching"
+              @input="() => { pagination.page = 1; fetchUsers() }"
+            />
+          </v-col>
+        </v-row>
+        <v-row class="fill-height">
+          <v-col ref="items" cols="12">
             <v-skeleton-loader
               :loading="loading"
               type="table-row-divider@10"
@@ -38,6 +57,15 @@
             </v-skeleton-loader>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-pagination
+              :value="pagination.page"
+              :length="pagination.lastPage"
+              @input="switchPage"
+            />
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
     <v-fab-transition>
@@ -51,7 +79,7 @@
         dark
         bottom
         right
-        absolute
+        fixed
         @click="dialog=true"
       >
         <v-icon>mdi-plus</v-icon>
@@ -62,7 +90,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { pick } from 'lodash'
+import { debounce, pick } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -74,6 +102,8 @@ export default {
   },
   data () {
     return {
+      searchterm: '',
+      searching: false,
       dialog: false,
       saving: false,
       loading: false,
@@ -81,7 +111,11 @@ export default {
       deleting: false,
       resending: false,
       fabVisible: false,
-      errors: {}
+      errors: {},
+      pagination: {
+        page: 1,
+        perPage: 12
+      }
     }
   },
   computed: {
@@ -92,28 +126,42 @@ export default {
       return this.User.query()
         .with(['user_type', 'studies'])
         .orderBy('name', 'asc')
+        .where('id', this.pagination.ids)
         .get()
     }
   },
   created () {
-    this.clearErrors(false)
-    this.loadUsers()
+    this.fetchUsers = debounce(this.fetchUsers, 250)
   },
   mounted () {
     this.fabVisible = true
+    const vh = this.$refs.items.clientHeight
+    this.pagination.perPage = Math.floor(vh / 60)
+    this.fetchUsers()
   },
   methods: {
     ...mapActions('notifications', ['notify']),
     /*
     * Fetch users from server
     */
-    async loadUsers () {
-      this.loading = true
+    async fetchUsers () {
+      if (this.loading || this.searching) { return }
       try {
-        await this.User.fetch()
+        const params = {
+          page: this.pagination.page,
+          perPage: this.pagination.perPage
+        }
+        if (this.searchterm && this.searchterm.length >= 2) {
+          params.q = this.searchterm
+          this.searching = true
+        } else {
+          this.loading = true
+        }
+        this.pagination = await this.User.fetch({ params })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
+        this.searching = false
         this.loading = false
       }
     },
@@ -131,11 +179,12 @@ export default {
      *  Save a user
      */
     async saveUser (userData) {
+      if (this.saving) { return }
       this.saving = true
       try {
         await this.User.persist(pick(userData,
           ['$id', 'id', 'name', 'email', 'password', 'user_type_id', 'account_status']))
-        this.notify({ message: 'User has been saved', color: 'success' })
+        this.notify({ message: this.$t('users.messages.saved'), color: 'success' })
         if (userData.id) {
           this.$refs.list.clearEditing()
         } else {
@@ -152,10 +201,11 @@ export default {
     * Delete a user
     */
     async deleteUser (id) {
+      if (this.deleting) { return }
       this.deleting = true
       try {
         await this.User.find(id).destroy()
-        this.notify({ message: 'User has been deleted', color: 'success' })
+        this.notify({ message: this.$t('users.messages.deleted'), color: 'success' })
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       } finally {
@@ -166,14 +216,15 @@ export default {
      * Resend email containing user password
      */
     async resendAccountEmail (user) {
+      if (this.resending) { return }
       this.resending = true
       try {
         if (user.last_login) {
           await user.resendActivationEmail()
-          this.notify({ message: 'Activation e-mail has been resent', color: 'success' })
+          this.notify({ message: this.$t('users.messages.activation_resent'), color: 'success' })
         } else {
           await user.resendAccountEmail()
-          this.notify({ message: 'Account info e-mail has been resent', color: 'success' })
+          this.notify({ message: this.$t('users.messages.account_info_resent'), color: 'success' })
         }
       } catch (e) {
         this.errors = processErrors(e, this.notify)
@@ -181,12 +232,13 @@ export default {
         this.resending = false
       }
     },
-    /**
-     *  Clear possible validation errors sent by adonis after closing the dialog.
+    /*
+     * Switch page
      */
-    clearErrors (val) {
-      if (!val) {
-        this.errors = { name: '', email: '' }
+    switchPage (page) {
+      if (page !== this.pagination.page) {
+        this.pagination.page = page
+        this.fetchUsers()
       }
     }
   },

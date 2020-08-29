@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable vue/no-v-html  -->
   <v-skeleton-loader
     :loading="loading"
     type="actions"
@@ -11,7 +12,7 @@
         <v-icon left :color="osexpPresent?'black':'white'">
           mdi-upload
         </v-icon>
-        experiment
+        {{ $t('studies.actions.upload_experiment') }}
       </v-btn>
       <v-btn
         :color="jobsPresent?'default':'success'"
@@ -20,18 +21,20 @@
         <v-icon left :color="jobsPresent?'black':'white'">
           mdi-upload
         </v-icon>
-        jobs
+        {{ $t('studies.actions.upload_jobs') }}
       </v-btn>
     </v-item-group>
 
-    <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
+    <v-item-group v-if="userIsOwner" class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
       <v-btn
         @click="$emit('clicked-collaborators')"
       >
-        <v-icon left>
-          mdi-account
+        <v-icon v-bind="shareIconAttrs">
+          mdi-share-variant
         </v-icon>
-        Sharing
+        <span class="d-none d-sm-inline">
+          {{ $t('studies.actions.sharing') }}
+        </span>
       </v-btn>
     </v-item-group>
 
@@ -46,30 +49,20 @@
             v-bind="attrs"
             v-on="on"
           >
-            <v-icon left>
+            <v-icon v-bind="delArchiveIconAttrs">
               {{ study && study.active ? 'mdi-archive' : 'mdi-archive-arrow-up' }}
             </v-icon>
-            {{ study && study.active ? 'Archive' : 'Reactivate' }}
+            <span class="d-none d-sm-inline d-lg-none d-xl-inline">
+              {{ study && study.active ? $t('studies.actions.archive') : $t('studies.actions.reactivate') }}
+            </span>
           </v-btn>
         </template>
         <template v-slot:title>
-          <span v-if="study && study.active">are about to archive this study</span>
-          <span v-else>You are about to reactivate this study</span>
+          <span v-if="study && study.active" v-text="$t('studies.dialogs.confirmation.archive.title')" />
+          <span v-else v-text="$t('studies.dialogs.confirmation.reactivate.title')" />
         </template>
-        <div v-if="study && study.active">
-          <p>
-            After you have archived this study, it is no longer is available for participants.
-            Any reports about the study will also be removed from your dashboard.
-          </p>
-          <p>Are you sure you want to archive this study?</p>
-        </div>
-        <div v-else>
-          <p>
-            After you have reactivated this study, it will be discoverable for participants again.
-            Any reports about the study will added to your dashboard.
-          </p>
-          <p>Are you sure you want to reactivate this study?</p>
-        </div>
+        <div v-if="study && study.active" v-html="$t('studies.dialogs.confirmation.archive.body')" />
+        <div v-else v-html="$t('studies.dialogs.confirmation.reactivate.body')" />
       </confirmation-dialog>
 
       <confirmation-dialog
@@ -83,21 +76,23 @@
             v-bind="attrs"
             v-on="on"
           >
-            <v-icon left>
+            <v-icon v-bind="delArchiveIconAttrs">
               mdi-delete
             </v-icon>
-            Delete
+            <span class="d-none d-sm-inline d-lg-none d-xl-inline">
+              {{ $t('studies.actions.delete') }}
+            </span>
           </v-btn>
         </template>
         <template v-slot:title>
-          You are about to <span class="error--text">&nbsp;delete&nbsp;</span> this study
+          <span v-html="$t('studies.dialogs.confirmation.delete.title')" />
         </template>
-        <p><strong>Deleting this study will also erase all its participations and associated data entries.</strong></p>
-        <p>
-          Are you sure you want to do this?
-        </p>
+        <div v-html="$t('studies.dialogs.confirmation.delete.body')" />
       </confirmation-dialog>
     </v-item-group>
+    <!-- This needs to be here because otherwise the v-btn-toggle styles
+    are discarded during tree-shaking, and the button row layout is no longer correct-->
+    <v-btn-toggle v-if="false" />
   </v-skeleton-loader>
 </template>
 
@@ -110,6 +105,14 @@ export default {
     study: {
       type: Object,
       default: () => ({})
+    },
+    jobs: {
+      type: Array,
+      default: () => ([])
+    },
+    userIsOwner: {
+      type: Boolean,
+      default: false
     },
     loading: {
       type: Boolean,
@@ -131,7 +134,17 @@ export default {
       return !!this.study?.files.filter(item => item.type === 'experiment').length
     },
     jobsPresent () {
-      return !!this.study?.jobs?.length
+      return !!this.jobs?.length
+    },
+    shareIconAttrs () {
+      return this.$vuetify.breakpoint.mdAndUp || this.$vuetify.breakpoint.smOnly
+        ? { left: true }
+        : { size: 18 }
+    },
+    delArchiveIconAttrs () {
+      return this.$vuetify.breakpoint.xsOnly || this.$vuetify.breakpoint.lgOnly
+        ? { size: 18 }
+        : { left: true }
     }
   }
 }

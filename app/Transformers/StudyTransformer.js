@@ -10,15 +10,15 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
  */
 class StudyTransformer extends BumblebeeTransformer {
   static get availableInclude () {
-    return ['users', 'jobs', 'variables', 'participants', 'participants_count', 'files']
+    return ['users', 'jobs', 'variables', 'participants', 'participants_count',
+      'finished_participants_count', 'jobs_count', 'files']
   }
 
   transform (model) {
-    const data = { ...model.toObject() }
-    if (model?.$relations?.pivot) {
-      data.pivot = { ...model?.$relations?.pivot.toObject() }
+    return {
+      ...model.toObject(),
+      pivot: model.$relations?.pivot?.toObject()
     }
-    return data
   }
 
   includeUsers (study) {
@@ -37,12 +37,20 @@ class StudyTransformer extends BumblebeeTransformer {
     return this.collection(study.getRelated('participants'), 'ParticipantTransformer')
   }
 
+  includeFiles (study) {
+    return this.collection(study.getRelated('files'), 'FileTransformer')
+  }
+
   includeParticipantsCount (study) {
     return study.$sideLoaded.participants_count
   }
 
-  includeFiles (study) {
-    return this.collection(study.getRelated('files'), 'FileTransformer')
+  includeJobsCount (study) {
+    return study.$sideLoaded.jobs_count
+  }
+
+  includeFinishedParticipantsCount (study) {
+    return study.$sideLoaded.finished_participants
   }
 }
 

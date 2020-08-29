@@ -11,7 +11,7 @@ class JobSchema extends Schema {
       table.integer('position').unsigned()
       table.timestamps()
 
-      table.foreign('study_id').references('id').inTable('studies')
+      table.foreign('study_id').references('id').inTable('studies').onDelete('cascade')
       table.unique(['study_id', 'position'])
     })
   }

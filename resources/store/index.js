@@ -8,8 +8,8 @@ import Study from '@/models/Study'
 import StudyUser from '@/models/StudyUser'
 import StudyFile from '@/models/StudyFile'
 import Participant from '@/models/Participant'
+import Participation from '@/models/Participation'
 import Job from '@/models/Job'
-import JobVariable from '@/models/JobVariable'
 import Variable from '@/models/Variable'
 import Dtype from '@/models/Dtype'
 
@@ -24,8 +24,8 @@ database.register(Study)
 database.register(StudyUser)
 database.register(StudyFile)
 database.register(Participant)
+database.register(Participation)
 database.register(Job)
-database.register(JobVariable)
 database.register(Variable)
 database.register(Dtype)
 
@@ -36,7 +36,8 @@ export const plugins = [
 
 export const state = () => ({
   cookieWarningVisible: false,
-  cookieWarningShown: false
+  cookieWarningShown: false,
+  studyTab: 0
 })
 export const mutations = make.mutations(state)
 

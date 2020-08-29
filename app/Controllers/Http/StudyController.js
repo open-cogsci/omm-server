@@ -7,8 +7,16 @@
 const Database = use('Database')
 const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
+const User = use('App/Models/User')
+const Helpers = use('Helpers')
+const pool = use('Workers/Sheets')
 
-const isInteger = require('lodash/isInteger')
+const fs = require('fs')
+const { isArray, isInteger } = require('lodash')
+const { format } = require('date-fns')
+
+const removeFile = Helpers.promisify(fs.unlink)
+const processTrend = require('../../Util/trend')
 
 /**
  * Resourceful controller for interacting with studies
@@ -113,6 +121,7 @@ class StudyController {
     try {
       const study = await auth.user.studies().create(data, (row) => {
         row.is_owner = true
+        row.access_permission_id = 2
       })
       await study.reload() // Refresh data otherwise some parameters are missing
       await study.load('users.userType')
@@ -169,15 +178,20 @@ class StudyController {
     const study = await auth.user
       .studies()
       .where('id', params.id)
-      .with('jobs.variables.dtype')
-      .with('participants')
       .with('variables.dtype')
       .with('users')
       .with('files')
+      .withCount('participants')
+      .withCount('jobs')
+      .withCount('jobs as completed_jobs', (query) => {
+        query.whereHas('participants', (q) => {
+          q.wherePivot('status_id', 3)
+        })
+      })
       .firstOrFail()
 
     return transform
-      .include('jobs,participants,variables,users,files')
+      .include('variables,users,files,completed_jobs_count,jobs_count,participants_count')
       .item(study, 'StudyTransformer')
   }
 
@@ -326,10 +340,15 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, auth, response }) {
-    const study = await await auth.user.studies()
+    const study = await auth.user.studies()
       .where('id', params.id)
       .firstOrFail()
-    study.delete()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({
+        message: 'You have insufficient priviliges to delete this study'
+      })
+    }
+    await study.delete()
     return response.noContent()
   }
 
@@ -389,32 +408,66 @@ class StudyController {
     study.save()
     return transform.item(study, 'StudyTransformer')
   }
-  // async upload ({ params, request, response }) {
-  //   const { id } = params
-  //   const expense = await Expense.find(id)
 
-  //   if (!expense) {
-  //     return response.json({ success: false })
-  //   }
+  /**
+   * Upload an experiment for the study
+   * PUT or PATCH studies/:id/archive
+   *
+   * @param {object} ctx
+   * @param {Params} ctx.params
+   * @param {Auth} ctx.auth
+   * @param {Response} ctx.response
+   * @param {Response} ctx.response
+   */
+  async uploadFile ({ params, auth, request, response }) {
+    const { id, type } = params
+    const study = await auth.user.studies()
+      .where('id', id)
+      .with('files')
+      .firstOrFail()
 
-  //   const receiptImage = request.file('receipt')
-  //   const imageName = receiptImage.clientName
+    if (!study.isEditableBy(auth.user)) {
+      return response.unauthorized('Insufficient privileges to edit this study')
+    }
 
-  //   const Helpers = use('Helpers')
-  //   await receiptImage.move(Helpers.publicPath('uploads'), {
-  //     name: imageName,
-  //     overwrite: true
-  //   })
+    const uploadedFile = request.file('payload')
+    const storagePath = Helpers.publicPath(`files/${study.id}`)
+    const filename = `${type}.${uploadedFile.extname}`
 
-  //   if (!receiptImage.moved()) {
-  //     return receiptImage.error()
-  //   }
+    for (const fl of study.getRelated('files').rows.filter(fl => fl.type === type)) {
+      await removeFile(Helpers.publicPath(fl.path))
+    }
 
-  //   expense.image = imageName
-  //   await expense.save()
+    await uploadedFile.move(storagePath, {
+      name: filename,
+      overwrite: true
+    })
+    if (!uploadedFile.moved()) {
+      return uploadedFile.error()
+    }
 
-  //   return response.json(expense)
-  // }
+    // Delete previous experiment file records
+    await study.files().where({ type }).delete()
+
+    const localPath = `${storagePath}/${uploadedFile.fileName}`
+    if (type === 'jobs') {
+      const jsonData = await pool.exec('readSheet', [localPath])
+      await study.processJobs(jsonData)
+      // Attach study participants (if any) to jobs
+      await study.attachParticipantsToJobs()
+    }
+
+    await study.files().create({
+      filename: uploadedFile.clientName,
+      path: localPath.replace(Helpers.publicPath(), ''),
+      size: uploadedFile.size,
+      type
+    })
+
+    // Fetch all files to also account for potential deletions/overwrites
+    const files = await study.files().fetch()
+    return { data: { id: study.id, files } }
+  }
 
   /**
   * @swagger
@@ -525,8 +578,8 @@ class StudyController {
         .where('position', '>=', index)
         .orderBy('position', 'desc')
         .increment('position', jobsData.length)
-        // Get a list of IDS of participants associated with the study to associate these participants
-        // with the new jobs too in the next step.
+      // Get a list of IDS of participants associated with the study to associate these participants
+      // with the new jobs too in the next step.
       const ptcpIDs = study.getRelated('participants').rows.map(ptcp => ptcp.id)
 
       // Assign positions to jobs and assign them to participants of study too.
@@ -550,6 +603,13 @@ class StudyController {
       }
       return response.status(code).json({ message: e.toString() })
     }
+
+    // Set participants with status 'finished' back started (since new jobs have been added)
+    await study.participants()
+      .pivotQuery()
+      .where('status_id', 3)
+      .update({ status_id: 2 })
+
     return transform.collection(jobs, 'JobTransformer')
   }
 
@@ -800,6 +860,298 @@ class StudyController {
       data: { jobs_deleted: rowsDeleted }
     }
   }
-}
 
+  /**
+   * Add collaborator for this study
+   *
+   * @param {*} { params, request, response, auth, transform }
+   * @returns
+   * @memberof StudyController
+   */
+  async addCollaborator ({ params, request, response, auth, transform }) {
+    const { id } = params
+    const userID = request.input('userID')
+
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({ message: 'Only the study owner can add collaborators' })
+    }
+
+    const user = await User.findOrFail(userID)
+    if (user.account_status !== 'active') {
+      return response.badRequest({ message: 'User status does not allow collaboration' })
+    }
+
+    await study.users().attach([userID])
+    await study.load('users', (query) => {
+      query.where('id', userID)
+    })
+    return transform.include('users').item(study, 'StudyTransformer')
+  }
+
+  /**
+   * Set access permissions for collaborator
+   *
+   * @param {*} { params, request, response, auth, transform }
+   * @returns
+   * @memberof StudyController
+   */
+  async updateCollaborator ({ params, request, response, auth, transform }) {
+    const { id } = params
+    const { userID, level } = request.all()
+
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({ message: 'Only the study owner can edit access levels' })
+    }
+    await study.users().pivotQuery()
+      .where('user_id', userID)
+      .update({ access_permission_id: level })
+
+    await study.load('users', (query) => {
+      query.where('id', userID)
+    })
+    return transform.include('users').item(study, 'StudyTransformer')
+  }
+
+  /**
+   * Remove collaborator from study
+   *
+   * @param {*} { params, response, auth }
+   * @returns
+   * @memberof StudyController
+   */
+  async removeCollaborator ({ params, response, auth }) {
+    const { id, userID } = params
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+    if (!await study.isOwnedBy(auth.user)) {
+      return response.unauthorized({ message: 'Only the study owner can remove collaborators' })
+    }
+    await study.users().detach([userID])
+    return response.noContent()
+  }
+
+  /**
+   * Download the study's data
+   *
+   * @param {*} { params, response, auth }
+   * @returns
+   * @memberof StudyController
+   */
+  async generateDatafile ({ params, auth, request, response }) {
+    const { id } = params
+    const filetype = request.input('format', 'csv')
+    const allowedFormats = ['ods', 'xlsx', 'csv']
+    if (!allowedFormats.includes(filetype)) {
+      return response.badRequest(`Invalid file format, possible values are ${allowedFormats}`)
+    }
+
+    const study = await auth.user.studies().where('id', id).firstOrFail()
+
+    const data = await study.getCollectedData(Database.connection().connectionClient)
+    const destFolder = Helpers.publicPath(`files/${study.id}`)
+    const timestamp = format(new Date(), 'yyyyMMddHHmmss')
+    const filename = `data_${timestamp}.${filetype}`
+    const path = `${destFolder}/${filename}`
+    const type = `data-${filetype}`
+    // Offload file creation to worker thread
+    await pool.exec('writeSheet', [data, path, filetype])
+
+    // Delete any previous occurrences of the file in the current format
+    const previousFile = await study.files().where('type', type).first()
+    if (previousFile) {
+      await removeFile(Helpers.publicPath(previousFile.path))
+      await previousFile.delete()
+    }
+
+    const newFile = await study.files().create({
+      path: path.replace(Helpers.publicPath(), ''),
+      filename,
+      type
+    })
+    return { data: { id: study.id, files: [newFile] } }
+  }
+
+  /**
+   * Fetch participants for a specific study
+   *
+   * @param {*} { params, request, auth, transform }
+   * @returns
+   * @memberof ParticipantController
+   */
+  async fetchParticipants ({ params, request, auth, transform }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    const perPage = request.input('perPage', 10)
+    const page = request.input('page', 1)
+
+    const ptcps = await study.participants()
+      .with('studies', (q) => {
+        q.where('study_id', study.id).select('id')
+      })
+      .withCount('jobs as completed_jobs', (query) => {
+        query.where('study_id', study.id).wherePivot('status_id', 3)
+      })
+      .orderBy('pivot_status_id', 'desc')
+      .paginate(page, perPage)
+
+    const reply = await transform.paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')
+    // Transform the record making study the parent record, to assure fluent handling by
+    // vuex-orm on the client-side
+    reply.data = { id: parseInt(id), participants: reply.data }
+    return reply
+  }
+
+  /**
+   * Fetch participant IDS for the study
+   *
+   * @param {*} { params, auth }
+   * @returns
+   * @memberof StudyController
+   */
+  async fetchParticipantIDs ({ params, auth }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    const assigned = await study.participants().where('active', 1).ids()
+    const all = await Participant.query().where('active', 1).ids()
+    const total = all.length
+    return { data: { assigned, all, total } }
+  }
+
+  /**
+   * Assign participants to a study
+   *
+   * @param {Object} { params, auth, request, response }
+   * @returns {Response}
+   * @memberof StudyController
+   */
+  async assignParticipants ({ params, auth, request, response }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({ message: 'You cannot edit this study' })
+    }
+
+    const ptcpIDs = request.input('participants')
+    if (!ptcpIDs || !isArray(ptcpIDs)) {
+      return response.badRequest({ message: 'No participants were specified' })
+    }
+    await study.participants().attach(ptcpIDs)
+    // Also assign participants to study jobs
+    const jobIDs = await study.jobs().ids()
+    const ptcpJobs = []
+    for (const jobID of jobIDs) {
+      for (const ptcpID of ptcpIDs) {
+        ptcpJobs.push({
+          job_id: jobID,
+          participant_id: ptcpID
+        })
+      }
+    }
+    await Database.table('job_states').insert(ptcpJobs)
+    return response.noContent()
+  }
+
+  /**
+   * Detach participant from a study
+   *
+   * @param {Object} { params, auth, request, response }
+   * @returns {Response}
+   * @memberof StudyController
+   */
+  async revokeParticipants ({ params, auth, request, response }) {
+    const { id } = params
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('study_id', id)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({ message: 'You cannot edit this study' })
+    }
+
+    const ptcpIDs = request.input('participants')
+    if (!ptcpIDs) {
+      return response.badRequest({ message: 'No participants were specified' })
+    }
+    await study.participants().detach(ptcpIDs)
+
+    const jobIDs = await study.jobs().ids()
+    // Also clean up noncompleted jobs
+    await Database.table('job_states')
+      .whereIn('participant_id', ptcpIDs)
+      .whereIn('job_id', jobIDs)
+      .delete()
+    return response.noContent()
+  }
+
+  /**
+   * Provides stats about the current status of the study
+   *
+   * @param {Object} { params, auth }
+   * @return {Object} JSON data with stats
+   * @memberof StudyController
+   */
+  async participationStats ({ params, auth, request }) {
+    const { id } = params
+    const bins = request.input('bins', 20)
+    // Check if user has permission to view this study
+    const study = await auth.user.studies()
+      .where('id', id)
+      .withCount('participants')
+      .withCount('participants as finished_participants', (query) => {
+        query.wherePivot('status_id', 3)
+      })
+      .withCount('participants as started_participants', (query) => {
+        query.wherePivot('status_id', 2)
+      })
+      .withCount('participants as pending_participants', (query) => {
+        query.wherePivot('status_id', 1)
+      })
+      .firstOrFail()
+
+    const ptcpTrend = (await Database.raw(`
+      SELECT SUM(c) AS amount, bin, updated_at
+      FROM (
+        SELECT
+          job_states.updated_at,
+          count(*) AS c,
+          FLOOR(
+            PERCENT_RANK() OVER (
+                ORDER BY job_states.updated_at ASC
+            ) * ?) as bin
+        FROM job_states
+        LEFT JOIN jobs ON job_states.job_id = jobs.id
+        WHERE status_id = 3 AND jobs.study_id = ?
+        GROUP BY job_states.updated_at
+      ) as bins
+      GROUP BY bin, updated_at
+      `, [bins, study.id]))[0]
+
+    const trend = processTrend(bins, ptcpTrend)
+
+    const data = {
+      participants: {
+        pending: study.$sideLoaded.pending_participants,
+        in_progress: study.$sideLoaded.started_participants,
+        finished: study.$sideLoaded.finished_participants,
+        total: study.$sideLoaded.participants_count
+      },
+      trend
+    }
+    return { data }
+  }
+}
 module.exports = StudyController

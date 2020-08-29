@@ -5,10 +5,10 @@
     @clicked-no="$emit('clicked-no')"
   >
     <template v-slot:title>
-      You have unsaved changes
+      {{ $t('common.dialogs.unsaved_changes.title') }}
     </template>
-    You will lose these changes if you don't save them first.<br>
-    Are you sure you want to cancel?
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <div v-html="$t('common.dialogs.unsaved_changes.body')" />
   </confirmation-dialog>
 </template>
 

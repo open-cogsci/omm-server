@@ -10,7 +10,6 @@ class StudySchema extends Schema {
       table.string('name').notNullable()
       table.string('description')
       table.boolean('active').default(true)
-      table.string('osexp_path')
       table.timestamps()
     })
   }

@@ -9,12 +9,8 @@ const BumblebeeTransformer = use('Bumblebee/Transformer')
  * @constructor
  */
 class UserTransformer extends BumblebeeTransformer {
-  static get defaultInclude () {
-    return ['user_type']
-  }
-
   static get availableInclude () {
-    return ['studies']
+    return ['studies', 'user_type', 'studies_count']
   }
 
   /**
@@ -28,23 +24,20 @@ class UserTransformer extends BumblebeeTransformer {
     return data
   }
 
-  transformWithStudiesCount (participant) {
-    return {
-      ...this.transform(participant),
-      studies_count: participant.$sideLoaded.studies_count
-    }
+  includeStudiesCount (model) {
+    return model.$sideLoaded.studies_count
   }
 
-  includeStudies (user) {
-    return this.collection(user.getRelated('studies'), 'StudyTransformer')
+  includeStudies (model) {
+    return this.collection(model.getRelated('studies'), 'StudyTransformer')
   }
 
-  includeStudiesWithParticipantCount (user) {
-    return this.collection(user.getRelated('studies'), 'StudyTransformer.withParticipantsCount')
+  includeStudiesWithParticipantCount (model) {
+    return this.collection(model.getRelated('studies'), 'StudyTransformer.withParticipantsCount')
   }
 
-  includeUserType (user) {
-    return this.item(user.getRelated('userType'), userType => ({
+  includeUserType (model) {
+    return this.item(model.getRelated('userType'), userType => ({
       id: userType.id,
       name: userType.name
     }))

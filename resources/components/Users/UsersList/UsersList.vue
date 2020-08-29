@@ -1,9 +1,5 @@
 <template>
-  <v-expansion-panels
-    v-model="panel"
-    popout
-    hover
-  >
+  <v-expansion-panels v-model="panel" popout hover>
     <v-expansion-panel v-for="user in users" :key="user.id">
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
@@ -30,7 +26,7 @@
                   {{ user.email }}
                 </v-col>
                 <v-col cols="3">
-                  {{ user.user_type.name }}
+                  {{ $t(`users.types.${user.user_type.name}`) }}
                 </v-col>
                 <v-col cols="2">
                   <v-tooltip left>
@@ -43,23 +39,16 @@
                         mdi-flask
                       </v-icon>
                     </template>
-                    Studies
+                    {{ $t('layout.nav.studies') }}
                   </v-tooltip>{{ user.studies_count }}
                 </v-col>
                 <v-col cols="2" class="text-center">
-                  <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span
-                        class="font-weight-light"
-                        :class="statusColor(user.account_status)"
-                        v-bind="attrs"
-                        v-on="on"
-                      >
-                        {{ user.account_status }}
-                      </span>
-                    </template>
-                    Status
-                  </v-tooltip>
+                  <span
+                    class="font-weight-light"
+                    :class="statusColor(user.account_status)"
+                  >
+                    {{ $t(`users.status.${user.account_status}`) }}
+                  </span>
                 </v-col>
               </v-row>
             </v-fade-transition>
@@ -69,39 +58,38 @@
       <v-expansion-panel-content>
         <v-row>
           <v-col cols="12" md="6">
-            <v-card outlined>
+            <v-card outlined class="d-flex flex-column" height="400">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Properties
+                {{ $t('common.properties') }}
               </v-card-title>
-              <div class="mt-5">
-                <v-fade-transition mode="out-in">
-                  <user-edit-data
-                    v-if="editing === user.id"
-                    :user="user"
-                    :saving="saving"
-                    :resending="resending"
-                    :errors="errors"
-                    @clicked-cancel="editing = null"
-                    @clicked-save="$emit('update-user', $event)"
-                    @clicked-resend-email="$emit('resend-email', $event)"
-                    @update:errors="$emit('update:errors', $event)"
-                  />
-                  <user-view-data
-                    v-else
-                    :user="user"
-                    :deleting="deleting"
-                    style="width: 100%"
-                    @clicked-edit="(id) => editing = id"
-                    @clicked-delete="$emit('delete-user', $event)"
-                  />
-                </v-fade-transition>
-              </div>
+
+              <v-fade-transition mode="out-in" class="mt-5">
+                <user-edit-data
+                  v-if="editing === user.id"
+                  :user="user"
+                  :saving="saving"
+                  :resending="resending"
+                  :errors="errors"
+                  @clicked-cancel="editing = null"
+                  @clicked-save="$emit('update-user', $event)"
+                  @clicked-resend-email="$emit('resend-email', $event)"
+                  @update:errors="$emit('update:errors', $event)"
+                />
+                <user-view-data
+                  v-else
+                  :user="user"
+                  :deleting="deleting"
+                  style="width: 100%"
+                  @clicked-edit="(id) => editing = id"
+                  @clicked-delete="$emit('delete-user', $event)"
+                />
+              </v-fade-transition>
             </v-card>
           </v-col>
           <v-col cols="12" md="6">
             <v-card outlined class="fill-height">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
-                Studies
+                {{ $t('layout.nav.studies') }}
               </v-card-title>
               <v-card-text class="pa-0">
                 <v-skeleton-loader
@@ -114,27 +102,53 @@
                   <div />
                   <v-virtual-scroll
                     v-if="user.studies.length"
-                    :items="user.studies"
+                    :items="user.studies.filter(study => study.pivot.is_owner)"
                     :item-height="65"
-                    height="392"
+                    height="340"
                   >
                     <template v-slot="{ item }">
                       <v-list-item>
-                        <v-list-item-content class="px-3">
+                        <v-list-item-content>
                           <v-list-item-title v-text="item.name" />
                           <v-list-item-subtitle v-text="item.description" />
                         </v-list-item-content>
                         <v-list-item-action>
                           <v-list-item-action-text class="info--text">
-                            <v-icon color="info">
-                              mdi-baby-face
-                            </v-icon> <span>{{ item.participants_count }}</span>
+                            <div>
+                              <v-tooltip bottom>
+                                <template v-slot:activator="{on, attrs}">
+                                  <div class="d-inline-block" v-bind="attrs" v-on="on">
+                                    <span>{{ item.participants_count }}</span>
+                                    <v-icon color="info">
+                                      mdi-baby-face
+                                    </v-icon>
+                                  </div>
+                                </template>
+                                {{ $t('layout.nav.participants') }}
+                              </v-tooltip>
+                              <v-tooltip bottom>
+                                <template v-slot:activator="{on, attrs}">
+                                  <div class="d-inline-block" v-bind="attrs" v-on="on">
+                                    <progress-circle :value="progress(item)" />
+                                  </div>
+                                </template>
+                                {{ $t('stats.progress') }}
+                              </v-tooltip>
+                            </div>
                           </v-list-item-action-text>
                         </v-list-item-action>
                       </v-list-item>
                       <v-divider :key="`divider-${item.id}`" />
                     </template>
                   </v-virtual-scroll>
+
+                  <v-list-item v-else>
+                    <v-list-item-content>
+                      <v-list-item-title class="font-weight-light text-center">
+                        {{ $t(`users.no_studies`) }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>
@@ -151,7 +165,8 @@ import { isNumber } from 'lodash'
 export default {
   components: {
     UserViewData: () => import('@/components/Users/UserViewData'),
-    UserEditData: () => import('@/components/Users/UserEditData')
+    UserEditData: () => import('@/components/Users/UserEditData'),
+    ProgressCircle: () => import('@/components/common/ProgressCircle')
   },
   props: {
     users: {
@@ -202,6 +217,10 @@ export default {
         pending: 'orange--text',
         inactive: 'red--text'
       }[status]
+    },
+    progress (item) {
+      if (!item.participants_count) { return 0 }
+      return item.finished_participants_count / item.participants_count * 100
     }
   }
 }
