@@ -18,7 +18,7 @@ git flow release start "$releaseVersion"
 git flow release finish "$releaseVersion"
 git push
 git push --tags
-
+git checkout develop
 echo
 echo ">>> Committed and pushed $releaseVersion"
 echo
