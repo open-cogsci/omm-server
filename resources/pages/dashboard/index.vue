@@ -9,46 +9,133 @@
             </h1>
           </v-col>
         </v-row>
-        <v-row style="max-height: 50%">
-          <v-col cols="12" sm="6">
+        <v-row class="fill-height">
+          <v-col cols="12" md="6" xl="4" style="height: 50%">
             <v-card class="fill-height">
-              <v-card-title>Most frequent participations</v-card-title>
-              <v-card-text>
-                <v-skeleton-loader :loading="loading.freq" type="list" transition="scale-transition">
-                  <v-list />
-                </v-skeleton-loader>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-card class="fill-height">
-              <v-card-title>Most active studies</v-card-title>
-              <v-card-text>Body</v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row style="max-height: 50%">
-          <v-col cols="12" sm="6">
-            <v-card class="fill-height">
-              <v-card-title>7 day participation trend</v-card-title>
-              <v-card-title class="font-weight-light text-subtitle-1 text-md-h6">
-                to all of your studies taken together.
+              <v-card-title class="font-weight-normal">
+                Most recent participations
               </v-card-title>
-              <v-card-text>
-                <v-skeleton-loader :loading="loading.trend" type="card" transition="fade-transition">
-                  <v-sparkline
-                    v-bind="sparkline"
-                    type="trend"
-                    auto-draw
-                  />
+              <v-card-text class="px-0">
+                <v-skeleton-loader
+                  :loading="loading.mostRecentPtcp"
+                  type="list-item-two-line@5"
+                >
+                  <v-list v-if="mostRecentPtcp.length">
+                    <v-list-item v-for="item of mostRecentPtcp" :key="item.identifier">
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ item.participant }}
+                          <span class="caption grey--text text--darken-1">
+                            ({{ item.identifier }})
+                          </span>
+                          to <span class="font-weight-medium">{{ item.study }}</span>
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ distanceFromNow(item.occurrence) }}
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                  <div v-else class="px-4 text-subtitle-1 font-weight-light">
+                    No recent participations
+                  </div>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" md="6" xl="4" style="height: 50%">
             <v-card class="fill-height">
-              <v-card-title>Most active participants</v-card-title>
-              <v-card-text>Body</v-card-text>
+              <v-card-title>
+                Your most active studies&nbsp;
+                <span class="text-subtitle-1 font-weight-light">
+                  of the last 7 days
+                </span>
+              </v-card-title>
+              <v-card-text class="px-0">
+                <v-skeleton-loader
+                  :loading="loading.mostActiveStudies"
+                  type="list-item-two-line@5"
+                >
+                  <v-list v-if="mostActiveStudies.length">
+                    <v-list-item
+                      v-for="item of mostActiveStudies"
+                      :key="item.identifier"
+                      :to="localePath(`/dashboard/studies/${item.id}`)"
+                      nuxt
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ item.name }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ item.participations }} participations
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                  <div v-else class="px-4 text-subtitle-1 font-weight-light">
+                    No studies to show
+                  </div>
+                </v-skeleton-loader>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6" xl="4" style="height: 50%">
+            <v-card class="fill-height">
+              <v-card-title>
+                Most active participants&nbsp;
+                <span class="text-subtitle-1 font-weight-light">
+                  of the last 7 days
+                </span>
+              </v-card-title>
+              <v-card-text class="px-0">
+                <v-skeleton-loader
+                  :loading="loading.mostActiveParticipants"
+                  type="list-item-two-line@5"
+                >
+                  <v-list v-if="mostActiveParticipants.length">
+                    <v-list-item
+                      v-for="item of mostActiveParticipants"
+                      :key="item.identifier"
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ item.name }}
+                          <span class="grey--text text--darken-1 caption">({{ item.identifier }})</span>
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ item.participations }} participations
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                  <div v-else class="px-4 text-subtitle-1 font-weight-light">
+                    No studies to show
+                  </div>
+                </v-skeleton-loader>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6" xl="12" style="height: 50%">
+            <v-card class="fill-height d-flex flex-column">
+              <v-card-title class="pb-0 mb-0">
+                <div>
+                  7 day participation trend<br>
+                  <span class="font-weight-light text-subtitle-1">
+                    to all of your current studies taken together.
+                  </span>
+                </div>
+              </v-card-title>
+
+              <v-card-text class="d-flex flex-column justify-center fill-height">
+                <v-skeleton-loader
+                  :loading="loading.trend"
+                  type="card"
+                  transition="fade-transition"
+                >
+                  <v-sparkline v-bind="sparkline" />
+                </v-skeleton-loader>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -59,6 +146,8 @@
 
 <script>
 import { mapActions } from 'vuex'
+import { formatDistanceToNow } from 'date-fns'
+import { nl, fr } from 'date-fns/locale'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -66,11 +155,13 @@ export default {
   data () {
     return {
       trend: {},
-      freq: {},
+      mostRecentPtcp: [],
+      mostActiveStudies: [],
+      mostActiveParticipants: [],
       loading: {
-        freq: false,
-        activeStudies: false,
-        activeParticipants: false,
+        mostRecentPtcp: false,
+        mostActiveStudies: false,
+        mostActiveParticipants: false,
         trend: false
       }
     }
@@ -83,16 +174,18 @@ export default {
       return {
         value: this.trend?.values || [],
         labels: this.trend?.labels || [],
-        height: 100,
-        padding: 16,
+        padding: this.$vuetify.breakpoint.xlOnly ? 8 : 16,
         radius: 10,
-        labelSize: this.$vuetify.breakpoint.xsOnly ? 10 : 7,
+        labelSize: this.$vuetify.breakpoint.xlOnly ? 3 : 9,
         lineCap: 'round',
         smooth: true,
         gradient: ['red', 'orange', 'lightGreen'],
         gradientDirection: 'bottom',
-        lineWidth: 2,
-        autoLineWidth: true
+        lineWidth: this.$vuetify.breakpoint.xlOnly ? 1 : 3,
+        autoLineWidth: true,
+        height: this.$vuetify.breakpoint.xlOnly ? '50%' : '100%',
+        type: 'trend',
+        autoDraw: true
       }
     }
   },
@@ -102,19 +195,19 @@ export default {
   methods: {
     ...mapActions('notifications', ['notify']),
     fetchAll () {
-      this.fetchFreqPtcp()
+      this.fetchMostRecentPtcp()
       this.fetch7dayTrend()
       this.fetchMostActiveStudies()
       this.fetchmostActivePtcp()
     },
-    async fetchFreqPtcp () {
-      this.loading.freq = true
+    async fetchMostRecentPtcp () {
+      this.loading.mostRecentPtcp = true
       try {
-        this.freq = await this.Participation.mostFrequent()
+        this.mostRecentPtcp = await this.Participation.mostRecent()
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
-        this.loading.freq = false
+        this.loading.mostRecentPtcp = false
       }
     },
     async fetch7dayTrend () {
@@ -128,10 +221,32 @@ export default {
       }
     },
     async fetchMostActiveStudies () {
-
+      this.loading.mostActiveStudies = true
+      try {
+        this.mostActiveStudies = await this.Participation.mostActiveStudies()
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.loading.mostActiveStudies = false
+      }
     },
     async fetchmostActivePtcp () {
-
+      this.loading.mostActiveParticipants = true
+      try {
+        this.mostActiveParticipants = await this.Participation.mostActiveParticipants()
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.loading.mostActiveParticipants = false
+      }
+    },
+    distanceFromNow (val) {
+      const locale = {
+        en: null,
+        fr,
+        nl
+      }[this.$i18n.locale]
+      return formatDistanceToNow(new Date(val), { addSuffix: true, locale })
     }
   },
   head () {

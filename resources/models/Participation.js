@@ -25,11 +25,27 @@ export default class Participation extends Model {
       ...config,
       save: false
     })
-    return reply.response.data.data.trend
+    return reply.response.data.data
   }
 
-  static async mostFrequent (config) {
-    const reply = await this.api().get('/participations/mostfrequent', {
+  static async mostRecent (config) {
+    const reply = await this.api().get('/participations/most_recent', {
+      ...config,
+      save: false
+    })
+    return reply.response.data.data
+  }
+
+  static async mostActiveStudies (config) {
+    const reply = await this.api().get('/participations/most_active_studies', {
+      ...config,
+      save: false
+    })
+    return reply.response.data.data
+  }
+
+  static async mostActiveParticipants (config) {
+    const reply = await this.api().get('/participations/most_active_participants', {
       ...config,
       save: false
     })

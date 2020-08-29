@@ -75,8 +75,12 @@ Route.group(() => {
 
   Route.get('/participations/trend', 'DashboardController.participationTrend')
     .as('stats.participation_trend')
-  Route.get('/participations/mostfrequent', 'DashboardController.mostFrequentParticipations')
-    .as('stats.most_frequent_participations')
+  Route.get('/participations/most_recent', 'DashboardController.mostRecentParticipations')
+    .as('stats.most_recent_participations')
+  Route.get('/participations/most_active_studies', 'DashboardController.mostActiveStudies')
+    .as('stats.most_active_studies')
+  Route.get('/participations/most_active_participants', 'DashboardController.mostActiveParticipants')
+    .as('stats.most_active_participants')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {
