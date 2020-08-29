@@ -10,10 +10,10 @@
           </v-col>
         </v-row>
         <v-row class="fill-height">
-          <v-col cols="12" md="6" xl="4" style="height: 50%">
+          <v-col cols="12" sm="6" xl="4" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title class="font-weight-normal">
-                Most recent participations
+                {{ $t('dashboard.title.most_recent_ptcp') }}
               </v-card-title>
               <v-card-text class="px-0">
                 <v-skeleton-loader
@@ -37,18 +37,18 @@
                     </v-list-item>
                   </v-list>
                   <div v-else class="px-4 text-subtitle-1 font-weight-light">
-                    No recent participations
+                    {{ $t('dashboard.no_recent_ptcps') }}
                   </div>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" md="6" xl="4" style="height: 50%">
+          <v-col cols="12" sm="6" xl="4" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title>
-                Your most active studies&nbsp;
+                {{ $t('dashboard.title.most_active_studies') }}&nbsp;
                 <span class="text-subtitle-1 font-weight-light">
-                  of the last 7 days
+                  {{ $t('dashboard.title.period').replace('{days}', days) }}
                 </span>
               </v-card-title>
               <v-card-text class="px-0">
@@ -68,24 +68,24 @@
                           {{ item.name }}
                         </v-list-item-title>
                         <v-list-item-subtitle>
-                          {{ item.participations }} participations
+                          {{ item.participations }} {{ $t('dashboard.participations') }}
                         </v-list-item-subtitle>
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
                   <div v-else class="px-4 text-subtitle-1 font-weight-light">
-                    No studies to show
+                    {{ $t('dashboard.no_studies') }}
                   </div>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" md="6" xl="4" style="height: 50%">
+          <v-col cols="12" sm="6" xl="4" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title>
-                Most active participants&nbsp;
+                {{ $t('dashboard.title.most_active_ptcp') }}&nbsp;
                 <span class="text-subtitle-1 font-weight-light">
-                  of the last 7 days
+                  {{ $t('dashboard.title.period').replace('{days}', days) }}
                 </span>
               </v-card-title>
               <v-card-text class="px-0">
@@ -104,25 +104,25 @@
                           <span class="grey--text text--darken-1 caption">({{ item.identifier }})</span>
                         </v-list-item-title>
                         <v-list-item-subtitle>
-                          {{ item.participations }} participations
+                          {{ item.participations }} {{ $t('dashboard.jobs_performed') }}
                         </v-list-item-subtitle>
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
                   <div v-else class="px-4 text-subtitle-1 font-weight-light">
-                    No studies to show
+                    {{ $t('dashboard.no_ptcps') }}
                   </div>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" md="6" xl="12" style="height: 50%">
+          <v-col cols="12" sm="6" xl="12" :style="colStyle">
             <v-card class="fill-height d-flex flex-column">
               <v-card-title class="pb-0 mb-0">
                 <div>
-                  7 day participation trend<br>
+                  {{ $t('dashboard.title.trend.main').replace('{days}', days) }}<br>
                   <span class="font-weight-light text-subtitle-1">
-                    to all of your current studies taken together.
+                    {{ $t('dashboard.title.trend.sub') }}
                   </span>
                 </div>
               </v-card-title>
@@ -158,6 +158,7 @@ export default {
       mostRecentPtcp: [],
       mostActiveStudies: [],
       mostActiveParticipants: [],
+      days: 7,
       loading: {
         mostRecentPtcp: false,
         mostActiveStudies: false,
@@ -187,6 +188,13 @@ export default {
         type: 'trend',
         autoDraw: true
       }
+    },
+    colStyle () {
+      return this.$vuetify.breakpoint.smAndUp
+        ? {
+          height: '50%'
+        }
+        : {}
     }
   },
   created () {
@@ -213,7 +221,8 @@ export default {
     async fetch7dayTrend () {
       this.loading.trend = true
       try {
-        this.trend = await this.Participation.trend()
+        this.trend = await this.Participation.trend(
+          { params: { days: this.days } })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -223,7 +232,8 @@ export default {
     async fetchMostActiveStudies () {
       this.loading.mostActiveStudies = true
       try {
-        this.mostActiveStudies = await this.Participation.mostActiveStudies()
+        this.mostActiveStudies = await this.Participation.mostActiveStudies(
+          { params: { days: this.days } })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
@@ -233,7 +243,8 @@ export default {
     async fetchmostActivePtcp () {
       this.loading.mostActiveParticipants = true
       try {
-        this.mostActiveParticipants = await this.Participation.mostActiveParticipants()
+        this.mostActiveParticipants = await this.Participation.mostActiveParticipants(
+          { params: { days: this.days } })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {

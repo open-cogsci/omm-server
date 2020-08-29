@@ -92,7 +92,7 @@ class DashboardController {
    */
   async mostActiveStudies ({ request, auth }) {
     const limit = request.input('limit', 5)
-    const period = request.input('period', 7)
+    const days = request.input('days', 7)
     const data = await JobState.query()
       .select(
         Database.raw('COUNT(*) as participations'),
@@ -104,7 +104,7 @@ class DashboardController {
       .leftJoin('study_users', 'studies.id', 'study_users.study_id')
       .where('study_users.user_id', auth.user.id)
       .where('studies.active', 1)
-      .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [period])
+      .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
       .whereNot('job_states.status_id', 1)
       .groupByRaw('studies.name, studies.id')
       .limit(limit)
@@ -121,14 +121,14 @@ class DashboardController {
    */
   async mostActiveParticipants ({ request }) {
     const limit = request.input('limit', 5)
-    const period = request.input('period', 7)
+    const days = request.input('days', 7)
     const data = await JobState.query()
       .select('participants.name',
         'participants.identifier',
         Database.raw('COUNT(*) as participations')
       )
       .leftJoin('participants', 'job_states.participant_id', 'participants.id')
-      .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [period])
+      .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
       .whereNot('job_states.status_id', 1)
       .groupByRaw('name, identifier')
       .limit(limit)
