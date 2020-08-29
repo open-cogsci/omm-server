@@ -17,7 +17,7 @@ echo
 git commit -a -m "Preparing v$releaseVersion"
 git flow release start "$releaseVersion"
 git tag -a $releaseVersion -m $releaseVersion
-git flow release finish -n
+git flow release finish $releaseVersion -n -m "release/$releaseVersion"
 
 git push
 git push origin master
