@@ -8,6 +8,7 @@ export default {
   inactive: 'Inactief',
   created_at: 'Aangemaakt op',
   updated_at: 'Gewijzigd op',
+  no_studies: 'Geen toewijzingen aan studies',
   tooltips: {
     delete: `Een participant kan niet langer verwijderd worden wanneer deze met een studie is geassocieerd.<br>
              Deactiveer de participant in plaats hiervan.`
