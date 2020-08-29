@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "OpenMonkeyMind",
   "author": "Daniel Schreij",
+  "contributors": [
+    "Sebastiaan Mathôt"
+  ],
   "private": true,
   "scripts": {
     "serve:dev": "npm run dev",
@@ -10,7 +13,8 @@
     "build": "cross-env NODE_ENV=production node ./ace nuxtbuild",
     "start": "cross-env NODE_ENV=production node server.js",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
-    "test": "jest"
+    "test": "jest",
+    "docker-build": "npm run build && docker build -f docker/Dockerfile ."
   },
   "dependencies": {
     "@adonisjs/ace": "^5.0.8",
@@ -32,7 +36,7 @@
     "@vuex-orm/core": "^0.36.3",
     "@vuex-orm/plugin-axios": "^0.9.3",
     "adonis-bumblebee": "^2.2.0",
-    "adonis-swagger": "github:ahmadarif/adonis-swagger#v1.3.0",
+    "adonis-swagger": "ahmadarif/adonis-swagger#v1.3.0",
     "cross-env": "^7.0.2",
     "date-fns": "^2.15.0",
     "mysql2": "^2.1.0",
