@@ -1,6 +1,6 @@
 {
-  "name": "omm",
-  "version": "0.1.2-SNAPSHOT",
+  "name": "omm-server",
+  "version": "0.1.1",
   "description": "OpenMonkeyMind",
   "author": "Daniel Schreij",
   "contributors": [
