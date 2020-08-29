@@ -90,6 +90,9 @@
         <div v-html="$t('studies.dialogs.confirmation.delete.body')" />
       </confirmation-dialog>
     </v-item-group>
+    <!-- This needs to be here because otherwise the v-btn-toggle styles
+    are discarded during tree-shaking, and the button row layout is no longer correct-->
+    <v-btn-toggle v-if="false" />
   </v-skeleton-loader>
 </template>
 
