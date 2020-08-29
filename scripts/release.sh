@@ -13,7 +13,7 @@ echo ">>> Will commit and push new snapshot version"
 echo
 read -p "OK? (Ctrl-C to cancel)" -n 1 -r && echo
 echo
-
+git commit -a -m "Release v$releaseVersion"
 git flow release start "$releaseVersion"
 git flow release finish "$releaseVersion"
 git push
