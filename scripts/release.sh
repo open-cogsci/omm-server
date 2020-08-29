@@ -15,7 +15,7 @@ read -p "OK? (Ctrl-C to cancel)" -n 1 -r && echo
 echo
 git commit -a -m "Preparing release v$releaseVersion"
 git flow release start "$releaseVersion"
-git flow release finish "$releaseVersion"
+git flow release finish -m "Release v$releaseVersion" -t "release/$releaseVersion" "$releaseVersion"
 git push
 git push --tags
 git checkout develop
