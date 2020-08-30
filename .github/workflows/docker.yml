@@ -6,7 +6,7 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    tags: 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -19,10 +19,43 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
-      # Runs a single command using the runners shell
-      - name: GithubPackages-Docker
-        uses: Kolkies/githubpackages-docker@v1.0.4
+      - name: Build and push Docker images
+        # You may pin to the exact commit or the version.
+        # uses: docker/build-push-action@92e71463491f2d026a477188b8ad3a0fdd9d672c
+        uses: docker/build-push-action@v1.1.0
         with:
-          repo-token: ''
-          image-name: ''
+          # Username used to log in to a Docker registry. If not set then no login will occur
+          username: ${{ github.actor }}
+          # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+          password: ${{ secrets.GITHUB_TOKEN }}
+          # Server address of Docker registry. If not set then will default to Docker Hub
+          registry: https://docker.pkg.github.com
+          # Docker repository to tag the image with
+          repository: omm-server
+          # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
+          tags: ${{ steps.get_version.outputs.VERSION }} # optional
+          # Automatically tags the built image with the git reference as per the readme
+          tag_with_ref: true # optional
+          # Automatically tags the built image with the git short SHA as per the readme
+          tag_with_sha: true # optional
+          # Path to the build context
+          # path: # optional, default is .
+          # Path to the Dockerfile (Default is '{path}/Dockerfile')
+          dockerfile: 'docker/Dockerfile'
+          # Sets the target stage to build
+          target: production
+          # Always attempt to pull a newer version of the image
+          # always_pull: # optional
+          # Comma-delimited list of build-time variables
+          # build_args: # optional
+          # Comma-delimited list of images to consider as cache sources
+          # cache_froms: # optional
+          # Comma-delimited list of labels to add to the built image
+          # labels: # optional
+          # Adds labels with git repository information to the built image
+          # add_git_labels: # optional
