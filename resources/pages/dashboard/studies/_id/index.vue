@@ -48,10 +48,10 @@
           <v-row no-gutters>
             <v-col cols="12" lg="8" xl="9" class="text-md-right">
               <study-actions
-                v-if="userCanEdit"
                 :loading="status.loading"
                 :study="study"
                 :jobs="jobs"
+                :user-can-edit="userCanEdit"
                 :user-is-owner="userIsOwner"
                 @clicked-delete="deleteStudy"
                 @clicked-archive="archiveStudy"
@@ -224,7 +224,11 @@ export default {
     ...mapActions('notifications', ['notify']),
     async fetchStudy (studyID, options) {
       try {
-        await this.Study.fetchById(studyID, options)
+        await this.Study.fetchById(studyID, {
+          persistOptions: {
+            create: ['users']
+          }
+        })
       } catch (e) {
         processErrors(e, this.notify, true)
       }

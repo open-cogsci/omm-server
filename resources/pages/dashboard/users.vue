@@ -182,7 +182,7 @@ export default {
       if (this.saving) { return }
       this.saving = true
       try {
-        await this.User.persist(pick(userData,
+        const newRecord = await this.User.persist(pick(userData,
           ['$id', 'id', 'name', 'email', 'password', 'user_type_id', 'account_status']))
         this.notify({ message: this.$t('users.messages.saved'), color: 'success' })
         if (userData.id) {
@@ -190,6 +190,7 @@ export default {
         } else {
           this.dialog = false
           this.$refs.dialog.clear()
+          this.pagination.ids.unshift(newRecord.response.data.data.id)
         }
       } catch (e) {
         this.errors = processErrors(e, this.notify)

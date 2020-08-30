@@ -34,7 +34,7 @@ async function createCaptureJobs (study) {
 class StudySeeder {
   async run () {
     // Don't seed any studies if there already are some.
-    if (await Study.getCount() !== 0) { return }
+    if (await Study.getCount() > 0) { return }
 
     const daniel = await User.findOrFail(1)
     const sebastiaan = await User.findOrFail(2)

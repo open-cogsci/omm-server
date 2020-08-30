@@ -4,7 +4,7 @@
     :loading="loading"
     type="actions"
   >
-    <v-item-group class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
+    <v-item-group v-if="userCanEdit" class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
       <v-btn
         :color="osexpPresent?'default':'success'"
         @click="$emit('clicked-upload-exp')"
@@ -38,8 +38,9 @@
       </v-btn>
     </v-item-group>
 
-    <v-item-group class="v-btn-toggle">
+    <v-item-group :class="{'v-btn-toggle': userCanEdit}">
       <confirmation-dialog
+        v-if="userCanEdit"
         v-model="archiveDialog"
         @clicked-no="archiveDialog = false"
         @clicked-yes="$emit('clicked-archive'); archiveDialog = false"
@@ -87,12 +88,9 @@
         <template v-slot:title>
           <span v-html="$t('studies.dialogs.confirmation.delete.title')" />
         </template>
-        <div v-html="$t('studies.dialogs.confirmation.delete.body')" />
+        <div v-html="deleteBody" />
       </confirmation-dialog>
     </v-item-group>
-    <!-- This needs to be here because otherwise the v-btn-toggle styles
-    are discarded during tree-shaking, and the button row layout is no longer correct-->
-    <v-btn-toggle v-if="false" />
   </v-skeleton-loader>
 </template>
 
@@ -109,6 +107,10 @@ export default {
     jobs: {
       type: Array,
       default: () => ([])
+    },
+    userCanEdit: {
+      type: Boolean,
+      default: false
     },
     userIsOwner: {
       type: Boolean,
@@ -145,6 +147,11 @@ export default {
       return this.$vuetify.breakpoint.xsOnly || this.$vuetify.breakpoint.lgOnly
         ? { size: 18 }
         : { left: true }
+    },
+    deleteBody () {
+      return this.userIsOwner
+        ? this.$t('studies.dialogs.confirmation.delete.body')
+        : this.$t('studies.dialogs.confirmation.delete.body_collaborator')
     }
   }
 }

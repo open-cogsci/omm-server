@@ -52,6 +52,12 @@ export default {
         body: `<p><strong>Als je dit experiment verwijdert, worden ook alle resultaten gewist.</strong></p>
               <p>
                 Weet je zeker dat je dit experiment wilt verwijderen?
+              </p>`,
+        body_collaborator: `
+              <p>Je bent niet de eigenaar van deze studie, dus je zal alleen worden verwijderd van de
+              lijst van personen met wie deze studie is gedeeld.</p>
+              <p>
+                Weet je zeker dat je deze verbinding wilt verbreken?
               </p>`
       }
     },
