@@ -14,4 +14,4 @@ ENV NODE_ENV=production
 ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=80
 COPY --from=builder ./img .
-CMD npm start
+CMD node ace migration:run && node ace seed && npm start
