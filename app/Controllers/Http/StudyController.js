@@ -340,15 +340,15 @@ class StudyController {
    * @param {Response} ctx.response
    */
   async destroy ({ params, auth, response }) {
+    const { id } = params
     const study = await auth.user.studies()
-      .where('id', params.id)
+      .where('id', id)
       .firstOrFail()
-    if (!await study.isOwnedBy(auth.user)) {
-      return response.unauthorized({
-        message: 'You have insufficient priviliges to delete this study'
-      })
+    if (await study.isOwnedBy(auth.user)) {
+      await study.delete()
+    } else {
+      await auth.user.studies().detach([id])
     }
-    await study.delete()
     return response.noContent()
   }
 

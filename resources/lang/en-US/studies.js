@@ -51,8 +51,14 @@ export default {
         title: 'You are about to <span class="error--text">delete</span> this study',
         body: `<p><strong>Deleting this study will also erase all its participations and associated data entries.</strong></p>
               <p>
-                Are you sure you want to do this?
+                Are you sure you want <span class="error--text">delete</span> the experiment?
+              </p>`,
+        body_collaborator: `
+              <p>Since you are not the owner of this study, this action will only remove you from its list of collaborators.</p>
+              <p>
+                Are you sure you want to break the link?
               </p>`
+
       }
     },
     base_upload: {

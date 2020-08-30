@@ -14,10 +14,10 @@ echo
 read -p "OK? (Ctrl-C to cancel)" -n 1 -r && echo
 echo
 
-git commit -a -m "Preparing v$releaseVersion"
+git commit -a -m "Preparing $releaseVersion"
 git flow release start "$releaseVersion"
 git tag -a $releaseVersion -m $releaseVersion
-git flow release finish $releaseVersion -n -m "release/$releaseVersion"
+git flow release finish $releaseVersion -n
 
 git push
 git push origin master

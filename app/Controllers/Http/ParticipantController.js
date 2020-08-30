@@ -3,9 +3,11 @@
 const isArray = require('lodash/isArray')
 const isObject = require('lodash/isObject')
 const formatISO9075 = require('date-fns/formatISO9075')
+const { keyBy } = require('lodash')
+const { ModelNotFoundException } = require('@adonisjs/lucid/src/Exceptions')
+// const { LogicalException } = require('@adonisjs/generic-exceptions')
 
 const Participant = use('App/Models/Participant')
-const { keyBy } = require('lodash')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -741,6 +743,10 @@ class ParticipantController {
 
     let data = request.input('data')
     const job = ptcp.getRelated('jobs').first()
+    if (!job) {
+      throw new ModelNotFoundException(`Cannot find job with ID ${jobID} for participant ${identifier}`)
+    }
+
     const study = await job.study().first()
     const previousData = job.getRelated('pivot')?.data
     // Check if data has already been stored
