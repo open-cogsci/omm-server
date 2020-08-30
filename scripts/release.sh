@@ -4,20 +4,10 @@ set -e
 
 : "${1:?}"
 
-git checkout develop
-releaseVersion=$(npm version "$1" --git-tag-version=false)
-
-echo
-echo ">>> Bumped to $releaseVersion"
-echo ">>> Will commit and push new snapshot version"
-echo
-read -p "OK? (Ctrl-C to cancel)" -n 1 -r && echo
-echo
-
-git commit -a -m "Preparing $releaseVersion"
-git flow release start "$releaseVersion"
-git tag -a $releaseVersion -m $releaseVersion
-git flow release finish $releaseVersion -n
+git flow release start next
+releaseVersion=$(npm version "$1")
+git commit -a -m "Release $releaseVersion"
+git flow release finish next -n -m "Release $releaseVersion "
 
 git push
 git push origin master

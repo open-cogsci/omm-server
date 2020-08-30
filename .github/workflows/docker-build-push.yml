@@ -37,7 +37,7 @@ jobs:
           # Automatically tags the built image with the git reference as per the readme
           tag_with_ref: true # optional
           # Automatically tags the built image with the git short SHA as per the readme
-          tag_with_sha: true # optional
+          # tag_with_sha: true # optional
           # Path to the build context
           # path: # optional, default is .
           # Path to the Dockerfile (Default is '{path}/Dockerfile')
