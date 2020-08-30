@@ -33,9 +33,9 @@ jobs:
           # Server address of Docker registry. If not set then will default to Docker Hub
           registry: https://docker.pkg.github.com
           # Docker repository to tag the image with
-          repository: omm-server
+          repository: open-cogsci/omm-server
           # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
-          # tags: latest # optional
+          tags: latest # optional
           # Automatically tags the built image with the git reference as per the readme
           tag_with_ref: true # optional
           # Automatically tags the built image with the git short SHA as per the readme
@@ -45,7 +45,7 @@ jobs:
           # Path to the Dockerfile (Default is '{path}/Dockerfile')
           # dockerfile: 'docker/Dockerfile'
           # Sets the target stage to build
-          target: production
+          # target: production
           # Always attempt to pull a newer version of the image
           # always_pull: # optional
           # Comma-delimited list of build-time variables
