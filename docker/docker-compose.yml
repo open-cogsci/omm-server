@@ -5,26 +5,24 @@ services:
     container_name: mysql
     image: 'mysql:8'
     restart: always
-    ports:
-      - "3306:3306"
     # volumes:
     #   - /var/data/mysql:/var/lib/mysql
     #   - /etc/mysql:/etc/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: 4D#BF_RPtrQ3Q2n=VuNR!k5WvhLsmB#8
       MYSQL_DATABASE: omm
       MYSQL_USER: omm
-      MYSQL_PASSWORD: 4tt3nt10n!
+      MYSQL_PASSWORD: LhWxqJ^?pn@6AK+md6wZ_hsA=Qz52DSm
 
   server:
-    image: registry.github.com/open-cogsci/omm-server:latest
+    image: docker.pkg.github.com/open-cogsci/omm-server/omm-server:0.1.12
     environment:
       DB_PORT: 3306
       DB_USER: omm
-      DB_PASSWORD: 4tt3nt10n!
+      DB_PASSWORD: LhWxqJ^?pn@6AK+md6wZ_hsA=Qz52DSm
       DB_HOST: mysql
       DB_DATABASE: omm
     depends_on:
       - mysql
     ports:
-      - 80:80
+      - 3000:80
