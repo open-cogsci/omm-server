@@ -18,7 +18,7 @@ const Study = use('App/Models/Study')
 class ParticipationSeeder {
   async run () {
     // Don't seed any participations if there already are some.
-    if (await Participant.getCount() > 0 || await Study.getCount() > 0) {
+    if (await Participant.getCount() === 0 || await Study.getCount() === 0) {
       return
     }
 
