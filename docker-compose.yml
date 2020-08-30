@@ -14,7 +14,7 @@ services:
       MYSQL_PASSWORD: LhWxqJ^?pn@6AK+md6wZ_hsA=Qz52DSm
 
   server:
-    image: docker.pkg.github.com/open-cogsci/omm-server/omm-server:latest
+    image: docker.pkg.github.com/open-cogsci/omm-server/omm-server
     environment:
       HOST: 0.0.0.0
       DB_CONNECTION: mysql
