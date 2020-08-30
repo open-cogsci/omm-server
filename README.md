@@ -41,7 +41,7 @@ npx adonis <command>
 or use the alternative cli tool that is included with the framework, but accepts the same parameters.
 
 ```
-npx ace <command>
+node ace <command>
 ```
 
 ## Initializing the database
