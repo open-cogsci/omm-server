@@ -7,7 +7,9 @@ set -e
 git flow release start next
 releaseVersion=$(npm version "$1" --git-tag-version=false)
 git commit -a -m "Bump to $releaseVersion"
-git flow release finish -T "$releaseVersion" -m "Release $releaseVersion" next
+# Remove the v from the tag because Git flow adds it again
+releaseVersion=${releaseVersion#?};
+git flow release finish -T "$releaseVersion" -m "Release v$releaseVersion" next
 
 git push
 git push origin master
