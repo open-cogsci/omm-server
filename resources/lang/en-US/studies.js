@@ -2,7 +2,8 @@ export default {
   list: {
     add: 'Add new study',
     current: 'Current',
-    archived: 'Archived'
+    archived: 'Archived',
+    shared_by: 'Shared by'
   },
   notifications: {
     created: 'The study has been created',

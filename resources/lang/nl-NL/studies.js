@@ -2,7 +2,8 @@ export default {
   list: {
     add: 'Voeg nieuw experiment toe',
     current: 'Actueel',
-    archived: 'Gearchiveerd'
+    archived: 'Gearchiveerd',
+    shared_by: 'Gedeeld door'
   },
   notifications: {
     created: 'Het experiment is aangemaakt',

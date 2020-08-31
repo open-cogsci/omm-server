@@ -46,6 +46,7 @@ export default {
         .whereHas('users', (q) => {
           q.where('id', this.$auth.user.id)
         })
+        .with('users')
         .where('active', true)
         .orderBy('created_at', 'desc')
         .get()
