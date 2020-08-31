@@ -65,10 +65,11 @@ class StudyController {
     const active = request.input('active') !== 'false'
     const studies = await auth.user
       .studies()
+      .with('users')
       .where('active', active)
       .orderBy('created_at', 'desc')
       .fetch()
-    return transform.collection(studies, 'StudyTransformer')
+    return transform.include('users').collection(studies, 'StudyTransformer')
   }
 
   /**

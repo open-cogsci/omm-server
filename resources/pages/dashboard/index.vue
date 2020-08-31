@@ -68,7 +68,7 @@
                           {{ item.name }}
                         </v-list-item-title>
                         <v-list-item-subtitle>
-                          {{ item.participations }} {{ $t('dashboard.participations') }}
+                          {{ item.participations }} {{ $t('dashboard.jobs_performed') }}
                         </v-list-item-subtitle>
                       </v-list-item-content>
                     </v-list-item>

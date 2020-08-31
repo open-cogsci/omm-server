@@ -28,7 +28,7 @@
         :items="studies"
         :item-height="88"
         height="calc(100vh - 268px)"
-        class="py-0 three-line"
+        class="py-0"
       >
         <template v-slot="{ item }">
           <v-list-item three-line :to="localePath(`/dashboard/studies/${item.id}`)" nuxt>
@@ -36,6 +36,16 @@
               <v-list-item-title v-text="item.name" />
               <v-list-item-subtitle v-text="item.description" />
             </v-list-item-content>
+            <v-list-item-action v-if="!userIsOwner(item.id)" class="align-self-center">
+              <v-tooltip bottom>
+                <template v-slot:activator="{on, attrs}">
+                  <v-icon color="primary" v-bind="attrs" v-on="on">
+                    mdi-share-variant
+                  </v-icon>
+                </template>
+                {{ $t('studies.list.shared_by') }} {{ studyOwners[item.id].name }}
+              </v-tooltip>
+            </v-list-item-action>
           </v-list-item>
           <v-divider />
         </template>
@@ -58,6 +68,19 @@ export default {
     addStudyButton: {
       type: Boolean,
       default: false
+    }
+  },
+  computed: {
+    studyOwners () {
+      return this.studies.reduce((result, study) => {
+        result[study.id] = study?.users.find(user => user.pivot.is_owner)
+        return result
+      }, {})
+    }
+  },
+  methods: {
+    userIsOwner (studyID) {
+      return this.$auth.user.id === this.studyOwners[studyID].id
     }
   }
 }
