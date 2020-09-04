@@ -7,11 +7,13 @@
     "Sebastiaan Mathôt"
   ],
   "private": true,
+  "main": "electron.js",
   "scripts": {
     "serve:dev": "npm run dev",
     "dev": "nodemon --watch app --watch config --watch .env --watch start -x node server.js",
     "build": "cross-env NODE_ENV=production node ./ace nuxtbuild",
     "start": "cross-env NODE_ENV=production node server.js",
+    "electron": "cross-env NODE_ENV=production electron .",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "test": "jest",
     "docker-build": "npm run build && docker build -f docker/Dockerfile .",
@@ -64,6 +66,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
+    "electron": "^10.1.0",
     "eslint": "^6.8.0",
     "eslint-plugin-nuxt": "^1.0.0",
     "eslint-plugin-vue": "^6.2.2",
