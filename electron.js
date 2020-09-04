@@ -1,22 +1,40 @@
+const path = require('path')
 const { app, BrowserWindow } = require('electron')
 const server = require('./server')
 
+const debug = /--debug/.test(process.argv[2])
+if (process.mas) { app.setName('Open Monkey Mind') }
+
+let win
 async function createWindow () {
-  // Create the browser window.
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+  makeSingleInstance()
+
+  const windowOptions = {
+    width: 1024,
+    height: 768,
+    title: app.getName(),
     webPreferences: {
       nodeIntegration: true
     }
-  })
-
-  // and load the index.html of the app.
-  try {
-    await win.loadURL('http://localhost:3000')
-  } catch (e) {
-    setTimeout(() => win.loadURL('http://localhost:3000'), 500)
   }
+
+  if (process.platform === 'linux') {
+    windowOptions.icon = path.join(__dirname, '/resources/assets/img/cogsci.png')
+  }
+
+  // Create the browser window.
+  win = new BrowserWindow(windowOptions)
+  await win.loadFile('index.html')
+
+  if (debug) {
+    win.webContents.openDevTools()
+    win.maximize()
+    require('devtron').install()
+  }
+
+  win.on('closed', () => {
+    win = null
+  })
 }
 
 // This method will be called when Electron has finished
@@ -40,3 +58,23 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+// Make this app a single instance app.
+//
+// The main window will be restored and focused instead of a second window
+// opened when a person attempts to launch a second instance.
+//
+// Returns true if the current version of the app should quit instead of
+// launching.
+function makeSingleInstance () {
+  if (process.mas) { return }
+
+  app.requestSingleInstanceLock()
+
+  app.on('second-instance', () => {
+    if (win) {
+      if (win.isMinimized()) { win.restore() }
+      win.focus()
+    }
+  })
+}
