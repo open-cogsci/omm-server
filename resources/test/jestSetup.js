@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { config } from '@vue/test-utils'
+import { Plugin } from 'vue-fragment'
 
+Vue.use(Plugin)
 Vue.use(Vuetify)
 
 Vue.mixin({
