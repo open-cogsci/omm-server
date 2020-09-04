@@ -5,13 +5,19 @@ import axios from 'axios'
 
 // import { Breakpoint } from 'vuetify/lib/services'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { Model } from '@vuex-orm/core'
 import ArchivedStudies from './ArchivedStudies.vue'
 import { STUDIES } from '@/assets/js/endpoints'
 
+import * as storeIndex from '@/store'
+
 jest.mock('axios')
+Model.setAxios(axios)
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
+
+const user = { id: 1, name: 'User' }
 
 describe('ArchivedStudies', () => {
   let vuetify
@@ -19,31 +25,35 @@ describe('ArchivedStudies', () => {
   let actions
 
   beforeEach(() => {
-    const state = {
-      current: {},
-      pending: []
-    }
     actions = {
       notify: jest.fn()
     }
     store = new Vuex.Store({
-      state: {},
+      ...storeIndex,
       modules: {
         notifications: {
           namespaced: true,
-          state,
+          state: {
+            current: {},
+            pending: []
+          },
           actions
         }
       }
     })
     vuetify = new Vuetify({
       mocks: {
+        $axios: axios,
+        $auth: { user },
         $vuetify: {
           breakpoint: {}
         }
       }
     })
     jest.resetAllMocks()
+    // Make sure the fetch() function works for all tests
+    const response = { data: { data: [] } }
+    axios.request.mockResolvedValue(response)
   })
 
   function mountFunc (options = {}) {
@@ -59,16 +69,25 @@ describe('ArchivedStudies', () => {
   }
 
   test('Data is fetched after creation of component', () => {
-    const response = { data: { data: [] } }
-    axios.get.mockResolvedValue(response)
     mountFunc()
-    expect(axios.get).toHaveBeenCalledWith(STUDIES, { params: { active: false } })
+    expect(axios.request).toHaveBeenCalledWith({
+      method: 'get',
+      baseURL: STUDIES,
+      save: true,
+      dataKey: 'data',
+      url: '',
+      params: { active: false }
+    })
   })
 
   test('Should notify the user after an error occurs', async () => {
-    axios.get.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
+    jest.resetAllMocks()
+    axios.request.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
+    // Notify should not have been called yet.
+    expect(actions.notify).not.toHaveBeenCalled()
     mountFunc()
     await flushPromises()
+    // Notify should have been called
     expect(actions.notify).toHaveBeenCalled()
   })
 })

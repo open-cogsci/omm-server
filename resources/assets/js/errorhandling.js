@@ -25,8 +25,9 @@ export function processErrors (e, notify = null, print = false) {
       })
     }
   } else if (isFunction(notify)) {
+    const message = e?.response?.data?.error?.message || e?.response?.data?.message || e?.response?.data || e
     notify({
-      message: e?.response?.data?.error?.message || e?.response?.data?.message || e?.response?.data || e,
+      message,
       color: 'error'
     })
   }

@@ -70,7 +70,7 @@ export default {
           }
         })
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(e, this.notify, true)
       } finally {
         this.loading = false
       }

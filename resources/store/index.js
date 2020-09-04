@@ -40,7 +40,4 @@ export const state = () => ({
   studyTab: 0
 })
 export const mutations = make.mutations(state)
-
-export const actions = {
-  // async nuxtServerInit ({ commit, state }) {}
-}
+export const actions = {}

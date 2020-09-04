@@ -55,8 +55,9 @@ export default {
         })
       } catch (e) {
         processErrors(e, this.notify)
+      } finally {
+        this.loading = false
       }
-      this.loading = false
     }
   }
 }

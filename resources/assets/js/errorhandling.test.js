@@ -36,8 +36,8 @@ describe('Error handling', () => {
     const err = {
       response: {
         data: [
-          { field: 'name', validation: 'Required' },
-          { field: 'email', validation: 'Invalid email' }
+          { field: 'name', message: 'Required' },
+          { field: 'email', message: 'Invalid email' }
         ]
       }
     }
@@ -50,8 +50,8 @@ describe('Error handling', () => {
     let err = {
       response: {
         data: [
-          { field: 'name', validation: 'Required' },
-          { field: 'email', validation: 'Invalid email' }
+          { field: 'name', message: 'Required' },
+          { field: 'email', message: 'Invalid email' }
         ]
       }
     }
