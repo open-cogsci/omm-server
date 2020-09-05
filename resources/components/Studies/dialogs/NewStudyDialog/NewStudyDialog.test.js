@@ -2,10 +2,8 @@ import Vuetify from 'vuetify'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import NewStudyDialog from './NewStudyDialog.vue'
-import SaveCancelButtons from '@/components/common/SaveCancelButtons'
 
 const localVue = createLocalVue()
-localVue.component(SaveCancelButtons)
 
 describe('NewStudyDialog', () => {
   let vuetify
