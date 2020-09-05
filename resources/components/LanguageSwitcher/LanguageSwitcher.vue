@@ -4,7 +4,11 @@
       <template v-slot:activator="{ on, attrs }">
         <v-list-item v-bind="attrs" v-on="on">
           <v-list-item-action>
-            <v-img width="25" height="20" :src="require(`~/assets/img/${items[currentLocale].flag}`)" />
+            <v-img
+              width="25"
+              height="20"
+              :src="require(`~/assets/img/${items[currentLocale].flag}`)"
+            />
           </v-list-item-action>
           <v-list-item-content>
             {{ items[currentLocale].title }}
@@ -56,7 +60,6 @@ export default {
         this.$router.push(this.switchLocalePath(val))
         this.$emit('switched-locale', val)
       }
-
     }
   }
 }

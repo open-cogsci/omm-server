@@ -2,13 +2,15 @@ import Vuetify from 'vuetify'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import NewStudyDialog from './NewStudyDialog.vue'
+import SaveCancelButtons from '@/components/common/SaveCancelButtons'
 
 const localVue = createLocalVue()
+localVue.component(SaveCancelButtons)
 
 describe('NewStudyDialog', () => {
   let vuetify
 
-  beforeEach(() => {
+  beforeAll(() => {
     vuetify = new Vuetify()
   })
 
@@ -25,6 +27,7 @@ describe('NewStudyDialog', () => {
 
   it('should mount succesfully and completely', () => {
     const wrapper = mountFunc()
+    flushPromises()
     expect(wrapper.find('.v-input.v-text-field input[type="text"]').exists()).toBe(true)
     expect(wrapper.find('.v-input.v-textarea textarea').exists()).toBe(true)
     expect(wrapper.find('.v-btn.success').exists()).toBe(true)
@@ -80,7 +83,7 @@ describe('NewStudyDialog', () => {
     const wrapper = mountFunc()
     await flushPromises()
     // The button should be disabled at first
-    const saveBtn = wrapper.find('.v-btn.success')
+    const saveBtn = wrapper.find('.v-btn.primary')
     expect(saveBtn.attributes('disabled')).toBe('disabled')
     // Force a save action and see if that guard works too
     wrapper.vm.save()
