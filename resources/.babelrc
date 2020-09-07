@@ -1,7 +1,12 @@
 {
   "env": {
     "test": {
+      "plugins": [
+        "@babel/plugin-transform-runtime",
+        ["dynamic-import-node", { "noInterop": true }]
+      ],
       "presets": [
+        "jest",
         [
           "@babel/env",
           {

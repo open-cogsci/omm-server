@@ -2,7 +2,6 @@ import Vuetify from 'vuetify'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import NewStudyDialog from './NewStudyDialog.vue'
-
 const localVue = createLocalVue()
 
 describe('NewStudyDialog', () => {
@@ -28,7 +27,7 @@ describe('NewStudyDialog', () => {
     flushPromises()
     expect(wrapper.find('.v-input.v-text-field input[type="text"]').exists()).toBe(true)
     expect(wrapper.find('.v-input.v-textarea textarea').exists()).toBe(true)
-    expect(wrapper.find('.v-btn.success').exists()).toBe(true)
+    expect(wrapper.find('button.v-btn.success--text').exists()).toBe(true)
     expect(wrapper.findAll('.v-btn').length).toBe(2)
   })
 
@@ -81,7 +80,7 @@ describe('NewStudyDialog', () => {
     const wrapper = mountFunc()
     await flushPromises()
     // The button should be disabled at first
-    const saveBtn = wrapper.find('.v-btn.primary')
+    const saveBtn = wrapper.find('.v-card__actions').findAll('button.v-btn').at(1)
     expect(saveBtn.attributes('disabled')).toBe('disabled')
     // Force a save action and see if that guard works too
     wrapper.vm.save()
@@ -96,7 +95,7 @@ describe('NewStudyDialog', () => {
 
   it('should handle cancel button presses correctly', async () => {
     const wrapper = mountFunc()
-    const cancelBtn = wrapper.find('.v-btn.cancel')
+    const cancelBtn = wrapper.find('.v-card__actions').findAll('button.v-btn').at(0)
     await cancelBtn.trigger('click')
     expect(wrapper.emitted('input')[0]).toEqual([false])
   })

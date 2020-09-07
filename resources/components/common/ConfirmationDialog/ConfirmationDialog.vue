@@ -7,7 +7,7 @@
       <v-card>
         <v-card-title>
           <slot name="title">
-            Are you sure?
+            {{ $t('common.dialogs.confirm') }}
           </slot>
         </v-card-title>
         <v-card-text>
