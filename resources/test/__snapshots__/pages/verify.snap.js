@@ -5,10 +5,12 @@ exports[`Verify wrapper matches its snapshot 1`] = `
   <div class="v-card__title justify-center">
     <div class="v-image v-responsive mx-2 theme--light" style="max-height: 40px; max-width: 40px;">
       <div class="v-responsive__content"></div>
-    </div> <span class="display-1 font-weight-light">Open Monkey Mind</span>
+    </div>
+    <span class="display-1 font-weight-light">Open Monkey Mind</span>
   </div>
   <div class="v-card__text">
     <p>
+    </p>
     <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="v-progress-linear theme--light" style="height: 4px;">
       <div class="v-progress-linear__background green" style="opacity: 0.3; left: 0%; width: 100%;"></div>
       <div class="v-progress-linear__buffer"></div>
@@ -18,8 +20,10 @@ exports[`Verify wrapper matches its snapshot 1`] = `
           <div class="v-progress-linear__indeterminate short green"></div>
         </div>
       </transition-stub>
-    </div><br> <span>Verifying email address.</span>
-    </p>
+    </div>
+    <br>
+    <span>Verifying email address.</span>
+    <p></p>
   </div>
 </div>
 `;
