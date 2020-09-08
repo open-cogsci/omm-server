@@ -1,7 +1,7 @@
 import Vuetify from 'vuetify'
 import Vuex from 'vuex'
-// import { Breakpoint } from 'vuetify/lib/services'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import NotificationBox from './NotificationBox.vue'
 
 const localVue = createLocalVue()
@@ -49,8 +49,9 @@ describe('NotificationBox', () => {
     })
   }
 
-  test('is a Vue instance', () => {
+  it('should match its snapshot', async () => {
     const wrapper = mountFunc()
-    expect(wrapper.exists()).toBeTruthy()
+    await flushPromises()
+    expect(wrapper).toMatchSnapshot()
   })
 })
