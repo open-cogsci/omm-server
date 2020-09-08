@@ -7,12 +7,6 @@ import StudiesList from './StudiesList.vue'
 jest.mock('axios')
 const localVue = createLocalVue()
 
-const resizeWindow = (x, y) => {
-  window.innerWidth = x
-  window.innerHeight = y
-  window.dispatchEvent(new Event('resize'))
-}
-
 describe('StudiesList', () => {
   let vuetify
   beforeEach(() => {
@@ -29,33 +23,30 @@ describe('StudiesList', () => {
     })
   }
 
-  test.skip('Data is shown', async () => {
-    // Test is skipped because the v-virtual-scroll component of vuetify doesn't render any items
-    // offscreen. I have yet to find out how to force it to.
-    const studies = [
-      { id: 1, name: 'Test study', description: 'Description' },
-      { id: 2, name: 'Test study 2', description: 'Description', to: '/studies/2' }
-    ]
+  // test('Data is shown', async () => {
+  //   // Test is skipped because the v-virtual-scroll component of vuetify doesn't render any items
+  //   // offscreen. I have yet to find out how to force it to.
+  //   const studies = [
+  //     { id: 1, name: 'Test study', description: 'Description' },
+  //     { id: 2, name: 'Test study 2', description: 'Description', to: '/studies/2' }
+  //   ]
+  //   const wrapper = mountFunc({
+  //     propsData: { studies }
+  //   })
 
-    resizeWindow(1920, 1080)
+  //   await flushPromises()
+  //   // Expect a list item to be created
+  //   const listItem = wrapper.find('.v-list-item')
+  //   expect(listItem.exists()).toBe(true)
 
-    const wrapper = mountFunc({
-      propsData: { studies }
-    })
+  //   // Expect a list item title to be same as study name
+  //   expect(listItem.find('.v-list-item__title').text()).toBe(studies[0].name)
+  //   // Expect a list item description to be the same as study name
+  //   expect(listItem.find('.v-list-item__subtitle').text()).toBe(studies[0].description)
 
-    await flushPromises()
-    // Expect a list item to be created
-    const listItem = wrapper.find('.v-list-item')
-    expect(listItem.exists()).toBe(true)
-
-    // Expect a list item title to be same as study name
-    expect(listItem.find('.v-list-item__title').text()).toBe(studies[0].name)
-    // Expect a list item description to be the same as study name
-    expect(listItem.find('.v-list-item__subtitle').text()).toBe(studies[0].description)
-
-    // Expect the found the same amount of list items as passed studies
-    expect(wrapper.findAll('.v-list-item').length).toBe(studies.length)
-  })
+  //   // Expect the found the same amount of list items as passed studies
+  //   expect(wrapper.findAll('.v-list-item').length).toBe(studies.length)
+  // })
 
   test('Skeleton is shown during loading and hidden afterwards', async () => {
     const wrapper = mountFunc({
@@ -64,6 +55,7 @@ describe('StudiesList', () => {
         loading: true
       }
     })
+    await flushPromises()
     expect(wrapper.find('.v-skeleton-loader').exists()).toBe(true)
     expect(wrapper.find('.v-list-item').exists()).toBe(false)
 
@@ -82,7 +74,7 @@ describe('StudiesList', () => {
         addStudyButton: false
       }
     })
-
+    await flushPromises()
     expect(wrapper.find('.v-list-item.success').exists()).toBe(false)
     await wrapper.setProps({ addStudyButton: true })
 

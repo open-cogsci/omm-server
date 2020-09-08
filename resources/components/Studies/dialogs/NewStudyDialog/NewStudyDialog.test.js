@@ -50,7 +50,7 @@ describe('NewStudyDialog', () => {
     expect(titleField.find('.v-messages__message').exists()).toBe(false)
   })
 
-  it('should show error messages for the title field  on too long input', async () => {
+  it('should show error messages for the title field on too long input', async () => {
     const wrapper = mountFunc()
     const titleField = wrapper.get('.v-text-field')
     // No errors should be set
