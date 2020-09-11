@@ -1,17 +1,13 @@
 
-import Vue from 'vue'
 import Vuetify from 'vuetify'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
-import SaveCancelIconButtons from './SaveCancelIconButtons.vue'
+import componentToTest from './SaveCancelIconButtons.vue'
+import { FragmentWrapper } from '@/test/util'
 
 const localVue = createLocalVue()
-// Fragment needs a parent to function correctly so wrap the component
-const WrapperComponent = Vue.component('WrapperComponent', {
-  template: '<div><slot></slot></div>'
-})
 
-describe('SaveCancelIconButtons', () => {
+describe(`${componentToTest}`, () => {
   let vuetify
 
   beforeAll(() => {
@@ -22,23 +18,32 @@ describe('SaveCancelIconButtons', () => {
     jest.resetAllMocks()
   })
 
-  function mountFunc (options = {}) {
-    return mount(WrapperComponent, {
+  async function mountFunc (options = {}) {
+    const wrapper = mount(FragmentWrapper(componentToTest), {
       localVue,
-      slots: {
-        default: SaveCancelIconButtons
-      },
       vuetify,
       mocks: {},
-      propsData: {
-      },
+      propsData: {},
       ...options
     })
+    await flushPromises()
+    return wrapper.findComponent(componentToTest)
   }
 
   it('should match its snapshot', async () => {
     const wrapper = mountFunc()
     await flushPromises()
     expect(wrapper).toMatchSnapshot()
+  })
+
+  it('should correct events when clicked', async () => {
+    const wrapper = await mountFunc()
+    const btns = wrapper.findAll('.v-icon')
+    expect(wrapper.emitted('clicked-cancel')).toBeFalsy()
+    await btns.at(1).trigger('click')
+    expect(wrapper.emitted('clicked-cancel')).toBeTruthy()
+    expect(wrapper.emitted('clicked-save')).toBeFalsy()
+    await btns.at(0).trigger('click')
+    expect(wrapper.emitted('clicked-save')).toBeTruthy()
   })
 })

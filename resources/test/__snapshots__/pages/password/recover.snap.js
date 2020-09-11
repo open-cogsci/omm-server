@@ -1,54 +1,52 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Password wrapper matches its snapshot 1`] = `
-<v-card-stub loaderheight="4" tag="div" width="475">
-  <v-card-title-stub class="justify-center">
-    <v-img-stub maxheight="40" maxwidth="40" contain="true" options="[object Object]" position="center center" src transition="fade-transition" class="mx-2"></v-img-stub>
+<div class="v-card v-sheet theme--light" style="width: 475px;">
+  <div class="v-card__title justify-center">
+    <div class="v-image v-responsive mx-2 theme--light" style="max-height: 40px; max-width: 40px;">
+      <div class="v-responsive__content"></div>
+    </div>
     <span class="display-1 font-weight-light">Open Monkey Mind</span>
-  </v-card-title-stub>
-  <v-card-text-stub>
+  </div>
+  <div class="v-card__text">
     <p class="text-center">
       password_recover.subheader
     </p>
-    <v-form-stub lazyvalidation="true" value="true">
-      <v-row-stub tag="div">
-        <v-col-stub cols="12" tag="div">
-          <v-text-field-stub errorcount="1" errormessages messages rules="v => {
-            /* istanbul ignore next */
-            cov_we1qd24j0().f[2]++;
-            cov_we1qd24j0().s[8]++;
-            return (
-              /* istanbul ignore next */
-              (cov_we1qd24j0().b[0][0]++, !(0, _validator.isEmpty)(\`\${v}\`)) ||
-              /* istanbul ignore next */
-              (cov_we1qd24j0().b[0][1]++, this.$t('password_recover.fields.email.validation.empty'))
-            );
-          },v => {
-            /* istanbul ignore next */
-            cov_we1qd24j0().f[3]++;
-            cov_we1qd24j0().s[9]++;
-            return (
-              /* istanbul ignore next */
-              (cov_we1qd24j0().b[1][0]++, (0, _validator.isEmail)(v)) ||
-              /* istanbul ignore next */
-              (cov_we1qd24j0().b[1][1]++, this.$t('password_recover.fields.email.validation.invalid'))
-            );
-          }" successmessages value backgroundcolor label="password_recover.fields.email.label" loaderheight="2" clearicon="$clear" type="text"></v-text-field-stub>
-        </v-col-stub>
-      </v-row-stub>
-    </v-form-stub>
-  </v-card-text-stub>
-  <v-card-actions-stub>
-    <v-spacer-stub></v-spacer-stub>
-    <v-btn-stub color="primary" tag="button" activeclass to="[object Object]" nuxt="true" type="button">
-      password_recover.buttons.signin
-    </v-btn-stub>
-    <v-btn-stub color="success" tag="button" activeclass type="button">
-      password_recover.buttons.email
-      <v-icon-stub right>
-        mdi-send
-      </v-icon-stub>
-    </v-btn-stub>
-  </v-card-actions-stub>
-</v-card-stub>
+    <form novalidate="novalidate" class="v-form">
+      <div class="row">
+        <div class="col col-12">
+          <div class="v-input theme--light v-text-field">
+            <div class="v-input__control">
+              <div class="v-input__slot">
+                <div class="v-text-field__slot">
+                  <label for="input-5" class="v-label theme--light" style="left: 0px; position: absolute;">password_recover.fields.email.label</label>
+                  <input id="input-5" type="text">
+                </div>
+              </div>
+              <div class="v-text-field__details">
+                <div class="v-messages theme--light">
+                  <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="v-card__actions">
+    <div class="spacer"></div>
+    <nuxt-link-stub class="v-btn v-btn--contained v-btn--router theme--light v-size--default primary">
+      <span class="v-btn__content">
+        password_recover.buttons.signin
+      </span>
+    </nuxt-link-stub>
+    <button type="button" class="v-btn v-btn--contained theme--light v-size--default success">
+      <span class="v-btn__content">
+        password_recover.buttons.email
+        <i aria-hidden="true" class="v-icon notranslate v-icon--right mdi mdi-send theme--light"></i>
+      </span>
+    </button>
+  </div>
+</div>
 `;

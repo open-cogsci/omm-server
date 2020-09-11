@@ -22,6 +22,7 @@ describe('UnsavedChangesDialog', () => {
       vuetify,
       mocks: {},
       propsData: {
+        value: true
       },
       ...options
     })

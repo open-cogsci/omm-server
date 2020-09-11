@@ -9,7 +9,7 @@
   >
     {{ current.message }}
     <template v-slot:action="{ attrs }">
-      <v-btn text v-bind="attrs" @click.native="pop">
+      <v-btn text v-bind="attrs" @click="pop">
         {{ current.closeText }}
       </v-btn>
     </template>

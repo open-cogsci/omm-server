@@ -1,5 +1,5 @@
 import Vuetify from 'vuetify'
-import { shallowMount, createLocalVue } from '@vue/test-utils'
+import { mount, createLocalVue } from '@vue/test-utils'
 import Password from './recover.vue'
 
 const localVue = createLocalVue()
@@ -12,13 +12,14 @@ describe('Password wrapper', () => {
   })
 
   function mountFunc (options = {}) {
-    return shallowMount(Password, {
+    return mount(Password, {
       localVue,
       vuetify,
       ...options,
       mocks: {
         localePath: v => v
-      }
+      },
+      stubs: ['nuxt-link']
     })
   }
 
