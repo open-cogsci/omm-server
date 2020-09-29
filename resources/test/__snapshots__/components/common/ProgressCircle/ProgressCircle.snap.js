@@ -7,7 +7,7 @@ exports[`ProgressCircle should match its snapshot 1`] = `
     <circle fill="transparent" cx="45.714285714285715" cy="45.714285714285715" r="20" stroke-width="5.714285714285714" stroke-dasharray="125.664" stroke-dashoffset="0px" class="v-progress-circular__overlay" />
   </svg>
   <div class="v-progress-circular__info">
-
+    100
   </div>
 </div>
 `;

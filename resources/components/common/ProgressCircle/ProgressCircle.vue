@@ -1,6 +1,6 @@
 <template>
   <v-progress-circular v-bind="$props" :color="color" v-on="$listeners">
-    {{ $attrs.value }}
+    {{ value }}
   </v-progress-circular>
 </template>
 
