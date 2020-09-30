@@ -128,7 +128,7 @@ export default {
     },
     download (type) {
       const url = this.dataFiles[`data-${type}`].path
-      window.location.href = url
+      window.location.assign(url)
     },
     showSuccessMessage (type) {
       this.message = `Succesfully (re)generated ${type} file. Click on the blue button to download it.`
