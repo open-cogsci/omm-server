@@ -81,6 +81,8 @@ Route.group(() => {
     .as('stats.most_active_studies')
   Route.get('/participations/most_active_participants', 'DashboardController.mostActiveParticipants')
     .as('stats.most_active_participants')
+  Route.patch('/participations/priority/:participantID/:studyID', 'ParticipantController.setParticipationPriority')
+    .as('participation.priority')
 }).prefix(API_PREFIX).middleware(['auth:jwt', 'json'])
 
 Route.group(() => {

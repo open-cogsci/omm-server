@@ -13,6 +13,7 @@ export default class Participation extends Model {
       study_id: this.attr(null),
       participant_id: this.attr(null),
       status_id: this.attr(null),
+      priority: this.number(1),
       jobs_count: this.number(0),
       completed_jobs_count: this.number(0),
       created_at: this.attr(null),
@@ -50,5 +51,13 @@ export default class Participation extends Model {
       save: false
     })
     return reply.response.data.data
+  }
+
+  setPriority (priority, config) {
+    const endpoint = `/participations/priority/${this.participant_id}/${this.study_id}`
+    return this.constructor.api().patch(endpoint, { priority }, {
+      ...config,
+      save: false
+    })
   }
 }

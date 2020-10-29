@@ -36,9 +36,14 @@
         <v-card-title>
           {{ $t('study_participants.participants.title') }}
           <v-spacer />
-          <span class="caption">
-            {{ $t('study_participants.participants.perc_complete') }}
-          </span>
+          <div v-if="participants.length">
+            <span class="caption mr-6">
+              Priority
+            </span>
+            <span class="caption">
+              {{ $t('study_participants.participants.perc_complete') }}
+            </span>
+          </div>
         </v-card-title>
         <v-card-text class="pa-0 fill-height">
           <study-participants-list
@@ -80,6 +85,7 @@
 <script>
 import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
+
 export default {
   components: {
     ParticipationStats: () => import('./ParticipationStats'),

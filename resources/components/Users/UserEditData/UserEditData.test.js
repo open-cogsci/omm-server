@@ -4,7 +4,7 @@ import UserEditData from './UserEditData.vue'
 
 const localVue = createLocalVue()
 
-describe('UserEditData wrapper', () => {
+describe('UserEditData', () => {
   let vuetify
   let login
 
