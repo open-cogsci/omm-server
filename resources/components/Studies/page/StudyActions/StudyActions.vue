@@ -75,6 +75,7 @@
           <v-btn
             :disabled="disableDelete"
             v-bind="attrs"
+            :large="!userCanEdit"
             v-on="on"
           >
             <v-icon v-bind="delArchiveIconAttrs">

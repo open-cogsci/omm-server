@@ -20,7 +20,7 @@
             <v-list-item-title v-text="item.name" />
             <v-list-item-subtitle v-text="item.identifier" />
           </v-list-item-content>
-          <v-list-item-action style="max-width: 65px">
+          <v-list-item-action v-if="editable" style="max-width: 65px">
             <priority-dial :participation="item.pivot" />
           </v-list-item-action>
           <v-list-item-avatar>
@@ -59,6 +59,10 @@ export default {
     totalJobs: {
       type: Number,
       default: 0
+    },
+    editable: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({

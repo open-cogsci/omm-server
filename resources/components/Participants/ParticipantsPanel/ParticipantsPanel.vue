@@ -47,6 +47,7 @@
         </v-card-title>
         <v-card-text class="pa-0 fill-height">
           <study-participants-list
+            :editable="userCanEdit"
             :total-jobs="study.jobs_count"
             :participants="participants"
             :loading="loading.initial"
@@ -68,6 +69,7 @@
             {{ $t('study_participants.participants.data') }}
           </v-btn>
           <v-btn
+            v-if="userCanEdit"
             color="primary"
             @click="dialog.manage = true"
           >
@@ -133,6 +135,10 @@ export default {
     },
     participants () {
       return this.study?.participants || []
+    },
+    userCanEdit () {
+      return !!this.study?.users.find(user => user.id === this.$auth.user.id &&
+        user.pivot.access_permission_id === 2)
     }
   },
   watch: {
