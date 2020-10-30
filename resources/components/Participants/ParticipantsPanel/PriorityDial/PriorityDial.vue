@@ -14,6 +14,8 @@
 
 <script>
 import { mapActions } from 'vuex'
+import { isArray, debounce } from 'lodash'
+import { processErrors } from '~/assets/js/errorhandling'
 
 export default {
   props: {
@@ -27,20 +29,30 @@ export default {
       get () {
         return this.participation.priority
       },
-      async set (val) {
+      set (val) {
         if (!this.$refs.field.validate()) {
           return
         }
-        try {
-          await this.participation.setPriority(val)
-        } catch (e) {
-          this.notify({ message: e.response.data[0].message, color: 'error' })
-        }
+        this.update(val)
       }
     }
   },
+  created () {
+    this.update = debounce(this.update, 500)
+  },
   methods: {
-    ...mapActions('notifications', ['notify'])
+    ...mapActions('notifications', ['notify']),
+    async update (val) {
+      try {
+        await this.participation.setPriority(val)
+      } catch (e) {
+        if (isArray(e.response.data)) {
+          this.notify({ message: e.response.data[0].message, color: 'error' })
+        } else {
+          processErrors(e, this.notfiy)
+        }
+      }
+    }
   }
 }
 </script>

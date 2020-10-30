@@ -220,7 +220,7 @@ class ParticipantController {
   * /participants/{id}:
   *   put:
   *     tags:
-  *       - ParticipantsS
+  *       - Participants
   *     security:
   *       - JWT: []
   *     summary: >
@@ -410,11 +410,10 @@ class ParticipantController {
 
     let study
     try {
-      // First find studies that are in progress, then select pending studies.
       study = await ptcp.studies()
         .with('files')
         .whereInPivot('status_id', [1, 2])
-        .orderBy('priority, desc')
+        .orderBy('priority', 'desc')
         .orderBy('status_id', 'desc')
         .orderBy('created_at', 'asc')
         .withPivot(['status_id', 'priority'])
@@ -793,7 +792,7 @@ class ParticipantController {
     }
 
     const validation = await validate(request.all(), {
-      priority: 'integer|range:0,99'
+      priority: 'integer|range:0,100'
     })
     if (validation.fails()) {
       return response.badRequest(validation.messages())

@@ -145,6 +145,7 @@ export default {
     }
   },
   async mounted () {
+    this.setStartpage()
     this.loading.initial = true
     await this.fetchParticipants()
     await this.fetchStats()
@@ -211,6 +212,9 @@ export default {
           }
         })
       }
+    },
+    setStartpage () {
+      this.pagination.page = Math.max(1, Math.ceil(this.participants.length / this.pagination.perPage))
     }
   }
 }
