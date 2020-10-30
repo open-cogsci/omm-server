@@ -46,7 +46,7 @@
     "nuxt": "^2.14.7",
     "nuxt-i18n": "^6.15.4",
     "sqlite3": "^5.0.0",
-    "swagger-jsdoc": "^4.3.1",
+    "swagger-jsdoc": "^5.0.0",
     "validator": "^13.1.17",
     "vue-fragment": "^1.5.1",
     "vue-smooth-reflow": "^0.1.12",
