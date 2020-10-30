@@ -14,20 +14,38 @@ services:
       MYSQL_PASSWORD: LhWxqJ^?pn@6AK+md6wZ_hsA=Qz52DSm
 
   server:
-    image: docker.pkg.github.com/open-cogsci/omm-server/omm-server
+    container_name: openmonkeymind
+    image: docker.pkg.github.com/open-cogsci/omm-server/omm-server:latest
     environment:
       HOST: 0.0.0.0
+      PORT: 3000
+      BASE_URL: http://${HOST}:${PORT}
       DB_CONNECTION: mysql
       DB_HOST: mysql
       DB_PORT: "3306"
       DB_USER: omm
       DB_PASSWORD: LhWxqJ^?pn@6AK+md6wZ_hsA=Qz52DSm
       DB_DATABASE: omm
+      APP_KEY: 2wsjLSopTjD6WQEztTYIZgCFou8wpLJn
+      MAIL_CONNECTION: smtp
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      MAIL_USERNAME: noreply@openmonkeymind.fr
+      MAIL_PASSWORD: password
+      MAIL_SENDER_NAME: OpenMonkeyMind
+      MAIL_SENDER_EMAIL: noreply@openmonkeymind.fr
     depends_on:
       - mysql
     restart: on-failure
     ports:
       - "3000:3000"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: always
+    ports:
+      - 1025:1025 # smtp server
+      - 3001:8025 # web ui
 
 volumes:
   mysql-data:

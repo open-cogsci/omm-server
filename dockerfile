@@ -17,7 +17,6 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV BASE_URL=http://${HOST}:${PORT}
 ENV CACHE_VIEWS=false
-ENV APP_KEY=2wsjLSopTjD6WQEztTYIZgCFou8wpLJn
 COPY --from=builder ./img .
 CMD node ace migration:run --force && \
     node ace seed --files ProductionSeeder.js --force && \

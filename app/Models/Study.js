@@ -76,6 +76,7 @@ class Study extends Model {
         await fs.rmdir(Helpers.publicPath(`files/${study.id}`), { recursive: true })
         return true
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(e)
         return false
       }
@@ -132,7 +133,7 @@ class Study extends Model {
     return this
       .belongsToMany('App/Models/Participant')
       .pivotModel('App/Models/Participation')
-      .withPivot(['status_id', 'created_at', 'updated_at'])
+      .withPivot(['status_id', 'priority', 'created_at', 'updated_at'])
   }
 
   /**

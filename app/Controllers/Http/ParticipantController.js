@@ -5,7 +5,7 @@ const isObject = require('lodash/isObject')
 const formatISO9075 = require('date-fns/formatISO9075')
 const { keyBy } = require('lodash')
 const { ModelNotFoundException } = require('@adonisjs/lucid/src/Exceptions')
-// const { LogicalException } = require('@adonisjs/generic-exceptions')
+const { validate } = use('Validator')
 
 const Participant = use('App/Models/Participant')
 
@@ -220,7 +220,7 @@ class ParticipantController {
   * /participants/{id}:
   *   put:
   *     tags:
-  *       - ParticipantsS
+  *       - Participants
   *     security:
   *       - JWT: []
   *     summary: >
@@ -410,13 +410,13 @@ class ParticipantController {
 
     let study
     try {
-      // First find studies that are in progress, then select pending studies.
       study = await ptcp.studies()
         .with('files')
         .whereInPivot('status_id', [1, 2])
+        .orderBy('priority', 'desc')
         .orderBy('status_id', 'desc')
         .orderBy('created_at', 'asc')
-        .withPivot(['status_id'])
+        .withPivot(['status_id', 'priority'])
         .firstOrFail()
     } catch (e) {
       return response.requestedRangeNotSatisfiable({
@@ -775,6 +775,33 @@ class ParticipantController {
       .where('job_id', jobID)
       .update({ data, status_id: 3 })
     await study.checkIfFinished(ptcp.id)
+
+    return response.noContent()
+  }
+
+  async setParticipationPriority ({ params, request, response, auth }) {
+    const { participantID, studyID } = params
+    const study = await auth.user.studies()
+      .where('id', studyID)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({
+        message: 'You have insufficient priviliges to change this study'
+      })
+    }
+
+    const validation = await validate(request.all(), {
+      priority: 'integer|range:0,100'
+    })
+    if (validation.fails()) {
+      return response.badRequest(validation.messages())
+    }
+
+    const priority = request.input('priority')
+    await study.participants().pivotQuery()
+      .where('participant_id', participantID)
+      .update({ priority })
 
     return response.noContent()
   }

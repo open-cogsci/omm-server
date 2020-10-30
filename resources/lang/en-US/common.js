@@ -4,7 +4,8 @@ export default {
       title: 'You have unsaved changes',
       body: `You will lose these changes if you don't save them first.<br>
              Are you sure you want to cancel?`
-    }
+    },
+    confirm: 'Are you sure?'
   },
   yes: 'Yes',
   no: 'No',

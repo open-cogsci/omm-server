@@ -44,7 +44,7 @@ class Participant extends Model {
     return this
       .belongsToMany('App/Models/Study')
       .pivotModel('App/Models/Participation')
-      .withPivot(['status_id', 'created_at', 'updated_at'])
+      .withPivot(['status_id', 'priority', 'created_at', 'updated_at'])
   }
 
   jobs () {

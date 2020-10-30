@@ -13,6 +13,7 @@ export default class Participation extends Model {
       study_id: this.attr(null),
       participant_id: this.attr(null),
       status_id: this.attr(null),
+      priority: this.number(1),
       jobs_count: this.number(0),
       completed_jobs_count: this.number(0),
       created_at: this.attr(null),
@@ -50,5 +51,27 @@ export default class Participation extends Model {
       save: false
     })
     return reply.response.data.data
+  }
+
+  async setPriority (priority, config) {
+    // Store old priority to reset it if an error occurs
+    const oldPriority = this.priority
+    // Already update the new priority locally
+    this.$update({ priority })
+
+    const endpoint = `/participations/priority/${this.participant_id}/${this.study_id}`
+    let response
+    try {
+      response = await this.constructor.api().patch(endpoint, { priority }, {
+        ...config,
+        save: false
+      })
+      return response
+    } catch (e) {
+      // Reset old priority value on error.
+      this.$update({ priority: oldPriority })
+      // Rethrow the error to let the calling component handle it.
+      throw e
+    }
   }
 }

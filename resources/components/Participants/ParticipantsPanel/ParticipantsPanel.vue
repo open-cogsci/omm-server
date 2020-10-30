@@ -36,12 +36,18 @@
         <v-card-title>
           {{ $t('study_participants.participants.title') }}
           <v-spacer />
-          <span class="caption">
-            {{ $t('study_participants.participants.perc_complete') }}
-          </span>
+          <div v-if="participants.length">
+            <span class="caption mr-6">
+              Priority
+            </span>
+            <span class="caption">
+              {{ $t('study_participants.participants.perc_complete') }}
+            </span>
+          </div>
         </v-card-title>
         <v-card-text class="pa-0 fill-height">
           <study-participants-list
+            :editable="userCanEdit"
             :total-jobs="study.jobs_count"
             :participants="participants"
             :loading="loading.initial"
@@ -63,6 +69,7 @@
             {{ $t('study_participants.participants.data') }}
           </v-btn>
           <v-btn
+            v-if="userCanEdit"
             color="primary"
             @click="dialog.manage = true"
           >
@@ -80,6 +87,7 @@
 <script>
 import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
+
 export default {
   components: {
     ParticipationStats: () => import('./ParticipationStats'),
@@ -127,6 +135,10 @@ export default {
     },
     participants () {
       return this.study?.participants || []
+    },
+    userCanEdit () {
+      return !!this.study?.users.find(user => user.id === this.$auth.user.id &&
+        user.pivot.access_permission_id === 2)
     }
   },
   watch: {
@@ -139,6 +151,7 @@ export default {
     }
   },
   async mounted () {
+    this.setStartpage()
     this.loading.initial = true
     await this.fetchParticipants()
     await this.fetchStats()
@@ -205,6 +218,9 @@ export default {
           }
         })
       }
+    },
+    setStartpage () {
+      this.pagination.page = Math.max(1, Math.ceil(this.participants.length / this.pagination.perPage))
     }
   }
 }

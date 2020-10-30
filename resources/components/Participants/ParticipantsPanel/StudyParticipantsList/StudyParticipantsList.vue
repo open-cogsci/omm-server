@@ -20,6 +20,9 @@
             <v-list-item-title v-text="item.name" />
             <v-list-item-subtitle v-text="item.identifier" />
           </v-list-item-content>
+          <v-list-item-action v-if="editable" style="max-width: 65px">
+            <priority-dial :participation="item.pivot" />
+          </v-list-item-action>
           <v-list-item-avatar>
             <progress-circle v-bind="progress(item)" :size="40" />
           </v-list-item-avatar>
@@ -37,7 +40,8 @@ import { debounce } from 'lodash'
 
 export default {
   components: {
-    ProgressCircle: () => import('@/components/common/ProgressCircle')
+    ProgressCircle: () => import('@/components/common/ProgressCircle'),
+    PriorityDial: () => import('@/components/Participants/ParticipantsPanel/PriorityDial')
   },
   props: {
     participants: {
@@ -55,13 +59,17 @@ export default {
     totalJobs: {
       type: Number,
       default: 0
+    },
+    editable: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({
     maxHeight: 400
   }),
   created () {
-    this.scrolling = debounce(this.scrolling, 200)
+    this.scrolling = debounce(this.scrolling, 100)
   },
   mounted () {
     this.setHeight()

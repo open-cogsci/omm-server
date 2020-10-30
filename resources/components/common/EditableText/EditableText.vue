@@ -43,10 +43,12 @@
 </template>
 
 <script>
+import SaveCancelIconButtons from '@/components/common/SaveCancelIconButtons'
+
 export default {
   sync: ['errors'],
   components: {
-    SaveCancelIconButtons: () => import('@/components/common/SaveCancelIconButtons')
+    SaveCancelIconButtons
   },
   props: {
     label: {

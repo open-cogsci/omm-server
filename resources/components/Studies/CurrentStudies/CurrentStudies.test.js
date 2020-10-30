@@ -5,13 +5,18 @@ import axios from 'axios'
 
 // import { Breakpoint } from 'vuetify/lib/services'
 import { mount, createLocalVue } from '@vue/test-utils'
+import { Model } from '@vuex-orm/core'
 import CurrentStudies from './CurrentStudies.vue'
 import { STUDIES } from '@/assets/js/endpoints'
+import * as storeIndex from '@/store'
 
 jest.mock('axios')
+Model.setAxios(axios)
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
+
+const user = { id: 1, name: 'User' }
 
 describe('CurrentStudies', () => {
   let vuetify
@@ -23,7 +28,7 @@ describe('CurrentStudies', () => {
       notify: jest.fn()
     }
     store = new Vuex.Store({
-      state: {},
+      ...storeIndex,
       modules: {
         notifications: {
           namespaced: true,
@@ -40,7 +45,7 @@ describe('CurrentStudies', () => {
 
     // Make sure the fetch() function works for all tests
     const response = { data: { data: [] } }
-    axios.get.mockResolvedValue(response)
+    axios.request.mockResolvedValue(response)
   })
 
   function mountFunc (options = {}) {
@@ -52,7 +57,8 @@ describe('CurrentStudies', () => {
       store,
       stubs: ['nuxt-link'],
       mocks: {
-        $axios: axios
+        $axios: axios,
+        $auth: { user }
       },
       ...options
     })
@@ -60,12 +66,18 @@ describe('CurrentStudies', () => {
 
   test('Data is fetched after creation of component', () => {
     mountFunc()
-    expect(axios.get).toHaveBeenCalledWith(STUDIES)
+    expect(axios.request).toHaveBeenCalledWith({
+      method: 'get',
+      baseURL: STUDIES,
+      save: true,
+      dataKey: 'data',
+      url: ''
+    })
   })
 
   test('Should notify the user after an error occurs', async () => {
     jest.resetAllMocks()
-    axios.get.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
+    axios.request.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
     // Notify should not have been called yet.
     expect(actions.notify).not.toHaveBeenCalled()
     mountFunc()
@@ -92,26 +104,38 @@ describe('CurrentStudies', () => {
     // Compose the expected server response
     const study = { name: 'Boop', description: 'Beep' }
     const studyAddedId = { id: 1, ...study }
-    const response = { data: { data: studyAddedId } }
+    const response = { data: { data: { ...studyAddedId, users: [user] } } }
     // ... and mock it
-    axios.post.mockResolvedValue(response)
+    axios.request.mockResolvedValue(response)
     // The saving indicator should be hidden at first.
     expect(wrapper.vm.saving).toBe(false)
     // Save the study
     wrapper.vm.saveNewStudy(study)
     // Check if saving indicator is active
     expect(wrapper.vm.saving).toBe(true)
+    expect(axios.request).toHaveBeenCalledWith({
+      method: 'post',
+      baseURL: '/api/v1/studies',
+      data: {
+        description: 'Beep',
+        name: 'Boop'
+      },
+      dataKey: 'data',
+      save: true,
+      url: ''
+    })
     await flushPromises()
     // After the operation is complete, the saving indicator should be deactivated
     expect(wrapper.vm.saving).toBe(false)
     // The studies array should now contain the saved study
-    expect(wrapper.vm.studies).toContain(studyAddedId)
+    expect(wrapper.vm.studies[0]).toMatchObject(studyAddedId)
   })
 
   test('In case of an error, the user should be notified', async () => {
     const wrapper = mountFunc()
     await flushPromises()
-    axios.post.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
+    jest.resetAllMocks()
+    axios.request.mockRejectedValue({ response: { data: { error: { message: 'Error' } } } })
     // Notify should not have been called yet
     expect(actions.notify).not.toHaveBeenCalled()
     // The buttons saving indicator should be hidden at first.
@@ -120,7 +144,7 @@ describe('CurrentStudies', () => {
     expect(wrapper.vm.saving).toBe(true)
     await flushPromises()
     expect(wrapper.vm.saving).toBe(false)
-    expect(actions.notify).toHaveBeenCalled()
+    expect(actions.notify.mock.calls[0][1]).toEqual({ message: 'Error', color: 'error' })
   })
 
   test('Errors should be reset after the dialog closes', async () => {
@@ -136,7 +160,7 @@ describe('CurrentStudies', () => {
     expect(wrapper.vm.errors).toEqual({ name: '', description: '' })
   })
 
-  test('Errors should not be reset if a dialog hasn not closed', async () => {
+  test('Errors should not be reset if a dialog has not closed', async () => {
     const errors = { name: 'Invalid', description: 'Required' }
     const wrapper = mountFunc({
       data () {

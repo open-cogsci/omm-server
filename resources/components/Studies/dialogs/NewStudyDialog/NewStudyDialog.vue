@@ -46,10 +46,11 @@
 <script>
 import { isEmpty, isLength } from 'validator'
 import serverErrors from '@/mixins/servererrors'
+import SaveCancelButtons from '@/components/common/SaveCancelButtons'
 
 export default {
   components: {
-    SaveCancelButtons: () => import('@/components/common/SaveCancelButtons')
+    SaveCancelButtons
   },
   mixins: [serverErrors],
   props: {

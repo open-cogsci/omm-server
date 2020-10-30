@@ -81,7 +81,7 @@
                 :label="$t('study_participants.dialogs.manage.filter.label')"
                 clearable
                 prepend-inner-icon="mdi-magnify"
-                @input="() => {pagination.page = 1; fetchParticipants()}"
+                @input="fetchAfterFilter"
               />
             </v-col>
             <v-col cols="4">
@@ -92,7 +92,7 @@
                 hide-details
                 :label="$t('study_participants.dialogs.manage.filter.status')"
                 :items="filterItems"
-                @input="() => {pagination.page = 1; fetchParticipants()}"
+                @input="fetchAfterFilter"
               />
             </v-col>
             <v-col cols="12">
@@ -228,8 +228,14 @@ export default {
   created () {
     this.fetchParticipants = debounce(this.fetchParticipants, 250)
   },
+  mounted () {
+    this.setStartpage()
+  },
   methods: {
     ...mapActions('notifications', ['notify']),
+    setStartpage () {
+      this.pagination.page = Math.max(1, Math.ceil(this.participants.length / this.pagination.perPage))
+    },
     async fetchParticipants (options = {}) {
       if (this.fetchingMore) { return }
       this.fetchingMore = true
@@ -313,6 +319,13 @@ export default {
           }
         })
       }
+    },
+    async fetchAfterFilter () {
+      // Wait a bit for the participants collection to be filtered, so its length can be used
+      // in the execution of setStartpage
+      await this.$nextTick()
+      this.setStartpage()
+      this.fetchParticipants()
     }
   }
 }

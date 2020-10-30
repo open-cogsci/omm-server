@@ -1,4 +1,5 @@
 module.exports = {
+  // globalSetup: '<rootDir>/resources/test/jestGlobalSetup.js',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/resources/$1',
     '^~/(.*)$': '<rootDir>/resources/$1',
@@ -24,6 +25,6 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!vue-router|@babel)'
   ],
-  snapshotSerializers: ['jest-serializer-vue'],
+  snapshotSerializers: ['jest-serializer-vue-tjw'],
   snapshotResolver: '<rootDir>/resources/test/snapshotResolver.js'
 }

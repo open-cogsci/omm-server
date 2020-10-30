@@ -30,10 +30,12 @@
 </template>
 
 <script>
+import CurrentStudies from '@/components/Studies/CurrentStudies'
+import ArchivedStudies from '@/components/Studies/ArchivedStudies'
 export default {
   components: {
-    CurrentStudies: () => import('@/components/Studies/CurrentStudies'),
-    ArchivedStudies: () => import('@/components/Studies/ArchivedStudies')
+    CurrentStudies,
+    ArchivedStudies
   },
   data () {
     return {

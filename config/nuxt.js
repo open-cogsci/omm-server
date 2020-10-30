@@ -2,7 +2,7 @@ const { resolve } = require('path')
 const i18n = require('../config/i18n.js')
 
 module.exports = {
-  mode: 'spa',
+  ssr: false,
   dev: process.env.NODE_ENV === 'development',
   srcDir: resolve(__dirname, '..', 'resources'),
   /*
