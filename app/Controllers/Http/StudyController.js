@@ -997,7 +997,7 @@ class StudyController {
       .withCount('jobs as completed_jobs', (query) => {
         query.where('study_id', study.id).wherePivot('status_id', 3)
       })
-      .orderBy('pivot_status_id', 'desc')
+      .orderBy('name', 'asc')
       .paginate(page, perPage)
 
     const reply = await transform.paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')
