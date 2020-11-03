@@ -1,7 +1,6 @@
 const workerpool = require('workerpool')
 const XLSX = require('xlsx')
 const { isArray } = require('lodash')
-const { formatISO9075 } = require('date-fns')
 
 // a deliberately inefficient implementation of the fibonacci sequence
 function readSheet (path) {
@@ -13,27 +12,16 @@ function readSheet (path) {
 function writeSheet (jobs, destination, format = 'csv') {
   const rows = jobs.reduce((result, job) => {
     // If there are multiple entries for data, suffix the object key values
-    // eslint-disable-next-line camelcase, prefer-const
-    let { data, trial_vars, timestamp, ...rest } = job
-
+    const { data, trial_vars: trialVars, ...rest } = job
+    let iteration = 1
     if (isArray(data)) {
-      data = job.data.reduce((total, dataEntry, idx) => {
-        if (idx !== 0) {
-          dataEntry = Object.entries(dataEntry).reduce((result, [key, value]) => {
-            result[`${key}_${idx}`] = value
-            return result
-          }, {})
-        }
-        return { ...dataEntry, ...total }
-      })
+      for (const row of data) {
+        result.push({ ...rest, iteration, ...row, ...trialVars })
+        iteration += 1
+      }
+    } else {
+      result.push({ ...rest, iteration, ...data, ...trialVars })
     }
-    result.push({
-      ...rest,
-      ...data,
-      // eslint-disable-next-line camelcase
-      ...trial_vars,
-      timestamp: formatISO9075(timestamp)
-    })
     return result
   }, [])
   const sheet = XLSX.utils.json_to_sheet(rows)
