@@ -611,6 +611,7 @@ class StudyController {
       .where('status_id', 3)
       .update({ status_id: 2 })
 
+    response.status(201)
     return transform.collection(jobs, 'JobTransformer')
   }
 
@@ -946,9 +947,7 @@ class StudyController {
     if (!allowedFormats.includes(filetype)) {
       return response.badRequest(`Invalid file format, possible values are ${allowedFormats}`)
     }
-
     const study = await auth.user.studies().where('id', id).firstOrFail()
-
     const data = await study.getCollectedData(Database.connection().connectionClient)
     const destFolder = Helpers.publicPath(`files/${study.id}`)
     const timestamp = format(new Date(), 'yyyyMMddHHmmss')
