@@ -17,8 +17,8 @@
               block
               class="mb-2"
               :loading="generating === button.type"
-              :disabled="generating && generating !== button.type"
-              @click="attemptDownload(button.type)"
+              :disabled="!!generating && generating !== button.type"
+              @click="generateAndDownload(button.type)"
             >
               <v-icon v-if="button.icon" left v-text="button.icon" />
               {{ button.type }}
@@ -26,10 +26,13 @@
             <v-btn
               v-if="button.generated"
               block
-              :disabled="generating && generating !== button.type"
-              @click="$emit('generate', button.type)"
+              :disabled="!!generating"
+              @click="download(button.type)"
             >
-              {{ $t('study_participants.dialogs.data.buttons.regenerate') }}
+              <v-icon left>
+                mdi-download
+              </v-icon>
+              {{ $t('study_participants.dialogs.data.buttons.cached') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -110,29 +113,16 @@ export default {
         this.download(this.watchType)
       }
       this.watchType = null
-    },
-    generating (newVal, oldVal) {
-      if (newVal === null && oldVal && Object.keys(this.dataFiles).includes(`data-${oldVal}`)) {
-        this.showSuccessMessage(oldVal)
-      }
     }
   },
   methods: {
-    attemptDownload (type) {
-      if (Object.keys(this.dataFiles).includes(`data-${type}`)) {
-        this.download(type)
-      } else {
-        this.watchType = type
-        this.$emit('generate', type)
-      }
+    generateAndDownload (type) {
+      this.watchType = type
+      this.$emit('generate', type)
     },
     download (type) {
       const url = this.dataFiles[`data-${type}`].path
       window.location.assign(url)
-    },
-    showSuccessMessage (type) {
-      this.message = `Succesfully (re)generated ${type} file. Click on the blue button to download it.`
-      setTimeout(() => { this.message = null }, 5000)
     }
   }
 }

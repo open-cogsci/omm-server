@@ -33,12 +33,11 @@ export default {
     data: {
       title: 'Download data',
       subtitle: 'Choose a file format below',
-      explanation: `Exporting data can take some time and therefore generated data files are cached. The next time
-                    the same data file is downloaded, the cached version is served to allow faster download speeds.<br>Click
-                    on <strong>regenerate</strong> to refresh the cached data if it is no longer up-to-date
-                    (e.g. after new data has been collected).`,
+      explanation: `Generating data files can take some time and therefore they are cached. You can
+                    download these cached versions by pressing the _cached_ buttons below the desired file format.
+                    Beware that although the cached versions can be downloaded faster, they may not be up to date.`,
       buttons: {
-        regenerate: 'Regenerate'
+        cached: 'Cached'
       }
     }
   }
