@@ -180,7 +180,8 @@ export default {
       }
       if (this.searchterm && this.searchterm.length > 2) {
         query.where((ptcp) => {
-          return ptcp.name.includes(this.searchterm) || ptcp.identifier.includes(this.searchterm)
+          return ptcp.name.toLowerCase().includes(this.searchterm.toLowerCase()) ||
+          ptcp.identifier.toLowerCase().includes(this.searchterm.toLowerCase())
         })
       }
       return query.get()
