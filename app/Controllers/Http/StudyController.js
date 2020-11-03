@@ -766,7 +766,6 @@ class StudyController {
     }
 
     const participant = await Participant.findByOrFail('identifier', ptcpID)
-
     let rowsUpdated = 0
     // SQLite doesn't support inner joins, therefore we need this ugly way:
     if (Database.connection().connectionClient === 'sqlite3') {
@@ -786,7 +785,7 @@ class StudyController {
           .where('studies.id', id)
           .whereBetween('jobs.position', [from, (to - 1)])
           .leftJoin('participants', 'job_states.participant_id', 'participants.id')
-          .where('participants.identifier', ptcpID)
+          .where('participants.identifier', `${ptcpID}`)
           .update({ status_id: state })
       })
     }
