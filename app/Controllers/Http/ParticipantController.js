@@ -1,7 +1,6 @@
 'use strict'
 
 const isArray = require('lodash/isArray')
-const isObject = require('lodash/isObject')
 const formatISO9075 = require('date-fns/formatISO9075')
 const { keyBy } = require('lodash')
 const { ModelNotFoundException } = require('@adonisjs/lucid/src/Exceptions')
@@ -412,6 +411,7 @@ class ParticipantController {
     try {
       study = await ptcp.studies()
         .with('files')
+        .withCount('jobs')
         .whereInPivot('status_id', [1, 2])
         .orderBy('priority', 'desc')
         .orderBy('status_id', 'desc')

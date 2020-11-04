@@ -694,6 +694,58 @@ class StudyController {
 
   /**
   * @swagger
+  * /studies/{id}/jobs/count:
+  *   get:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Gets the number of jobs for the current study.
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         type: integer
+  *         required: true
+  *         description: The ID of the study to retrieve the jobs from.
+  *         example: 1
+  *     responses:
+  *       200:
+  *         description: The jobs count for the specified study
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: object
+  *               properties:
+  *                 jobs_count:
+  *                   type: integer
+  *                   description: The number of jobs
+  *                   example: 22
+  *       400:
+  *         description: The request was invalid (e.g. wrong parameters were passed).
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
+   * Count jobs
+   *
+   * @param {*} { params, request, response }
+   * @memberof StudyController
+   */
+  async countJobs ({ params }) {
+    const { id } = params
+
+    // Fetch the study, or throw an error if it isn't found.
+    const result = await Study.query()
+      .where('id', id)
+      .withCount('jobs')
+      .firstOrFail()
+    return { data: { jobs_count: result.jobs_count } }
+  }
+
+  /**
+  * @swagger
   * /studies/{id}/jobs/state:
   *   put:
   *     tags:

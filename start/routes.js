@@ -131,6 +131,8 @@ Route.group(() => {
   // in the url for making them required (and thus for safety of not deleting all records)
   Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('jobs.delete_sequence')
 
+  Route.get('/studies/:id/jobs/count', 'StudyController.countJobs').as('jobs.count')
+
   Route.any('*', ({ response }) => {
     response.badRequest('This endpoint does not exist')
   })
