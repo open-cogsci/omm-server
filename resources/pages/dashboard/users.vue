@@ -95,7 +95,7 @@ import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   name: 'UsersPage',
-  inject: ['theme'],
+  // inject: ['theme'],
   components: {
     UsersList: () => import('@/components/Users/UsersList'),
     newUserDialog: () => import('@/components/Users/NewUserDialog')
