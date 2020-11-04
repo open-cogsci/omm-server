@@ -7,10 +7,16 @@ const localVue = createLocalVue()
 describe('ParticipantSelector', () => {
   let vuetify
   let login
+  let participants
+  let selected
 
   beforeEach(() => {
     vuetify = new Vuetify()
     login = jest.fn()
+    selected = [1]
+    participants = [
+      { id: 1 }
+    ]
   })
 
   function mountFunc (options = {}) {
@@ -23,7 +29,11 @@ describe('ParticipantSelector', () => {
           user: null
         }
       },
-      stubs: ['nuxt-link'],
+      stubs: ['nuxt-link', 'smooth-reflow'],
+      propsData: {
+        participants,
+        selected
+      },
       ...options
     })
   }

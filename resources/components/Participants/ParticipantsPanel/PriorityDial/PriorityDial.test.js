@@ -7,10 +7,14 @@ const localVue = createLocalVue()
 describe('PriorityDial', () => {
   let vuetify
   let login
+  let participation
 
   beforeEach(() => {
     vuetify = new Vuetify()
     login = jest.fn()
+    participation = {
+      priority: 1
+    }
   })
 
   function mountFunc (options = {}) {
@@ -24,6 +28,9 @@ describe('PriorityDial', () => {
         }
       },
       stubs: ['nuxt-link'],
+      propsData: {
+        participation
+      },
       ...options
     })
   }

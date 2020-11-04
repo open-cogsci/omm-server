@@ -105,11 +105,13 @@ describe('DataDownloadDialog', () => {
     expect(dlSpy).toHaveBeenCalledWith('csv')
     // Check if download is called now file is generated and button is clicked again
     await fileButton.trigger('click')
-    expect(dlSpy).toHaveBeenCalledTimes(2)
+    expect(dlSpy).toHaveBeenCalledTimes(1)
     dlSpy.mockReset()
   })
 
-  it('should show regenerate buttons if files are already present', async () => {
+  it('should show download cached buttons if files are already present', async () => {
+    const dlSpy = jest.spyOn(DataDownloadDialog.methods, 'download')
+    expect(dlSpy).toHaveBeenCalledTimes(0)
     const wrapper = mountFunc({
       propsData: {
         value: true,
@@ -121,11 +123,11 @@ describe('DataDownloadDialog', () => {
       }
     })
     await flushPromises()
-    const regenButtons = wrapper.findAll('.v-card__text button:not(.primary)')
-    expect(regenButtons.length).toBe(3)
+    const dlButtons = wrapper.findAll('.v-card__text button:not(.primary)')
+    expect(dlButtons.length).toBe(3)
     expect(wrapper.emitted('generate')).toBeFalsy()
-    await regenButtons.trigger('click')
-    expect(wrapper.emitted('generate').length).toBe(3)
-    expect(wrapper.emitted('generate').map(item => item[0])).toEqual(['csv', 'xlsx', 'ods'])
+    await dlButtons.trigger('click')
+    expect(dlSpy).toHaveBeenCalledTimes(3)
+    expect(dlSpy.mock.calls).toEqual([['csv'], ['xlsx'], ['ods']])
   })
 })

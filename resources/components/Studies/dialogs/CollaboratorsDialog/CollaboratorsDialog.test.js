@@ -23,7 +23,11 @@ describe('CollaboratorsDialog wrapper', () => {
           user: null
         }
       },
-      stubs: ['nuxt-link'],
+      stubs: ['nuxt-link', 'smooth-reflow'],
+      propsData: {
+        value: true,
+        'search-field': ''
+      },
       ...options
     })
   }

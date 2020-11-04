@@ -4,13 +4,20 @@ import ParticipantViewData from './ParticipantViewData.vue'
 
 const localVue = createLocalVue()
 
+const user = { id: 1, name: 'User' }
+
 describe('ParticipantViewData wrapper', () => {
   let vuetify
   let login
+  let participant
 
   beforeEach(() => {
     vuetify = new Vuetify()
     login = jest.fn()
+    participant = {
+      name: 'John Doe',
+      identifier: 'abcdef'
+    }
   })
 
   function mountFunc (options = {}) {
@@ -20,10 +27,13 @@ describe('ParticipantViewData wrapper', () => {
       mocks: {
         $auth: {
           login,
-          user: null
+          user
         }
       },
       stubs: ['nuxt-link'],
+      propsData: {
+        participant
+      },
       ...options
     })
   }
