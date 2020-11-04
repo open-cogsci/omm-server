@@ -611,6 +611,7 @@ class StudyController {
       .where('status_id', 3)
       .update({ status_id: 2 })
 
+    response.status(201)
     return transform.collection(jobs, 'JobTransformer')
   }
 
@@ -765,7 +766,6 @@ class StudyController {
     }
 
     const participant = await Participant.findByOrFail('identifier', ptcpID)
-
     let rowsUpdated = 0
     // SQLite doesn't support inner joins, therefore we need this ugly way:
     if (Database.connection().connectionClient === 'sqlite3') {
@@ -785,7 +785,7 @@ class StudyController {
           .where('studies.id', id)
           .whereBetween('jobs.position', [from, (to - 1)])
           .leftJoin('participants', 'job_states.participant_id', 'participants.id')
-          .where('participants.identifier', ptcpID)
+          .where('participants.identifier', `${ptcpID}`)
           .update({ status_id: state })
       })
     }
@@ -946,9 +946,7 @@ class StudyController {
     if (!allowedFormats.includes(filetype)) {
       return response.badRequest(`Invalid file format, possible values are ${allowedFormats}`)
     }
-
     const study = await auth.user.studies().where('id', id).firstOrFail()
-
     const data = await study.getCollectedData(Database.connection().connectionClient)
     const destFolder = Helpers.publicPath(`files/${study.id}`)
     const timestamp = format(new Date(), 'yyyyMMddHHmmss')
@@ -997,7 +995,7 @@ class StudyController {
       .withCount('jobs as completed_jobs', (query) => {
         query.where('study_id', study.id).wherePivot('status_id', 3)
       })
-      .orderBy('pivot_status_id', 'desc')
+      .orderBy('name', 'asc')
       .paginate(page, perPage)
 
     const reply = await transform.paginate(ptcps, 'ParticipantTransformer.paginatedUnderStudy')

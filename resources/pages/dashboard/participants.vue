@@ -86,7 +86,7 @@ import { pick, debounce } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
-  inject: ['theme'],
+  // inject: ['theme'],
   components: {
     ParticipantsList: () => import('@/components/Participants/ParticipantsList'),
     newParticipantDialog: () => import('@/components/Participants/dialogs/NewParticipantDialog')

@@ -23,6 +23,10 @@ describe('JobsTable wrapper', () => {
           user: null
         }
       },
+      propsData: {
+        page: 1,
+        'per-page': 50
+      },
       stubs: ['nuxt-link'],
       ...options
     })

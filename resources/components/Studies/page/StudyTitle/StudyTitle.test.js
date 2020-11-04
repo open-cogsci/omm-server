@@ -23,6 +23,9 @@ describe('StudyTitle wrapper', () => {
           user: null
         }
       },
+      propsData: {
+        loading: false
+      },
       stubs: ['nuxt-link'],
       ...options
     })

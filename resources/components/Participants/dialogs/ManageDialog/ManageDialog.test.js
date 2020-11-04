@@ -1,29 +1,65 @@
 import Vuetify from 'vuetify'
+import Vuex from 'vuex'
+import axios from 'axios'
+
 import { mount, createLocalVue } from '@vue/test-utils'
+import { Model } from '@vuex-orm/core'
 import ManageDialog from './ManageDialog.vue'
 
-const localVue = createLocalVue()
+import * as storeIndex from '@/store'
 
-describe('ManageDialog wrapper', () => {
+jest.mock('axios')
+Model.setAxios(axios)
+
+const localVue = createLocalVue()
+localVue.use(Vuex)
+
+const user = { id: 1, name: 'User' }
+
+describe('ManageDialog', () => {
   let vuetify
-  let login
+  let store
+  let actions
 
   beforeEach(() => {
+    actions = {
+      notify: jest.fn()
+    }
+    store = new Vuex.Store({
+      ...storeIndex,
+      modules: {
+        notifications: {
+          namespaced: true,
+          state: {
+            current: {},
+            pending: []
+          },
+          actions
+        }
+      }
+    })
     vuetify = new Vuetify()
-    login = jest.fn()
+    jest.resetAllMocks()
+
+    // Make sure the fetch() function works for all tests
+    const response = { data: { data: [] } }
+    axios.request.mockResolvedValue(response)
   })
 
   function mountFunc (options = {}) {
     return mount(ManageDialog, {
       localVue,
       vuetify,
+      store,
+      stubs: ['nuxt-link', 'smooth-reflow'],
       mocks: {
-        $auth: {
-          login,
-          user: null
-        }
+        $axios: axios,
+        $auth: { user }
       },
-      stubs: ['nuxt-link'],
+      propsData: {
+        value: true,
+        study: {}
+      },
       ...options
     })
   }

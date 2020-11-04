@@ -4,7 +4,7 @@ import Login from './login.vue'
 
 const localVue = createLocalVue()
 
-describe('Login wrapper', () => {
+describe('Login', () => {
   let vuetify
   let login
 

@@ -11,7 +11,7 @@
         </v-row>
         <v-row class="fill-height">
           <v-col cols="12" sm="6" xl="4" :style="colStyle">
-            <v-card class="fill-height">
+            <v-card class="fill-height" style="overflow: auto">
               <v-card-title class="font-weight-normal">
                 {{ $t('dashboard.title.most_recent_ptcp') }}
               </v-card-title>
@@ -154,7 +154,7 @@ export default {
   name: 'DashboardIndex',
   data () {
     return {
-      trend: {},
+      trend: { values: [], labels: [] },
       mostRecentPtcp: [],
       mostActiveStudies: [],
       mostActiveParticipants: [],
@@ -204,7 +204,7 @@ export default {
     ...mapActions('notifications', ['notify']),
     fetchAll () {
       this.fetchMostRecentPtcp()
-      this.fetch7dayTrend()
+      this.fetchDaysTrend()
       this.fetchMostActiveStudies()
       this.fetchmostActivePtcp()
     },
@@ -218,7 +218,7 @@ export default {
         this.loading.mostRecentPtcp = false
       }
     },
-    async fetch7dayTrend () {
+    async fetchDaysTrend () {
       this.loading.trend = true
       try {
         this.trend = await this.Participation.trend(

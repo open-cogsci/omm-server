@@ -33,13 +33,12 @@ export default {
     data: {
       title: 'Download data',
       subtitle: 'Kies een bestandsformaat',
-      explanation: `Het exporteren van de data kan tijdsintensief zijn en daarom worden gegenereerde
-                    bestanden in de cache opgeslagen. The volgende keer dat hetzelfde bestand wordt gedownload wordt
-                    de gecachte versie geserveerd om downloads sneller te laten verlopen.<br>Klik op
-                    <strong>Regenereer</strong> om de gecachte versie te verversen als deze niet langer
-                    actueel is (bijv. omdat er extra data is verzameld)`,
+      explanation: `Het genereren van de databestanden kan tijd kosten, en daarom worden deze
+                    gecached. Je kunt de gecachede versies downloadend door de _gecached_ knop te
+                    klikken onder het gewenste bestandsformaat. Let op dat gecachede versies
+                    sneller downloaden, maar mogelijk niet altijd up-to-date zijn.`,
       buttons: {
-        regenerate: 'Regenereer'
+        cached: 'gecached'
       }
     }
   }

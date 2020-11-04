@@ -742,6 +742,8 @@ class ParticipantController {
       .firstOrFail()
 
     let data = request.input('data')
+    // Add timestamp field to data so multiple iterations of the same job can be discriminated by time
+    data.timestamp = formatISO9075(new Date())
     const job = ptcp.getRelated('jobs').first()
     if (!job) {
       throw new ModelNotFoundException(`Cannot find job with ID ${jobID} for participant ${identifier}`)
@@ -751,9 +753,6 @@ class ParticipantController {
     const previousData = job.getRelated('pivot')?.data
     // Check if data has already been stored
     if (previousData) {
-      if (isObject(data)) {
-        data._time = formatISO9075(new Date())
-      }
       if (isArray(previousData)) {
         // If previous data already has multiple entries, simply push the current entry
         previousData.push(data)

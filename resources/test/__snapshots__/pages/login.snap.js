@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Login wrapper matches its snapshot 1`] = `
+exports[`Login matches its snapshot 1`] = `
 <div class="v-card v-sheet theme--light">
   <div class="v-card__title justify-center">
     <div class="v-image v-responsive mx-2 theme--light" style="max-height: 40px; max-width: 40px;">
