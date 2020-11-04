@@ -4,7 +4,7 @@ import NewUserDialog from './NewUserDialog.vue'
 
 const localVue = createLocalVue()
 
-describe('NewUserDialog wrapper', () => {
+describe('NewUserDialog', () => {
   let vuetify
   let login
 
@@ -23,7 +23,11 @@ describe('NewUserDialog wrapper', () => {
           user: null
         }
       },
-      stubs: ['nuxt-link'],
+      stubs: ['nuxt-link', 'user-edit-data'],
+      propsData: {
+        value: true,
+        errors: {}
+      },
       ...options
     })
   }

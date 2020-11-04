@@ -4,13 +4,17 @@ import UserViewData from './UserViewData.vue'
 
 const localVue = createLocalVue()
 
+const user = { id: 1, name: 'User' }
+
 describe('UserViewData wrapper', () => {
   let vuetify
-  let login
+  let viewUser
 
   beforeEach(() => {
     vuetify = new Vuetify()
-    login = jest.fn()
+    viewUser = {
+
+    }
   })
 
   function mountFunc (options = {}) {
@@ -19,11 +23,13 @@ describe('UserViewData wrapper', () => {
       vuetify,
       mocks: {
         $auth: {
-          login,
-          user: null
+          user
         }
       },
       stubs: ['nuxt-link'],
+      propsData: {
+        user: viewUser
+      },
       ...options
     })
   }

@@ -18,7 +18,7 @@
               </v-col>
             </v-card-title>
             <v-card-text>
-              <v-form ref="detailsForm" v-model="detailsFormValid">
+              <v-form ref="detailsForm" v-model="detailsFormValid" lazy-validation>
                 <v-container fluid>
                   <v-row>
                     <v-col cols="12">

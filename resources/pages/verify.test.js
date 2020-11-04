@@ -4,7 +4,7 @@ import Verify from './verify.vue'
 
 const localVue = createLocalVue()
 
-describe('Verify wrapper', () => {
+describe('Verify', () => {
   let vuetify
   let login
 

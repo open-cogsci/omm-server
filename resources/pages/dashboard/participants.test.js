@@ -2,10 +2,10 @@ import Vuetify from 'vuetify'
 import Vuex from 'vuex'
 import axios from 'axios'
 
+// import { Breakpoint } from 'vuetify/lib/services'
 import { mount, createLocalVue } from '@vue/test-utils'
 import { Model } from '@vuex-orm/core'
-import ManageDialog from './ManageDialog.vue'
-
+import Participants from './participants.vue'
 import * as storeIndex from '@/store'
 
 jest.mock('axios')
@@ -16,10 +16,11 @@ localVue.use(Vuex)
 
 const user = { id: 1, name: 'User' }
 
-describe('ManageDialog', () => {
+describe('Participants', () => {
   let vuetify
-  let store
+  let login
   let actions
+  let store
 
   beforeEach(() => {
     actions = {
@@ -40,26 +41,23 @@ describe('ManageDialog', () => {
     })
     vuetify = new Vuetify()
     jest.resetAllMocks()
-
     // Make sure the fetch() function works for all tests
     const response = { data: { data: [] } }
     axios.request.mockResolvedValue(response)
   })
 
   function mountFunc (options = {}) {
-    return mount(ManageDialog, {
+    return mount(Participants, {
       localVue,
-      vuetify,
       store,
-      stubs: ['nuxt-link', 'smooth-reflow'],
+      vuetify,
       mocks: {
-        $axios: axios,
-        $auth: { user }
+        $auth: {
+          login,
+          user
+        }
       },
-      propsData: {
-        value: true,
-        study: {}
-      },
+      stubs: ['nuxt-link'],
       ...options
     })
   }

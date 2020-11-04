@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`JobsTable wrapper matches its snapshot 1`] = `
-<div class="row no-gutters">
+<div class="row no-gutters" page="1" per-page="50">
   <div class="col col-12">
     <div class="v-skeleton-loader theme--light">
       <transition-stub name="fade-transition">
@@ -20,7 +20,7 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
                   <div role="button" aria-haspopup="listbox" aria-expanded="false" aria-owns="list-9" class="v-input__slot">
                     <div class="v-select__slot">
                       <div class="v-select__selections">
-                        <div class="v-select__selection v-select__selection--comma">10</div>
+                        <div class="v-select__selection v-select__selection--comma">50</div>
                         <input aria-label="$vuetify.dataTable.itemsPerPageText" id="input-9" readonly="readonly" type="text" aria-readonly="false" autocomplete="off">
                       </div>
                       <div class="v-input__append-inner">
@@ -28,7 +28,7 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
                           <i aria-hidden="true" class="v-icon notranslate mdi mdi-menu-down theme--light"></i>
                         </div>
                       </div>
-                      <input type="hidden" value="10">
+                      <input type="hidden" value="50">
                     </div>
                     <div class="v-menu">
                     </div>

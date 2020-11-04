@@ -4,7 +4,7 @@ import Dashboard from './dashboard.vue'
 
 const localVue = createLocalVue()
 
-describe('Dashboard wrapper', () => {
+describe('Dashboard', () => {
   let vuetify
 
   beforeEach(() => {
@@ -20,8 +20,8 @@ describe('Dashboard wrapper', () => {
     })
   }
 
-  it('Mounts and renders', () => {
+  it('matches its snapshot', () => {
     const wrapper = mountFunc()
-    expect(wrapper.exists()).toBe(true)
+    expect(wrapper).toMatchSnapshot()
   })
 })

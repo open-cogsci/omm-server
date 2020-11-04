@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Verify wrapper matches its snapshot 1`] = `
+exports[`Verify matches its snapshot 1`] = `
 <div class="v-card v-sheet theme--light" style="width: 475px;">
   <div class="v-card__title justify-center">
     <div class="v-image v-responsive mx-2 theme--light" style="max-height: 40px; max-width: 40px;">

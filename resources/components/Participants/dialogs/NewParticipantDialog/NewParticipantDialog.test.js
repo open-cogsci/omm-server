@@ -24,6 +24,10 @@ describe('NewParticipantDialog wrapper', () => {
         }
       },
       stubs: ['nuxt-link'],
+      propsData: {
+        value: true,
+        errors: {}
+      },
       ...options
     })
   }
