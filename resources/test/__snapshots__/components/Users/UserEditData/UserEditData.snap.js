@@ -4,11 +4,11 @@ exports[`UserEditData matches its snapshot 1`] = `
 <div class="fill-height d-flex flex-column">
   <div class="v-card__text fill-height">
     <form novalidate="novalidate" class="v-form">
-      <div class="v-input v-input--is-label-active v-input--is-dirty theme--light v-text-field">
+      <div class="v-input theme--light v-text-field">
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label for="input-6" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">users.fields.name.label</label>
+              <label for="input-6" class="v-label theme--light" style="left: 0px; position: absolute;">users.fields.name.label</label>
               <input id="input-6" type="text">
             </div>
           </div>
@@ -16,15 +16,15 @@ exports[`UserEditData matches its snapshot 1`] = `
             <div class="v-messages theme--light">
               <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
             </div>
-            <div class="v-counter theme--light">8 / 50</div>
+            <div class="v-counter theme--light">0 / 50</div>
           </div>
         </div>
       </div>
-      <div class="v-input v-input--is-label-active v-input--is-dirty theme--light v-text-field">
+      <div class="v-input theme--light v-text-field">
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label for="input-9" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">users.fields.email.label</label>
+              <label for="input-9" class="v-label theme--light" style="left: 0px; position: absolute;">users.fields.email.label</label>
               <input id="input-9" type="text">
             </div>
           </div>
