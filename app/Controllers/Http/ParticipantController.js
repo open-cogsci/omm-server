@@ -389,40 +389,26 @@ class ParticipantController {
   *         description: The specified identifier is invalid (e.g. not the expected dtype).
   *       404:
   *         description: The participant with the specified identifier was not found.
-  *       412:
-  *         description: The specified participant is marked as inactive.
   *       default:
   *         description: Unexpected error
   */
   async announce ({ params, transform, response }) {
     const { identifier } = params
-    let ptcp
-    try {
-      ptcp = await Participant.findByOrFail('identifier', identifier)
-    } catch (e) {
-      return response.notFound({ message: `No participant found for identifier ${identifier}.` })
-    }
-
+    const ptcp = await Participant.findByOrFail('identifier', identifier)
     if (!ptcp.active) {
-      return response.preconditionFailed({ message: 'Participant is not active' })
+      return response.badRequest({ message: 'Participant is not active' })
     }
 
-    let study
-    try {
-      study = await ptcp.studies()
-        .with('files')
-        .withCount('jobs')
-        .whereInPivot('status_id', [1, 2])
-        .orderBy('priority', 'desc')
-        .orderBy('status_id', 'desc')
-        .orderBy('created_at', 'asc')
-        .withPivot(['status_id', 'priority'])
-        .firstOrFail()
-    } catch (e) {
-      return response.requestedRangeNotSatisfiable({
-        message: `No study available to perform for participant with identifier ${identifier}`
-      })
-    }
+    const study = await ptcp.studies()
+      // .withCount('jobs')
+      .with('files')
+      .whereInPivot('status_id', [1, 2])
+      .orderBy('priority', 'desc')
+      .orderBy('status_id', 'desc')
+      .orderBy('studies.created_at', 'asc')
+      .withPivot(['status_id', 'priority'])
+      .withCount('jobs')
+      .firstOrFail()
 
     // Set studies status from pending to in progress
     if (study.pivot_status_id === 1) {
@@ -435,7 +421,7 @@ class ParticipantController {
       }
     }
 
-    return transform.include('files').item(study, 'StudyTransformer')
+    return transform.include('files,jobs_count').item(study, 'StudyTransformer')
   }
 
   /**
