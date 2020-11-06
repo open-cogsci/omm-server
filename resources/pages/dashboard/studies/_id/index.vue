@@ -227,7 +227,8 @@ export default {
         await this.Study.fetchById(studyID, {
           persistOptions: {
             create: ['users']
-          }
+          },
+          ...options
         })
       } catch (e) {
         processErrors(e, this.notify, true)
@@ -336,7 +337,7 @@ export default {
         this.resetPagination()
         await this.fetchStudy(this.study.id, {
           persistOptions: {
-            create: ['variables']
+            create: ['users', 'variables']
           }
         })
         this.fetchJobs(this.study.id, { refresh: true })

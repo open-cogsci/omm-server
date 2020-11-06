@@ -435,6 +435,7 @@ class StudyController {
     const storagePath = Helpers.publicPath(`files/${study.id}`)
     const filename = `${type}.${uploadedFile.extname}`
 
+    // Remove previous file(s) of this type
     for (const fl of study.getRelated('files').rows.filter(fl => fl.type === type)) {
       await removeFile(Helpers.publicPath(fl.path))
     }
