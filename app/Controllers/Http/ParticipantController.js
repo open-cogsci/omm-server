@@ -196,7 +196,12 @@ class ParticipantController {
     const ptcp = await Participant
       .query()
       .where('id', id)
-      .with('studies')
+      .with('studies', (query) => {
+        query.with('users', (query) => {
+          query.orderBy('pivot_is_owner', 'desc')
+          query.orderBy('name', 'asc')
+        })
+      })
       .firstOrFail()
 
     if (request.input('study_progress')) {
@@ -210,7 +215,7 @@ class ParticipantController {
     }
 
     return transform
-      .include('studies')
+      .include('studies.users')
       .item(ptcp, 'ParticipantTransformer')
   }
 

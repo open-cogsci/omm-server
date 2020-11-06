@@ -14,7 +14,7 @@ const getCancelBtn = (wrapper) => {
   return wrapper.findAll('.v-card__actions .v-btn').at(0)
 }
 
-describe('ParticipantEditData wrapper', () => {
+describe('ParticipantEditData', () => {
   let vuetify
   let login
 
