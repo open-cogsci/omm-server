@@ -1,10 +1,20 @@
 import Vuetify from 'vuetify'
 import { mount, createLocalVue } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
+import faker from 'faker'
 import ParticipantEditData from './ParticipantEditData.vue'
 
 const localVue = createLocalVue()
 
-describe('ParticipantEditData wrapper', () => {
+const getSaveBtn = (wrapper) => {
+  return wrapper.findAll('.v-card__actions .v-btn').at(1)
+}
+
+const getCancelBtn = (wrapper) => {
+  return wrapper.findAll('.v-card__actions .v-btn').at(0)
+}
+
+describe('ParticipantEditData', () => {
   let vuetify
   let login
 
@@ -31,5 +41,97 @@ describe('ParticipantEditData wrapper', () => {
   it('matches its snapshot', () => {
     const wrapper = mountFunc()
     expect(wrapper).toMatchSnapshot()
+  })
+
+  it('checks if local data matches props', async () => {
+    const participant = {
+      name: faker.name.findName(),
+      identifier: faker.git.shortSha(),
+      active: true
+    }
+    const wrapper = mountFunc({ propsData: { participant } })
+    await flushPromises()
+    expect(wrapper.vm.ptcp).toEqual(participant)
+  })
+
+  it('should have the save button disabled if no data is entered', async () => {
+    const wrapper = mountFunc()
+    await flushPromises()
+    const saveBtn = getSaveBtn(wrapper)
+    expect(saveBtn.attributes('disabled')).toBe('disabled')
+  })
+
+  it('checks if data is changed when cancelling and shows dialog if it is', async () => {
+    const wrapper = mountFunc({
+      propsData: {
+        participant: {
+          name: faker.name.findName(),
+          identifier: faker.git.shortSha(),
+          active: true
+        }
+      }
+    })
+    await flushPromises()
+    wrapper.vm.ptcp.name = 'Something different'
+    const cancelBtn = getCancelBtn(wrapper)
+    await cancelBtn.trigger('click')
+    expect(wrapper.find('.v-dialog').exists()).toBe(true)
+  })
+
+  it('checks if data is changed when cancelling, and closes when no changes have been made', async () => {
+    const wrapper = mountFunc({
+      propsData: {
+        participant: {
+          name: faker.name.findName(),
+          identifier: faker.git.shortSha(),
+          active: true
+        }
+      }
+    })
+    await flushPromises()
+    expect(wrapper.emitted('clicked-cancel')).toBeFalsy()
+    const cancelBtn = getCancelBtn(wrapper)
+    await cancelBtn.trigger('click')
+    expect(wrapper.find('.v-dialog').exists()).toBe(false)
+    expect(wrapper.emitted('clicked-cancel')).toBeTruthy()
+  })
+
+  it('should save changes', async () => {
+    const wrapper = mountFunc({
+      propsData: {
+        participant: {
+          name: faker.name.findName(),
+          identifier: faker.git.shortSha(),
+          active: true
+        }
+      }
+    })
+    await flushPromises()
+    expect(wrapper.emitted('clicked-save')).toBeFalsy()
+    wrapper.vm.ptcp.name = 'Something different'
+    const saveBtn = getSaveBtn(wrapper)
+    expect(saveBtn.attributes('disabled')).toBeFalsy()
+    await saveBtn.trigger('click')
+    expect(wrapper.emitted('clicked-cancel')).toBeFalsy()
+    expect(wrapper.emitted('clicked-save')).toBeTruthy()
+  })
+
+  it('should simply cancel if no changes have been made before clicking save', async () => {
+    const wrapper = mountFunc({
+      propsData: {
+        participant: {
+          name: faker.name.findName(),
+          identifier: faker.git.shortSha(),
+          active: true
+        }
+      }
+    })
+    await flushPromises()
+    expect(wrapper.emitted('clicked-save')).toBeFalsy()
+    const saveBtn = getSaveBtn(wrapper)
+    expect(saveBtn.attributes('disabled')).toBeFalsy()
+    await saveBtn.trigger('click')
+    expect(wrapper.emitted('clicked-cancel')).toBeTruthy()
+    expect(wrapper.emitted('clicked-save')).toBeFalsy()
   })
 })

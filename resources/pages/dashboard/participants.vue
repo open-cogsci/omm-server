@@ -115,7 +115,7 @@ export default {
     },
     participants () {
       return this.Participant.query()
-        .with('studies')
+        .with('studies.users')
         .orderBy('name', 'asc')
         .where('id', this.pagination.ids)
         .get()

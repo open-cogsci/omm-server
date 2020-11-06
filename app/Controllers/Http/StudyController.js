@@ -435,6 +435,7 @@ class StudyController {
     const storagePath = Helpers.publicPath(`files/${study.id}`)
     const filename = `${type}.${uploadedFile.extname}`
 
+    // Remove previous file(s) of this type
     for (const fl of study.getRelated('files').rows.filter(fl => fl.type === type)) {
       await removeFile(Helpers.publicPath(fl.path))
     }
@@ -690,6 +691,58 @@ class StudyController {
     const study = await query.firstOrFail()
     const jobs = study.getRelated('jobs')
     return transform.include('participants').collection(jobs, 'JobTransformer')
+  }
+
+  /**
+  * @swagger
+  * /studies/{id}/jobs/count:
+  *   get:
+  *     tags:
+  *       - Jobs
+  *     summary: >
+  *         Gets the number of jobs for the current study.
+  *     consumes:
+  *       - application/json
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         type: integer
+  *         required: true
+  *         description: The ID of the study to retrieve the jobs from.
+  *         example: 1
+  *     responses:
+  *       200:
+  *         description: The jobs count for the specified study
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: object
+  *               properties:
+  *                 jobs_count:
+  *                   type: integer
+  *                   description: The number of jobs
+  *                   example: 22
+  *       400:
+  *         description: The request was invalid (e.g. wrong parameters were passed).
+  *       default:
+  *         description: Unexpected error
+  */
+
+  /**
+   * Count jobs
+   *
+   * @param {*} { params, request, response }
+   * @memberof StudyController
+   */
+  async countJobs ({ params }) {
+    const { id } = params
+
+    // Fetch the study, or throw an error if it isn't found.
+    const result = await Study.query()
+      .where('id', id)
+      .withCount('jobs')
+      .firstOrFail()
+    return { data: { jobs_count: result.jobs_count } }
   }
 
   /**

@@ -150,7 +150,7 @@ export default {
     },
     save () {
       if (this.$refs.form.validate()) {
-        if (this.dataChanged() || !isEmpty(this.userData.password)) {
+        if (this.dataChanged()) {
           this.$emit('clicked-save', this.userData)
         } else {
           this.stopEdit()
