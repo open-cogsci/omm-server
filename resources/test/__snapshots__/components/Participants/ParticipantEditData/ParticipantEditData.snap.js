@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ParticipantEditData wrapper matches its snapshot 1`] = `
+exports[`ParticipantEditData matches its snapshot 1`] = `
 <div class="fill-height d-flex flex-column">
   <div class="v-card__text fill-height">
     <form novalidate="novalidate" class="v-form">

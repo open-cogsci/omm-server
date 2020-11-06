@@ -9,20 +9,13 @@ exports[`ParticipationsPanel matches its snapshot 1`] = `
     <div class="v-skeleton-loader theme--light">
       <div></div>
       <div class="v-virtual-scroll" style="height: 340px;">
-        <div class="v-virtual-scroll__container" style="height: 65px;">
+        <div class="v-virtual-scroll__container" style="height: 80px;">
           <div class="v-virtual-scroll__item" style="top: 0px;">
             <div tabindex="-1" class="v-list-item theme--light">
               <div class="v-list-item__content">
-                <div class="v-list-item__title">Melissa Nikolaus</div>
-                <div class="v-list-item__subtitle"></div>
-                <div class="v-list-item__subtitle">[
-                  {
-                  "name": "Mrs. Sonja DuBuque"
-                  },
-                  {
-                  "name": "Nathan Sawayn Jr."
-                  }
-                  ]</div>
+                <div class="v-list-item__title black--text">Randolph Kautzer</div>
+                <div class="v-list-item__subtitle font-weight-medium"></div>
+                <div class="v-list-item__subtitle">Mrs. Sidney Collier, Timmy Smith</div>
               </div>
               <div class="v-list-item__action">
                 <span class="v-list-item__action-text info--text"></span>

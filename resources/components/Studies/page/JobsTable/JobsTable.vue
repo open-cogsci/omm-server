@@ -86,7 +86,6 @@
 </template>
 
 <script>
-import { upperFirst } from 'lodash'
 import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
 
@@ -146,7 +145,7 @@ export default {
           sortable: false
         },
         ...(this.variables?.map(aVar => ({
-          text: upperFirst(aVar.name),
+          text: aVar.name,
           value: aVar.name,
           dtype: aVar.dtype?.name,
           sortable: false
