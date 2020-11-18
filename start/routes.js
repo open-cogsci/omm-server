@@ -1,5 +1,7 @@
 'use strict'
 
+const { RouterLinkStub } = require('@vue/test-utils')
+
 /*
 |--------------------------------------------------------------------------
 | Routes
@@ -137,5 +139,7 @@ Route.group(() => {
     response.badRequest('This endpoint does not exist')
   })
 }).prefix(API_PREFIX).middleware(['json'])
+
+Route.get('/healthz', () => 'OK').prefix(API_PREFIX)
 
 Route.any('*', 'NuxtController.render')
