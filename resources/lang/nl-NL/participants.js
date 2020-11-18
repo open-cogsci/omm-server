@@ -3,6 +3,7 @@ export default {
   identifier: 'Identifier',
   participations: 'Deelnames',
   status: 'Status',
+  meta: 'Extra info',
   name: 'Naam',
   active: 'Actief',
   inactive: 'Inactief',

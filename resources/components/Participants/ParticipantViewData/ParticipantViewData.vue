@@ -4,7 +4,7 @@
       <v-row
         v-for="(value, field) in listable(participant)"
         :key="field"
-        :dense="$vuetify.breakpoint.xsOnly"
+        :dense="!!participant.meta"
         class="body-1"
       >
         <v-col cols="6" md="4" class="font-weight-medium">
@@ -71,7 +71,7 @@ export default {
     }
   },
   methods: {
-    listable: ptcp => pick(ptcp, ['name', 'identifier', 'active', 'created_at', 'updated_at']),
+    listable: ptcp => pick(ptcp, ['name', 'identifier', 'meta', 'active', 'created_at', 'updated_at']),
     label (val) {
       return this.$t(`participants.${val}`)
     },

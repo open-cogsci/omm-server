@@ -178,7 +178,7 @@ export default {
       this.saving = true
       try {
         const newRecord = await this.Participant.persist(
-          pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'active']))
+          pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'meta', 'active']))
         this.notify({ message: 'Participant has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()

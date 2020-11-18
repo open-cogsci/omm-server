@@ -2,6 +2,7 @@ export default {
   search: 'Search participants by name or identifier',
   identifier: 'Identifier',
   participations: 'Participations',
+  meta: 'Extra info',
   status: 'Status',
   name: 'Name',
   active: 'Active',
