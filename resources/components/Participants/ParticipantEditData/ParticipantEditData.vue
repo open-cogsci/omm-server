@@ -22,8 +22,17 @@
           :label="$t('participants.fields.identifier.label')"
           @input="removeErrors('identifier')"
         />
+        <v-textarea
+          :value="metaToYaml"
+          no-resize
+          rows="3"
+          label="Extra information"
+          :error-messages="errors.meta"
+          @input="metaToJson"
+        />
         <v-switch
           v-model="ptcp.active"
+          hide-details
           :label="ptcp.active ? $t('participants.active') : $t('participants.inactive')"
         />
       </v-form>
@@ -48,6 +57,7 @@ import servererrors from '@/mixins/servererrors'
 const EMPTY_VALUES = {
   name: '',
   identifier: '',
+  meta: '',
   active: true
 }
 
@@ -89,6 +99,11 @@ export default {
       }
     }
   },
+  computed: {
+    metaToYaml () {
+      return this.ptcp.meta
+    }
+  },
   methods: {
     dataChanged () {
       const newData = JSON.parse(JSON.stringify(this.ptcp))
@@ -119,6 +134,10 @@ export default {
     },
     resetValidation () {
       this.$refs.form.resetValidation()
+    },
+    metaToJson (val) {
+      this.removeErrors('meta')
+      this.ptcp.meta = val
     }
   }
 }
