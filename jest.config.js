@@ -1,5 +1,4 @@
 module.exports = {
-  // globalSetup: '<rootDir>/resources/test/jestGlobalSetup.js',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/resources/$1',
     '^~/(.*)$': '<rootDir>/resources/$1',
