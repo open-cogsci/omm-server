@@ -4,7 +4,7 @@
       <v-row
         v-for="(value, field) in listable(participant)"
         :key="field"
-        :dense="!!participant.meta"
+        :dense="!!participant.meta || $vuetify.breakpoint.xsOnly"
         class="body-1"
       >
         <v-col cols="6" md="4" class="font-weight-medium">
