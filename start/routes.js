@@ -134,12 +134,11 @@ Route.group(() => {
   Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('jobs.delete_sequence')
 
   Route.get('/studies/:id/jobs/count', 'StudyController.countJobs').as('jobs.count')
+  Route.get('/healthz', () => 'OK').as('health')
 
   Route.any('*', ({ response }) => {
     response.badRequest('This endpoint does not exist')
   })
 }).prefix(API_PREFIX).middleware(['json'])
-
-Route.get('/healthz', () => 'OK').prefix(API_PREFIX)
 
 Route.any('*', 'NuxtController.render')
