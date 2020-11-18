@@ -60,7 +60,7 @@ describe('LanguageSwitcher', () => {
     expect(wrapper.emitted('switched-locale')[0]).toEqual([newLocale])
   })
 
-  test('should show the menu when clicked', async () => {
+  it('should show the menu when clicked', async () => {
     const wrapper = mountFunc()
     await flushPromises()
     expect(wrapper.find('.v-menu__content').exists()).toBe(false)
@@ -74,7 +74,7 @@ describe('LanguageSwitcher', () => {
     expect(langs.length).toBe(Object.keys(wrapper.vm.items).length)
   })
 
-  test('should change the locale depending on menu item click', async () => {
+  it('should change the locale depending on menu item click', async () => {
     const wrapper = mountFunc()
     await flushPromises()
     const currentLocaleButton = wrapper.find('.v-list > .v-list-item')
