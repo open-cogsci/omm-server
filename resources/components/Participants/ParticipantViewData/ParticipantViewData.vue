@@ -1,19 +1,36 @@
 <template>
   <div class="fill-height d-flex flex-column">
-    <v-card-text class="fill-height">
-      <v-row
-        v-for="(value, field) in listable(participant)"
-        :key="field"
-        :dense="!!participant.meta || $vuetify.breakpoint.xsOnly"
-        class="body-1"
-      >
-        <v-col cols="6" md="4" class="font-weight-medium">
-          {{ label(field) }}:
-        </v-col>
-        <v-col cols="6" md="8">
-          {{ convertBools(value) }}
-        </v-col>
-      </v-row>
+    <v-card-text class="fill-height" style="max-height:340px; overflow:auto">
+      <template v-for="(value, field) in listable(participant)">
+        <v-row
+          v-if="field !== 'meta'"
+          :key="field"
+          :dense="!!participant.meta || $vuetify.breakpoint.xsOnly"
+          class="body-1"
+        >
+          <v-col cols="6" md="4" class="font-weight-medium">
+            {{ label(field) }}:
+          </v-col>
+          <v-col cols="6" md="8">
+            {{ convertBools(value) }}
+          </v-col>
+        </v-row>
+        <template v-else>
+          <v-row
+            v-for="(metaValue, metaField) in checkJson(value)"
+            :key="metaField"
+            dense
+            class="body-1"
+          >
+            <v-col cols="6" md="4" class="font-weight-medium">
+              {{ metaField | capitalize }}:
+            </v-col>
+            <v-col cols="6" md="8">
+              {{ convertBools(metaValue) }}
+            </v-col>
+          </v-row>
+        </template>
+      </template>
     </v-card-text>
     <v-card-actions v-if="$auth.user.user_type_id === 1">
       <v-spacer />
@@ -61,9 +78,12 @@
 </template>
 
 <script>
-import { pick } from 'lodash'
+import { pick, capitalize } from 'lodash'
 
 export default {
+  filters: {
+    capitalize: val => capitalize(val)
+  },
   props: {
     participant: {
       type: Object,
@@ -80,6 +100,13 @@ export default {
       return val
         ? this.$t('common.yes')
         : this.$t('common.no')
+    },
+    checkJson (val) {
+      try {
+        return JSON.parse(val)
+      } catch {
+        return val
+      }
     }
   }
 }
