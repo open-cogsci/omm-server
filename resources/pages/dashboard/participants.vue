@@ -82,7 +82,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { pick, debounce } from 'lodash'
+import { pick, debounce, isString } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -177,8 +177,11 @@ export default {
       if (this.saving) { return }
       this.saving = true
       try {
-        const newRecord = await this.Participant.persist(
-          pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'meta', 'active']))
+        const payload = pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'meta', 'active'])
+        if (!isString(payload.meta)) {
+          payload.meta = JSON.stringify(payload.meta)
+        }
+        const newRecord = await this.Participant.persist(payload)
         this.notify({ message: 'Participant has been saved', color: 'success' })
         if (ptcpData.id) {
           this.$refs.list.clearEditing()

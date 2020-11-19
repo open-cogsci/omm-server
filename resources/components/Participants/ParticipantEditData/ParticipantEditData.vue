@@ -51,7 +51,8 @@
 
 <script>
 import { isEmpty, isLength } from 'validator'
-import { isEqual } from 'lodash'
+import { isEqual, debounce } from 'lodash'
+import yaml from 'js-yaml'
 import servererrors from '@/mixins/servererrors'
 
 const EMPTY_VALUES = {
@@ -101,8 +102,15 @@ export default {
   },
   computed: {
     metaToYaml () {
-      return this.ptcp.meta
+      let val = this.ptcp.meta
+      try {
+        val = JSON.parse(val)
+      } catch {}
+      return yaml.safeDump(val)
     }
+  },
+  created () {
+    this.metaToJson = debounce(this.metaToJson, 400)
   },
   methods: {
     dataChanged () {
@@ -137,7 +145,15 @@ export default {
     },
     metaToJson (val) {
       this.removeErrors('meta')
-      this.ptcp.meta = val
+      try {
+        this.ptcp.meta = yaml.safeLoad(val, { json: true })
+      } catch (e) {
+        const errors = {
+          ...this.errors,
+          meta: 'Invalid yaml format'
+        }
+        this.$emit('update:errors', errors)
+      }
     }
   }
 }
