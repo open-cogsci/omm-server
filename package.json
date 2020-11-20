@@ -42,6 +42,7 @@
     "adonis-swagger": "ahmadarif/adonis-swagger#v1.3.0",
     "cross-env": "^7.0.2",
     "date-fns": "^2.15.0",
+    "flat": "^5.0.2",
     "js-yaml": "^3.14.0",
     "mysql2": "^2.2.5",
     "nuxt": "^2.14.7",

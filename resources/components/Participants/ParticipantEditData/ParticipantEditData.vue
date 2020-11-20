@@ -28,7 +28,8 @@
           rows="3"
           label="Extra information"
           :error-messages="errors.meta"
-          @input="metaToJson"
+          @input="checkYaml"
+          @change="metaToJson"
         />
         <v-switch
           v-model="ptcp.active"
@@ -110,7 +111,7 @@ export default {
     }
   },
   created () {
-    this.metaToJson = debounce(this.metaToJson, 400)
+    this.checkYaml = debounce(this.checkYaml, 500)
   },
   methods: {
     dataChanged () {
@@ -143,17 +144,24 @@ export default {
     resetValidation () {
       this.$refs.form.resetValidation()
     },
-    metaToJson (val) {
-      this.removeErrors('meta')
+    checkYaml (val) {
       try {
-        this.ptcp.meta = yaml.safeLoad(val, { json: true })
+        const result = yaml.safeLoad(val, { json: true })
+        this.removeErrors('meta')
+        return result
       } catch (e) {
         const errors = {
           ...this.errors,
           meta: 'Invalid yaml format'
         }
         this.$emit('update:errors', errors)
+        return null
       }
+    },
+    metaToJson (val) {
+      const data = this.checkYaml(val)
+      if (data === null) { return }
+      this.ptcp.meta = data
     }
   }
 }
