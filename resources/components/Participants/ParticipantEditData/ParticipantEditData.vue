@@ -104,6 +104,7 @@ export default {
   computed: {
     metaToYaml () {
       let val = this.ptcp.meta
+      if (!val) { return '' }
       try {
         val = JSON.parse(val)
       } catch {}
