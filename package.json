@@ -39,7 +39,7 @@
     "@vuex-orm/core": "^0.36.3",
     "@vuex-orm/plugin-axios": "^0.9.3",
     "adonis-bumblebee": "^2.2.0",
-    "adonis-swagger": "ahmadarif/adonis-swagger#v1.3.0",
+    "adonis-swagger": "github:ahmadarif/adonis-swagger#v1.3.0",
     "cross-env": "^7.0.2",
     "date-fns": "^2.15.0",
     "flat": "^5.0.2",
@@ -56,7 +56,7 @@
     "vuex-pathify": "^1.4.1",
     "vuex-router-sync": "^5.0.0",
     "workerpool": "^6.0.3",
-    "xlsx": "^0.16.8"
+    "xlsx": "^0.16.9"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.12.1",
@@ -82,7 +82,7 @@
     "jest-transform-stub": "^2.0.0",
     "nodemon": "^2.0.6",
     "ts-jest": "^26.4.4",
-    "typescript": "^4.0.5",
+    "typescript": "^4.1.2",
     "vue-jest": "^3.0.7"
   }
 }
