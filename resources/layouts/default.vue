@@ -112,7 +112,7 @@
       <nuxt />
     </v-main>
     <v-footer :fixed="false" app>
-      <span>&copy; 2019</span>
+      <span>&copy; 2019-2020 le Centre National de la Recherche</span>
     </v-footer>
     <notification-box />
   </v-app>
