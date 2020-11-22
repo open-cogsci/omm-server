@@ -390,6 +390,13 @@ class ParticipantController {
   *                       type: array
   *                       items:
   *                         $ref: '#/definitions/StudyFile'
+  *                     participants:
+  *                       type: array
+  *                       items:
+  *                         type: object
+  *                         properties:
+  *                           meta:
+  *                            type: object
   *       400:
   *         description: The specified identifier is invalid (e.g. not the expected dtype).
   *       404:
@@ -404,9 +411,15 @@ class ParticipantController {
       return response.badRequest({ message: 'Participant is not active' })
     }
 
+    // Not very efficient to retrieve the participant from the DB twice (again in query below), but
+    // currently the simples solution...
     const study = await ptcp.studies()
-      // .withCount('jobs')
       .with('files')
+      .with('participants', (query) => {
+        query
+          .where('participants.id', ptcp.id)
+          .select(['id', 'meta'])
+      })
       .whereInPivot('status_id', [1, 2])
       .orderBy('priority', 'desc')
       .orderBy('status_id', 'desc')
@@ -426,7 +439,7 @@ class ParticipantController {
       }
     }
 
-    return transform.include('files,jobs_count').item(study, 'StudyTransformer')
+    return transform.include('files,jobs_count,participants').item(study, 'StudyTransformer')
   }
 
   /**
