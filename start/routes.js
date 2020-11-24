@@ -1,5 +1,7 @@
 'use strict'
 
+const { RouterLinkStub } = require('@vue/test-utils')
+
 /*
 |--------------------------------------------------------------------------
 | Routes
@@ -132,6 +134,7 @@ Route.group(() => {
   Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('jobs.delete_sequence')
 
   Route.get('/studies/:id/jobs/count', 'StudyController.countJobs').as('jobs.count')
+  Route.get('/healthz', () => 'OK').as('health')
 
   Route.any('*', ({ response }) => {
     response.badRequest('This endpoint does not exist')

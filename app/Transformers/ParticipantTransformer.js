@@ -14,7 +14,6 @@ class ParticipantTransformer extends BumblebeeTransformer {
   }
 
   transform (model) {
-    // console.log(model)
     return {
       ...model.toObject(),
       pivot: model.$relations.pivot

@@ -5,7 +5,7 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
   <div class="col col-12">
     <div class="v-skeleton-loader theme--light">
       <transition-stub name="fade-transition">
-        <div class="v-data-table v-data-table--dense v-data-table--fixed-header theme--light">
+        <div class="v-data-table v-data-table--dense v-data-table--fixed-header v-data-table--has-bottom theme--light">
           <div class="v-data-table__wrapper" style="height: 368px;">
             <table>
               <colgroup></colgroup>
@@ -21,7 +21,7 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
                     <div class="v-select__slot">
                       <div class="v-select__selections">
                         <div class="v-select__selection v-select__selection--comma">50</div>
-                        <input aria-label="$vuetify.dataTable.itemsPerPageText" id="input-9" readonly="readonly" type="text" aria-readonly="false" autocomplete="off">
+                        <input aria-label="Rows per page:" id="input-9" readonly="readonly" type="text" aria-readonly="false" autocomplete="off">
                       </div>
                       <div class="v-input__append-inner">
                         <div class="v-input__icon v-input__icon--append">

@@ -22,8 +22,18 @@
           :label="$t('participants.fields.identifier.label')"
           @input="removeErrors('identifier')"
         />
+        <v-textarea
+          :value="metaToYaml"
+          no-resize
+          rows="3"
+          label="Extra information"
+          :error-messages="errors.meta"
+          @input="checkYaml"
+          @change="metaToJson"
+        />
         <v-switch
           v-model="ptcp.active"
+          hide-details
           :label="ptcp.active ? $t('participants.active') : $t('participants.inactive')"
         />
       </v-form>
@@ -42,12 +52,14 @@
 
 <script>
 import { isEmpty, isLength } from 'validator'
-import { isEqual } from 'lodash'
+import { isEqual, debounce } from 'lodash'
+import yaml from 'js-yaml'
 import servererrors from '@/mixins/servererrors'
 
 const EMPTY_VALUES = {
   name: '',
   identifier: '',
+  meta: '',
   active: true
 }
 
@@ -89,6 +101,19 @@ export default {
       }
     }
   },
+  computed: {
+    metaToYaml () {
+      let val = this.ptcp.meta
+      if (!val) { return '' }
+      try {
+        val = JSON.parse(val)
+      } catch {}
+      return yaml.safeDump(val)
+    }
+  },
+  created () {
+    this.checkYaml = debounce(this.checkYaml, 500)
+  },
   methods: {
     dataChanged () {
       const newData = JSON.parse(JSON.stringify(this.ptcp))
@@ -119,6 +144,25 @@ export default {
     },
     resetValidation () {
       this.$refs.form.resetValidation()
+    },
+    checkYaml (val) {
+      try {
+        const result = yaml.safeLoad(val, { json: true })
+        this.removeErrors('meta')
+        return result
+      } catch (e) {
+        const errors = {
+          ...this.errors,
+          meta: 'Invalid yaml format'
+        }
+        this.$emit('update:errors', errors)
+        return null
+      }
+    },
+    metaToJson (val) {
+      const data = this.checkYaml(val)
+      if (data === null) { return }
+      this.ptcp.meta = data
     }
   }
 }

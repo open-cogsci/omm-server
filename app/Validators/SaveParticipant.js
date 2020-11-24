@@ -6,7 +6,8 @@ class SaveParticipant {
     return {
       // validation rules
       name: 'required|max:50',
-      identifier: `required|unique:participants,identifier,id,${ptcpId}`
+      identifier: `required|unique:participants,identifier,id,${ptcpId}`,
+      meta: 'json'
     }
   }
 

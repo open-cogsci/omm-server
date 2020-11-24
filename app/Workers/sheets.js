@@ -1,6 +1,7 @@
 const workerpool = require('workerpool')
 const XLSX = require('xlsx')
-const { isArray } = require('lodash')
+const { isArray, isObject } = require('lodash')
+const flatten = require('flat')
 
 // a deliberately inefficient implementation of the fibonacci sequence
 function readSheet (path) {
@@ -11,16 +12,19 @@ function readSheet (path) {
 
 function writeSheet (jobs, destination, format = 'csv') {
   const rows = jobs.reduce((result, job) => {
-    // If there are multiple entries for data, suffix the object key values
-    const { data, trial_vars: trialVars, ...rest } = job
+    const { data, trial_vars: trialVars, meta, ...rest } = job
+    let metaData = {}
+    if (meta && isObject(meta)) {
+      metaData = flatten(meta)
+    }
     let iteration = 1
     if (isArray(data)) {
       for (const row of data) {
-        result.push({ ...rest, iteration, ...row, ...trialVars })
+        result.push({ ...rest, ...metaData, iteration, ...row, ...trialVars })
         iteration += 1
       }
     } else {
-      result.push({ ...rest, iteration, ...data, ...trialVars })
+      result.push({ ...rest, ...metaData, iteration, ...data, ...trialVars })
     }
     return result
   }, [])

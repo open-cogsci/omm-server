@@ -298,7 +298,8 @@ class Study extends Model {
 
     return await Database
       .select('jobs.id as job_id', 'jobs.position', 'jobs.study_id', 'job_states.data',
-        'job_statuses.name as status', 'participants.identifier as participant', aggVars)
+        'job_statuses.name as status', 'participants.identifier as participant', 'participants.meta',
+        aggVars)
       .from('jobs')
       .leftJoin('job_variable', 'jobs.id', 'job_variable.job_id')
       .leftJoin('variables', 'variables.id', 'job_variable.variable_id')
@@ -312,6 +313,7 @@ class Study extends Model {
       .groupBy('status')
       .groupBy('participant_id')
       .groupBy('participants.identifier')
+      .groupBy('participants.meta')
   }
 
   /**
