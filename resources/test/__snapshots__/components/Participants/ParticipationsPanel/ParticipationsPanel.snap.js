@@ -13,9 +13,9 @@ exports[`ParticipationsPanel matches its snapshot 1`] = `
           <div class="v-virtual-scroll__item" style="top: 0px;">
             <div tabindex="-1" class="v-list-item theme--light">
               <div class="v-list-item__content">
-                <div class="v-list-item__title black--text">Juan Lynch</div>
+                <div class="v-list-item__title black--text">Study name</div>
                 <div class="v-list-item__subtitle font-weight-medium"></div>
-                <div class="v-list-item__subtitle">Georgia Kunze, Frederick Wintheiser</div>
+                <div class="v-list-item__subtitle">Participant 1, Participant 2</div>
               </div>
               <div class="v-list-item__action">
                 <span class="v-list-item__action-text info--text"></span>

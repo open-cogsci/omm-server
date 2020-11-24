@@ -62,10 +62,10 @@ describe('ParticipationsPanel', () => {
       propsData: {
         participant: {
           studies: [{
-            name: faker.name.findName(),
+            name: 'Study name',
             users: [
-              { name: faker.name.findName() },
-              { name: faker.name.findName() }
+              { name: 'Participant 1' },
+              { name: 'Participant 2' }
             ]
           }]
         }
