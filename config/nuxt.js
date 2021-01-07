@@ -3,8 +3,22 @@ const i18n = require('../config/i18n.js')
 
 module.exports = {
   ssr: false,
-  dev: process.env.NODE_ENV === 'development',
   srcDir: resolve(__dirname, '..', 'resources'),
+
+  publicRuntimeConfig: {
+    baseURL: process.env.BASE_URL,
+    auth: {
+      strategies: {
+        local: {
+          endpoints: {
+            login: { url: `${process.env.BASE_URL}/api/v1/auth/login`, method: 'post', propertyName: 'data.token' },
+            logout: { url: `${process.env.BASE_URL}/api/v1/auth/logout`, method: 'post' },
+            user: { url: `${process.env.BASE_URL}/api/v1/auth/user`, method: 'get', propertyName: 'data' }
+          }
+        }
+      }
+    }
+  },
   /*
   ** Headers of the page
   */
@@ -74,10 +88,11 @@ module.exports = {
   auth: {
     strategies: {
       local: {
+        scheme: '~/plugins/auth.js',
         endpoints: {
-          login: { url: '/api/v1/auth/login', method: 'post', propertyName: 'data.token' },
-          logout: { url: '/api/v1/auth/logout', method: 'post' },
-          user: { url: '/api/v1/auth/user', method: 'get', propertyName: 'data' }
+          login: { url: `${process.env.BASE_URL}/api/v1/auth/login`, method: 'post', propertyName: 'data.token' },
+          logout: { url: `${process.env.BASE_URL}/api/v1/auth/logout`, method: 'post' },
+          user: { url: `${process.env.BASE_URL}/api/v1/auth/user`, method: 'get', propertyName: 'data' }
         }
       }
     }

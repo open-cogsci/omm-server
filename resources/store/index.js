@@ -14,7 +14,8 @@ import Variable from '@/models/Variable'
 import Dtype from '@/models/Dtype'
 
 VuexORM.use(VuexORMAxios, {
-  dataKey: 'data'
+  dataKey: 'data',
+  baseURL: process.env.BASE_URL
 })
 
 const database = new VuexORM.Database()
