@@ -1,8 +1,34 @@
 # OpenMonkeyMind
 
-OpenMonkeyMind is a server and a user interface for managing and communcating with experiments that are run with OpenSesame. These experiments can utilize the omm-client extension to communicate with the server and for instance send over results to be stored in its database.
+*Server software*
 
-## Running omm-server using docker
+## About
+
+OpenMonkeyMind (OMM) allows OpenSesame experiments to be managed on a central server ([omm-server](https://github.com/open-cogsci/omm-server)) and deployed to computers running OpenSesame with the [omm-client](https://github.com/open-cogsci/omm-client) software installed. 
+
+
+## Credits
+
+© 2020 - 2021:
+
+- Sebastiaan Mathôt (@smathot), University of Groningen, The Netherlands
+- Daniel Schreij  (@dschreij)
+- Joel Fagot (@joelfagot), CNRS and Aix-Marseille University, France
+- Nicolas Claidère (@nclaidiere), CNRS and Aix-Marseille University, France
+- Pascal Belin, Aix Marseille University, France
+
+The development of Open Monkey Mind was supported by ERC Advanced grant COVOPRIM #78824
+
+## Jump to
+
+- [Running using docker](#running-using-docker)
+- [Installing with npm](#installing-with-npm)
+- [API documentation with swagget](#api-documentation-with-swagger)
+- [Built on the shoulders of giants](#built-on-the-shoulders-of-giants)
+- [License](#license)
+
+
+## Running using docker
 
 If you use Docker, it is really easy to get the server up and running:
 
@@ -175,3 +201,9 @@ This project uses prominent open-source frameworks and libraries:
   - [Bumblebee](https://github.com/rhwilr/adonis-bumblebee): Data serializer for structured json responses.
   - [Adonis-swagger](https://github.com/ahmadarif/adonis-swagger): Easy swagger documentation with Adonis.
 
+
+## License
+
+OpenMonkeyMind is distributed under the terms of the GNU General Public License 3. The full license should be included in the file COPYING, or can be obtained from:
+
+- <http://www.gnu.org/licenses/gpl.txt>
