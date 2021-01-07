@@ -32,12 +32,24 @@ The development of Open Monkey Mind was supported by ERC Advanced grant COVOPRIM
 
 If you use Docker, it is really easy to get the server up and running:
 
-1. If you are using Windows, or MacOS, install docker desktop from https://www.docker.com/products/docker-desktop. In Linux you can use your favourite package manager to pull in the docker packages.
+### Download the server software
+
+If you have `git` installed, you can simply clone the repository:
+
+```
+git clone https://github.com/open-cogsci/omm-server.git
+```
+
+### Install Docker
+
+If you are using Windows, or MacOS, install docker desktop from https://www.docker.com/products/docker-desktop. In Linux you can use your favourite package manager to pull in the docker packages.
 Refer to https://docs.docker.com/engine/install/ubuntu/ for instructions for this process.
 
 Once this is done, you should have access to the docker commands from your terminal (Mac/Linux) of Powershell/Command (Windows)
 
-2. Navigate to the folder in which you placed the contents of omm-server (e.g. `cd /folder/to/omm-server`) and execute the command
+### Start the Docker image
+
+Navigate to the folder in which you placed the contents of omm-server (e.g. `cd /folder/to/omm-server`) and execute the command
 
 ```
 docker-compose up -d
@@ -45,37 +57,20 @@ docker-compose up -d
 
 It may fail the first time because the first initialisation of the database takes a bit longer than usual. If so try executing the command again, or press the play/restart button for omm-server in the docker desktop dashboard.
 
-> If you get permission denied errors, or other errors indicating that you do not have access to the
-docker image of omm-server during this step, please check the next section for steps on how to login with your docker client to github
-
 After the docker-compose script has run for the first time, the entry for omm-server will stay in your Docker desktop dashboard, and the next time(s) you can simply start the server and database by pressing the button with the play icon behind the omm-server listing.
 
-3. Open a browser and navigate to http://localhost:3000. You should now be able to play around with the omm-server. You can login with `admin@admin.com` and password `admin`
 
-### Authenticating to the Github registry
+### Access the server
 
-Since the omm-server repository is currently private, you need to authenticate to Github first to be able to access it. For a more elaborate guide, refer to https://docs.github.com/en/free-pro-team@latest/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages
+Open a browser and navigate to http://localhost:3000. You should now be able to play around with the omm-server. You can login with `admin@admin.com` and password `admin`
 
-In short, the steps are:
 
-1. Create an account at Github.com (or login to your existing account)
-2. Create a personal access token.  It is advisable to grant only read access to this token to prevent unintended alterations to the repository or registry.
-3. Save it to a text file (for example token.txt) and use this with docker login
+### Access account-verification email
 
-``` bash
-cat ~/TOKEN.txt | docker login https://docker.pkg.github.com -u USERNAME --password-stdin
-```
-
-(replace USERNAME with you Github username)
-
-4. try pulling the omm-server image again using `docker-compose up`. If you are authenticated, the command should now succeed without problems, and te server should be started.
-
-### Test driving omm-server's e-mail functionality
-
-Ideally, omm-server should be connected to a working mail server, so the account creation and management features work as designed. E-mails are for instace sent to a new user after an admin creates an account, or a user wants to reset his or her password.
-If such a connection to a mail server is not easily possible, the docker-compose setup comes with a built-in mail server which intercepts *all* e-mails that omm-server sends out. You can access the webmail interface of this mail server by going to http://localhost:3001 in your browser, once docker is running (the mail server also gets started when executing `docker-compose up`).
+Ideally, omm-server should be connected to a working mail server, so the account creation and management features work as designed. E-mails are for instace sent to a new user after an admin creates an account, or a user wants to reset his or her password. If such a connection to a mail server is not easily possible, the docker-compose setup comes with a built-in mail server which intercepts *all* e-mails that omm-server sends out. You can access the webmail interface of this mail server by going to http://localhost:3001 in your browser, once docker is running (the mail server also gets started when executing `docker-compose up`).
 
 The mail server is currently configured to discard all emails after it is shut down, so every time you start up the server, you start with a completely empty and pristine mailbox. This is by design, as the built-in mail server is intended for testing purposes only, and not to be used as a real mail service.
+
 
 ## Installing with npm
 
