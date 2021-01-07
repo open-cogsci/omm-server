@@ -1,7 +1,4 @@
 'use strict'
-
-const { RouterLinkStub } = require('@vue/test-utils')
-
 /*
 |--------------------------------------------------------------------------
 | Routes
