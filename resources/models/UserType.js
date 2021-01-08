@@ -1,6 +1,5 @@
 import { Model } from '@vuex-orm/core'
 import User from '@/models/User'
-
 import { USERS } from '@/assets/js/endpoints'
 
 export default class UserType extends Model {

@@ -23,10 +23,6 @@ export const jobTransformer = ({ data }) => {
 export default class Study extends Model {
   static entity = 'studies'
 
-  static apiConfig = {
-    baseURL: STUDIES
-  }
-
   static fields () {
     return {
       id: this.attr(''),
@@ -56,7 +52,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   static fetch (config) {
-    return this.api().get('', config)
+    return this.api().get(STUDIES, config)
   }
 
   /**
@@ -69,7 +65,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   static fetchById (id, config) {
-    return this.api().get(`/${id}`, config)
+    return this.api().get(`${STUDIES}/${id}`, config)
   }
 
   /**
@@ -83,9 +79,9 @@ export default class Study extends Model {
    */
   static persist (data, config) {
     if (data.id) {
-      return this.api().patch(`/${data.id}`, data, config)
+      return this.api().patch(`${STUDIES}/${data.id}`, data, config)
     }
-    return this.api().post('', data, config)
+    return this.api().post(STUDIES, data, config)
   }
 
   /**
@@ -96,7 +92,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   destroy (config) {
-    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
+    return this.constructor.api().delete(`${STUDIES}/${this.id}`, { delete: this.id, ...config })
   }
 
   /**
@@ -107,7 +103,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   toggleArchived (config) {
-    return this.constructor.api().patch(`/${this.id}/archive`, config)
+    return this.constructor.api().patch(`${STUDIES}/${this.id}/archive`, config)
   }
 
   /**
@@ -124,7 +120,7 @@ export default class Study extends Model {
     formData.append('payload', file)
     formData.append('type', type)
     return this.constructor.api().post(
-      `/${this.id}/upload/${type}`,
+      `${STUDIES}/${this.id}/upload/${type}`,
       formData,
       {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -145,7 +141,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   addUser (userID, config) {
-    return this.constructor.api().post(`${this.id}/collaborator`, { userID }, config)
+    return this.constructor.api().post(`${STUDIES}/${this.id}/collaborator`, { userID }, config)
   }
 
   /**
@@ -157,7 +153,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   async deleteUser (userID, config) {
-    const response = await this.constructor.api().delete(`${this.id}/collaborator/${userID}`, {
+    const response = await this.constructor.api().delete(`${STUDIES}/${this.id}/collaborator/${userID}`, {
       save: false,
       ...config
     })
@@ -174,7 +170,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   setAccessLevel ({ userID, level }, config) {
-    return this.constructor.api().patch(`${this.id}/collaborator`, { userID, level }, config)
+    return this.constructor.api().patch(`${STUDIES}/${this.id}/collaborator`, { userID, level }, config)
   }
 
   /**
@@ -185,7 +181,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   async fetchStats (config) {
-    const result = await this.constructor.api().get(`${this.id}/stats`, {
+    const result = await this.constructor.api().get(`${STUDIES}/${this.id}/stats`, {
       save: false,
       ...config
     })
@@ -200,7 +196,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   generateDataFile (config) {
-    return this.constructor.api().get(`${this.id}/data`, config)
+    return this.constructor.api().get(`${STUDIES}/${this.id}/data`, config)
   }
 
   /**
@@ -211,7 +207,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   async fetchParticipants (config) {
-    const reply = await this.constructor.api().get(`${this.id}/participants`, config)
+    const reply = await this.constructor.api().get(`${STUDIES}/${this.id}/participants`, config)
     return reply.response.data.pagination
   }
 
@@ -223,7 +219,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   async fetchParticipantIDs (config) {
-    const reply = await this.constructor.api().get(`/${this.id}/participants/ids`, {
+    const reply = await this.constructor.api().get(`${STUDIES}/${this.id}/participants/ids`, {
       save: false,
       ...config
     })
@@ -239,7 +235,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   assignParticipants (ids, config) {
-    return this.constructor.api().post(`${this.id}/participants`, { participants: ids }, {
+    return this.constructor.api().post(`${STUDIES}/${this.id}/participants`, { participants: ids }, {
       save: false,
       ...config
     })
@@ -254,7 +250,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   async revokeParticipants (ids, config) {
-    const response = await this.constructor.api().delete(`${this.id}/participants`, {
+    const response = await this.constructor.api().delete(`${STUDIES}/${this.id}/participants`, {
       save: false,
       params: { participants: ids },
       ...config
@@ -275,7 +271,7 @@ export default class Study extends Model {
    * @memberof Study
    */
   async fetchParticipationStats (config) {
-    const reply = await this.constructor.api().get(`${this.id}/stats`, {
+    const reply = await this.constructor.api().get(`${STUDIES}/${this.id}/stats`, {
       save: false,
       ...config
     })

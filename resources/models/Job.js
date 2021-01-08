@@ -13,10 +13,6 @@ export const jobTransformer = (job) => {
 export default class Job extends Model {
   static entity = 'jobs'
 
-  static apiConfig = {
-    baseURL: JOBS
-  }
-
   static fields () {
     return {
       id: this.number(null),
@@ -43,7 +39,7 @@ export default class Job extends Model {
       this.delete(record => record.study_id === studyID)
     }
 
-    return this.api().get(`/study/${studyID}`, {
+    return this.api().get(`${JOBS}/study/${studyID}`, {
       dataTransformer: ({ data }) => data.data.map(jobTransformer),
       ...cfg
     })
@@ -51,17 +47,17 @@ export default class Job extends Model {
 
   static persist (data, config) {
     if (data.id) {
-      return this.api().patch(`/${data.id}`, data, config)
+      return this.api().patch(`${JOBS}/${data.id}`, data, config)
     }
     return this.api().post('', data, config)
   }
 
   destroy (config) {
-    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
+    return this.constructor.api().delete(`${JOBS}/${this.id}`, { delete: this.id, ...config })
   }
 
   moveTo (newPosition, config) {
-    return this.constructor.api().patch(`/${this.id}/move/${newPosition}`, config)
+    return this.constructor.api().patch(`${JOBS}/${this.id}/move/${newPosition}`, config)
   }
 
   setVariableValue (variableID, value, config) {
@@ -78,7 +74,7 @@ export default class Job extends Model {
     })
     // Then remotely
     return this.constructor.api().patch(
-      `/${this.id}`,
+      `${JOBS}/${this.id}`,
       {
         variable_id: variableID,
         value
