@@ -6,26 +6,15 @@ module.exports = {
   srcDir: resolve(__dirname, '..', 'resources'),
 
   publicRuntimeConfig: {
-    // axios: {
-    //   browserBaseURL: process.env.BASE_URL
-    // }
-    // auth: {
-    //   strategies: {
-    //     local: {
-    //       endpoints: {
-    //         login: { url: `/api/v1/auth/login`, method: 'post', propertyName: 'data.token' },
-    //         logout: { url: `/api/v1/auth/logout`, method: 'post' },
-    //         user: { url: `/api/v1/auth/user`, method: 'get', propertyName: 'data' }
-    //       }
-    //     }
-    //   }
-    // }
+    axios: {
+      browserBaseURL: process.env.API_URL
+    }
   },
-  // privateRuntimeConfig: {
-  //   axios: {
-  //     baseURL: process.env.BASE_URL
-  //   }
-  // },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.API_URL
+    }
+  },
   /*
   ** Headers of the page
   */
