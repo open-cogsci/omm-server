@@ -20,7 +20,7 @@
           fixed-header
           :height="tableHeight"
         >
-          <template v-slot:body="{ items, headers }">
+          <template #body="{ items, headers }">
             <draggable
               v-model="rows"
               tag="tbody"
@@ -66,7 +66,7 @@
                       @save="save(editingBuffer, item.id, item.variables[header.value].id)"
                     >
                       {{ item.variables[header.value].pivot.value }}
-                      <template v-slot:input>
+                      <template #input>
                         <v-text-field
                           v-model="editingBuffer"
                           label="Edit"

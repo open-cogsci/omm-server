@@ -3,8 +3,18 @@ const i18n = require('../config/i18n.js')
 
 module.exports = {
   ssr: false,
-  dev: process.env.NODE_ENV === 'development',
   srcDir: resolve(__dirname, '..', 'resources'),
+
+  publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.API_URL
+    }
+  },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.API_URL
+    }
+  },
   /*
   ** Headers of the page
   */
@@ -56,8 +66,6 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    // Doc: https://github.com/nuxt-community/dotenv-module
-    '@nuxtjs/dotenv',
     '@nuxtjs/auth',
     'nuxt-i18n'
   ],
@@ -66,6 +74,7 @@ module.exports = {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
+    baseURL: 'http://localhost:3000'
   },
   /*
   ** Auth module configuration
@@ -75,9 +84,9 @@ module.exports = {
     strategies: {
       local: {
         endpoints: {
-          login: { url: '/api/v1/auth/login', method: 'post', propertyName: 'data.token' },
-          logout: { url: '/api/v1/auth/logout', method: 'post' },
-          user: { url: '/api/v1/auth/user', method: 'get', propertyName: 'data' }
+          login: { url: '/auth/login', method: 'post', propertyName: 'data.token' },
+          logout: { url: '/auth/logout', method: 'post' },
+          user: { url: '/auth/user', method: 'get', propertyName: 'data' }
         }
       }
     }
@@ -106,12 +115,6 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    extend (config, { isClient }) {
-      // Extend only webpack config for client-bundle
-      if (isClient) {
-        config.devtool = process.env.NODE_ENV === 'development' ? 'inline-source-map' : ''
-      }
-    },
     watch: [
       'lang/**/*.js'
     ],

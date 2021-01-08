@@ -109,6 +109,11 @@ export default {
       }
     }
   },
+  head () {
+    return {
+      title: 'Participants'
+    }
+  },
   computed: {
     Participant () {
       return this.$store.$db().model('participants')
@@ -219,11 +224,6 @@ export default {
         this.pagination.page = page
         this.fetchParticipants()
       }
-    }
-  },
-  head () {
-    return {
-      title: 'Participants'
     }
   }
 }

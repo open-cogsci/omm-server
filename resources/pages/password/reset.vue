@@ -44,12 +44,19 @@ import { RESET_PASSWORD } from '@/assets/js/endpoints'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
-  layout: 'guest',
-  middleware: ['auth'],
-  auth: 'guest',
   components: {
     ResetPasswordForm: () => import('@/components/Users/ResetPasswordForm')
   },
+  beforeRouteEnter (to, from, next) {
+    // If not token is provided in the query string, redirect to login
+    if (!to.query.token) {
+      next(vm => vm.$router.replace(vm.localePath({ name: 'login' })))
+    }
+    next()
+  },
+  layout: 'guest',
+  middleware: ['auth'],
+  auth: 'guest',
   data () {
     return {
       errors: {},
@@ -91,13 +98,6 @@ export default {
       this.savingPassword = false
     }
 
-  },
-  beforeRouteEnter (to, from, next) {
-    // If not token is provided in the query string, redirect to login
-    if (!to.query.token) {
-      next(vm => vm.$router.replace(vm.localePath({ name: 'login' })))
-    }
-    next()
   }
 }
 </script>

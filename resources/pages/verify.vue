@@ -30,6 +30,13 @@ import { VERIFY_EMAIL } from '@/assets/js/endpoints'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
+  beforeRouteEnter (to, from, next) {
+    // If not token is provided in the query string, redirect to login
+    if (!to.query.token) {
+      next(vm => vm.$router.replace(vm.localePath({ name: 'login' })))
+    }
+    next()
+  },
   layout: 'guest',
   middleware: ['auth'],
   auth: 'guest',
@@ -66,13 +73,6 @@ export default {
       }
       this.verifying = false
     }
-  },
-  beforeRouteEnter (to, from, next) {
-    // If not token is provided in the query string, redirect to login
-    if (!to.query.token) {
-      next(vm => vm.$router.replace(vm.localePath({ name: 'login' })))
-    }
-    next()
   }
 }
 </script>

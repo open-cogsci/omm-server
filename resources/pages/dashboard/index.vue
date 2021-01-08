@@ -167,6 +167,11 @@ export default {
       }
     }
   },
+  head () {
+    return {
+      title: 'Dashboard'
+    }
+  },
   computed: {
     Participation () {
       return this.$store.$db().model('participations')
@@ -192,8 +197,8 @@ export default {
     colStyle () {
       return this.$vuetify.breakpoint.smAndUp
         ? {
-          height: '50%'
-        }
+            height: '50%'
+          }
         : {}
     }
   },
@@ -258,11 +263,6 @@ export default {
         nl
       }[this.$i18n.locale]
       return formatDistanceToNow(new Date(val), { addSuffix: true, locale })
-    }
-  },
-  head () {
-    return {
-      title: 'Dashboard'
     }
   }
 }

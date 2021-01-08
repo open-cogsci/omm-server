@@ -4,7 +4,7 @@
       bottom
       color="success"
     >
-      <template v-slot:activator="{ on }">
+      <template #activator="{ on }">
         <v-icon
           :disabled="saveDisabled"
           color="success"
@@ -18,7 +18,7 @@
     </v-tooltip>
                   &nbsp;
     <v-tooltip bottom>
-      <template v-slot:activator="{ on }">
+      <template #activator="{ on }">
         <v-icon
           v-on="on"
           @click="$emit('clicked-cancel')"

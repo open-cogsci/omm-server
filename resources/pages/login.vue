@@ -87,6 +87,11 @@ export default {
       }
     }
   },
+  head () {
+    return {
+      title: 'Login'
+    }
+  },
   computed: {
     redirect () {
       return (
@@ -124,11 +129,6 @@ export default {
         ...this.errors,
         [field]: ''
       }
-    }
-  },
-  head () {
-    return {
-      title: 'Login'
     }
   }
 }

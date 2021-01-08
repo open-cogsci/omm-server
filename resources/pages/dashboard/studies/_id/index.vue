@@ -126,6 +126,19 @@ export default {
     CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog'),
     ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel')
   },
+  beforeRouteUpdate (to, from, next) {
+    // The component is reused if the id simply changed, so mounted is not called in this case.
+    // Force a refetch if the id has changed.
+    if (to.params.id !== from.params.id) {
+      this.fetchAll(to.params.id)
+    }
+    this.resetPagination()
+    next()
+  },
+  validate ({ params }) {
+    // Must be a number
+    return /^\d+$/.test(params.id)
+  },
   data () {
     return {
       status: {
@@ -165,6 +178,11 @@ export default {
           file: null
         }
       }
+    }
+  },
+  head () {
+    return {
+      title: 'Study -- ' + this.study?.name || 404
     }
   },
   computed: {
@@ -403,24 +421,6 @@ export default {
     },
     resetPagination () {
       this.pagination = { ...defaultPagination }
-    }
-  },
-  validate ({ params }) {
-    // Must be a number
-    return /^\d+$/.test(params.id)
-  },
-  beforeRouteUpdate (to, from, next) {
-    // The component is reused if the id simply changed, so mounted is not called in this case.
-    // Force a refetch if the id has changed.
-    if (to.params.id !== from.params.id) {
-      this.fetchAll(to.params.id)
-    }
-    this.resetPagination()
-    next()
-  },
-  head () {
-    return {
-      title: 'Study -- ' + this.study?.name || 404
     }
   }
 }

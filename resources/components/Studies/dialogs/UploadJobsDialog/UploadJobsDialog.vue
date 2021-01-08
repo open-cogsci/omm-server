@@ -9,7 +9,7 @@
     v-bind="$props"
     v-on="$listeners"
   >
-    <template v-if="progress === 100 && uploadStatus.inProgress" v-slot:status>
+    <template v-if="progress === 100 && uploadStatus.inProgress" #status>
       <span class="primary--text">Processing...</span>
       <v-progress-linear indeterminate color="primary" />
     </template>

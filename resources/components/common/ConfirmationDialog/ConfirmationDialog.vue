@@ -1,9 +1,9 @@
 <template>
   <v-dialog :value="dialog" v-bind="$attrs" persistent max-width="600" v-on="$listeners">
-    <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+    <template v-for="(_, slot) of $scopedSlots" #[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
-    <template v-slot:default>
+    <template #default>
       <v-card>
         <v-card-title>
           <slot name="title">

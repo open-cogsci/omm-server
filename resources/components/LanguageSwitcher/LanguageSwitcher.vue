@@ -1,7 +1,7 @@
 <template>
   <v-list>
     <v-menu>
-      <template v-slot:activator="{ on, attrs }">
+      <template #activator="{ on, attrs }">
         <v-list-item v-bind="attrs" v-on="on">
           <v-list-item-action>
             <v-img

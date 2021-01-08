@@ -19,6 +19,12 @@ export default {
     StudiesTabs: () => import('@/components/Studies/StudiesTabs'),
     StudyPageDialog: () => import('@/components/Studies/StudyPageDialog')
   },
+  beforeRouteUpdate (to, from, next) {
+    if (this.$vuetify.breakpoint.smAndDown && to.params.id !== from.params.id) {
+      this.dialog = true
+    }
+    next()
+  },
   data () {
     return {
       dialog: false
@@ -28,12 +34,6 @@ export default {
     return {
       title: 'Studies'
     }
-  },
-  beforeRouteUpdate (to, from, next) {
-    if (this.$vuetify.breakpoint.smAndDown && to.params.id !== from.params.id) {
-      this.dialog = true
-    }
-    next()
   }
 }
 </script>

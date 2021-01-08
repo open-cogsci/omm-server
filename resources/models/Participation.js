@@ -1,12 +1,8 @@
 import { Model } from '@vuex-orm/core'
-import { API_PREFIX } from '@/assets/js/endpoints'
+import { PARTICIPATIONS } from '@/assets/js/endpoints'
 export default class Participation extends Model {
   static entity = 'participations'
   static primaryKey = ['study_id', 'participant_id']
-
-  static apiConfig = {
-    baseURL: API_PREFIX
-  }
 
   static fields () {
     return {
@@ -22,7 +18,7 @@ export default class Participation extends Model {
   }
 
   static async trend (config) {
-    const reply = await this.api().get('/participations/trend', {
+    const reply = await this.api().get(`${PARTICIPATIONS}/trend`, {
       ...config,
       save: false
     })
@@ -30,7 +26,7 @@ export default class Participation extends Model {
   }
 
   static async mostRecent (config) {
-    const reply = await this.api().get('/participations/most_recent', {
+    const reply = await this.api().get(`${PARTICIPATIONS}/most_recent`, {
       ...config,
       save: false
     })
@@ -38,7 +34,7 @@ export default class Participation extends Model {
   }
 
   static async mostActiveStudies (config) {
-    const reply = await this.api().get('/participations/most_active_studies', {
+    const reply = await this.api().get(`${PARTICIPATIONS}/most_active_studies`, {
       ...config,
       save: false
     })
@@ -46,7 +42,7 @@ export default class Participation extends Model {
   }
 
   static async mostActiveParticipants (config) {
-    const reply = await this.api().get('/participations/most_active_participants', {
+    const reply = await this.api().get(`${PARTICIPATIONS}/most_active_participants`, {
       ...config,
       save: false
     })
@@ -59,7 +55,7 @@ export default class Participation extends Model {
     // Already update the new priority locally
     this.$update({ priority })
 
-    const endpoint = `/participations/priority/${this.participant_id}/${this.study_id}`
+    const endpoint = `${PARTICIPATIONS}/priority/${this.participant_id}/${this.study_id}`
     let response
     try {
       response = await this.constructor.api().patch(endpoint, { priority }, {

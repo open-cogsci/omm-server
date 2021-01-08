@@ -1,15 +1,11 @@
 import { Model } from '@vuex-orm/core'
+import { USERS, SET_LOCALE, RESEND_VERIFICATION } from '@/assets/js/endpoints'
 import UserType from './UserType'
 import Study from './Study'
 import StudyUser from './StudyUser'
-import { USERS, SET_LOCALE, RESEND_VERIFICATION } from '@/assets/js/endpoints'
 
 export default class User extends Model {
   static entity = 'users'
-
-  static apiConfig = {
-    baseURL: USERS
-  }
 
   static fields () {
     return {
@@ -30,26 +26,26 @@ export default class User extends Model {
   }
 
   static async fetch (config) {
-    const reply = await this.api().get('', config)
+    const reply = await this.api().get(USERS, config)
     const pagination = reply.response.data.pagination
     pagination.ids = reply.entities.users?.map(entity => entity.id) || []
     return pagination
   }
 
   static fetchById (id, config) {
-    return this.api().get(`/${id}`, config)
+    return this.api().get(`${USERS}/${id}`, config)
   }
 
   static persist (data, config) {
     if (data.id) {
-      return this.api().patch(`/${data.id}`, data, config)
+      return this.api().patch(`${USERS}/${data.id}`, data, config)
     }
-    return this.api().post('', data, config)
+    return this.api().post(USERS, data, config)
   }
 
   static async search (term, config) {
     if (!term || term.length < 3) { return [] }
-    const results = await this.api().post('/search', { term },
+    const results = await this.api().post(`${USERS}/search`, { term },
       {
         save: false,
         ...config
@@ -60,13 +56,12 @@ export default class User extends Model {
   static setLocale (locale, config) {
     return this.api().patch(SET_LOCALE, { locale }, {
       ...config,
-      save: false,
-      baseURL: null
+      save: false
     })
   }
 
   resendAccountEmail (config) {
-    return this.constructor.api().post('/resend_account_email', { id: this.id }, {
+    return this.constructor.api().post(`${USERS}/resend_account_email`, { id: this.id }, {
       save: false,
       ...config
     })
@@ -75,13 +70,12 @@ export default class User extends Model {
   resendActivationEmail (config) {
     return this.constructor.api().post(RESEND_VERIFICATION, { id: this.id }, {
       ...config,
-      save: false,
-      baseURL: null
+      save: false
     })
   }
 
   destroy (config) {
-    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
+    return this.constructor.api().delete(`${USERS}/${this.id}`, { delete: this.id, ...config })
   }
 
   get isAdmin () {

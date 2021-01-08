@@ -14,7 +14,7 @@
       :max-height="maxHeight"
       @scroll.native="scrolling"
     >
-      <template v-slot="{ item }">
+      <template #default="{ item }">
         <v-list-item>
           <v-list-item-content>
             <v-list-item-title v-text="item.name" />

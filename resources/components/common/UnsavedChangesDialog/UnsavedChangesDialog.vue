@@ -4,7 +4,7 @@
     @clicked-yes="$emit('clicked-yes')"
     @clicked-no="$emit('clicked-no')"
   >
-    <template v-slot:title>
+    <template #title>
       {{ $t('common.dialogs.unsaved_changes.title') }}
     </template>
     <!-- eslint-disable-next-line vue/no-v-html -->

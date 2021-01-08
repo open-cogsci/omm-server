@@ -1,15 +1,10 @@
 import { Model } from '@vuex-orm/core'
+import { PARTICIPANTS } from '@/assets/js/endpoints'
 import Participation from './Participation'
 import Study from './Study'
 
-import { PARTICIPANTS } from '@/assets/js/endpoints'
-
 export default class Participant extends Model {
   static entity = 'participants'
-
-  static apiConfig = {
-    baseURL: PARTICIPANTS
-  }
 
   static fields () {
     return {
@@ -27,7 +22,7 @@ export default class Participant extends Model {
   }
 
   static async fetch (config) {
-    const reply = await this.api().get('', config)
+    const reply = await this.api().get(PARTICIPANTS, config)
     if (!reply.response.data.pagination) {
       return reply
     }
@@ -37,17 +32,17 @@ export default class Participant extends Model {
   }
 
   static fetchById (id, config) {
-    return this.api().get(`/${id}`, config)
+    return this.api().get(`${PARTICIPANTS}/${id}`, config)
   }
 
   static persist (data, config) {
     if (data.id) {
-      return this.api().patch(`/${data.id}`, data, config)
+      return this.api().patch(`${PARTICIPANTS}/${data.id}`, data, config)
     }
-    return this.api().post('', data, config)
+    return this.api().post(PARTICIPANTS, data, config)
   }
 
   destroy (config) {
-    return this.constructor.api().delete(`/${this.id}`, { delete: this.id, ...config })
+    return this.constructor.api().delete(`${PARTICIPANTS}/${this.id}`, { delete: this.id, ...config })
   }
 }

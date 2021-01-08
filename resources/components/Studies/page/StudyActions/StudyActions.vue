@@ -45,7 +45,7 @@
         @clicked-no="archiveDialog = false"
         @clicked-yes="$emit('clicked-archive'); archiveDialog = false"
       >
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn
             v-bind="attrs"
             v-on="on"
@@ -58,7 +58,7 @@
             </span>
           </v-btn>
         </template>
-        <template v-slot:title>
+        <template #title>
           <span v-if="study && study.active" v-text="$t('studies.dialogs.confirmation.archive.title')" />
           <span v-else v-text="$t('studies.dialogs.confirmation.reactivate.title')" />
         </template>
@@ -71,7 +71,7 @@
         @clicked-no="deleteDialog = false"
         @clicked-yes="$emit('clicked-delete')"
       >
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn
             :disabled="disableDelete"
             v-bind="attrs"
@@ -86,7 +86,7 @@
             </span>
           </v-btn>
         </template>
-        <template v-slot:title>
+        <template #title>
           <span v-html="$t('studies.dialogs.confirmation.delete.title')" />
         </template>
         <div v-html="deleteBody" />
