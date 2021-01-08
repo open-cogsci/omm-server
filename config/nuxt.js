@@ -7,16 +7,24 @@ module.exports = {
 
   publicRuntimeConfig: {
     baseURL: process.env.BASE_URL,
-    auth: {
-      strategies: {
-        local: {
-          endpoints: {
-            login: { url: `${process.env.BASE_URL}/api/v1/auth/login`, method: 'post', propertyName: 'data.token' },
-            logout: { url: `${process.env.BASE_URL}/api/v1/auth/logout`, method: 'post' },
-            user: { url: `${process.env.BASE_URL}/api/v1/auth/user`, method: 'get', propertyName: 'data' }
-          }
-        }
-      }
+    axios: {
+      browserBaseURL: process.env.BASE_URL
+    }
+    // auth: {
+    //   strategies: {
+    //     local: {
+    //       endpoints: {
+    //         login: { url: `/api/v1/auth/login`, method: 'post', propertyName: 'data.token' },
+    //         logout: { url: `/api/v1/auth/logout`, method: 'post' },
+    //         user: { url: `/api/v1/auth/user`, method: 'get', propertyName: 'data' }
+    //       }
+    //     }
+    //   }
+    // }
+  },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL
     }
   },
   /*
@@ -80,6 +88,7 @@ module.exports = {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
+    baseURL: 'http://localhost:3000'
   },
   /*
   ** Auth module configuration
@@ -88,11 +97,11 @@ module.exports = {
   auth: {
     strategies: {
       local: {
-        scheme: '~/plugins/auth.js',
+        // scheme: '~/plugins/auth.js',
         endpoints: {
-          login: { url: `${process.env.BASE_URL}/api/v1/auth/login`, method: 'post', propertyName: 'data.token' },
-          logout: { url: `${process.env.BASE_URL}/api/v1/auth/logout`, method: 'post' },
-          user: { url: `${process.env.BASE_URL}/api/v1/auth/user`, method: 'get', propertyName: 'data' }
+          login: { url: '/api/v1/auth/login', method: 'post', propertyName: 'data.token' },
+          logout: { url: '/api/v1/auth/logout', method: 'post' },
+          user: { url: '/api/v1/auth/user', method: 'get', propertyName: 'data' }
         }
       }
     }

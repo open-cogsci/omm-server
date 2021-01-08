@@ -1,5 +1,6 @@
 import { Model } from '@vuex-orm/core'
 import keyBy from 'lodash/keyBy'
+import { STUDIES } from '@/assets/js/endpoints'
 import User from './User'
 import StudyUser from './StudyUser'
 import Job from './Job'
@@ -7,8 +8,6 @@ import Variable from './Variable'
 import StudyFile from './StudyFile'
 import Participant from './Participant'
 import Participation from './Participation'
-
-import { STUDIES } from '@/assets/js/endpoints'
 
 export const jobTransformer = ({ data }) => {
   const study = data.data

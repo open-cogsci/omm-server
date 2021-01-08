@@ -5,8 +5,8 @@ import axios from 'axios'
 // import { Breakpoint } from 'vuetify/lib/services'
 import { mount, createLocalVue } from '@vue/test-utils'
 import { Model } from '@vuex-orm/core'
-import Account from './account.vue'
 import * as storeIndex from '@/store'
+import Account from './account.vue'
 
 jest.mock('axios')
 Model.setAxios(axios)

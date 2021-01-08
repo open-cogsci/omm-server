@@ -24,7 +24,7 @@
               >
                 <v-col cols="5">
                   <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ on, attrs }">
                       <v-icon
                         small
                         v-bind="attrs"
@@ -39,7 +39,7 @@
                 </v-col>
                 <v-col cols="5">
                   <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ on, attrs }">
                       <v-icon
                         small
                         v-bind="attrs"
@@ -53,7 +53,7 @@
                 </v-col>
                 <v-col cols="2" class="text-center">
                   <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ on, attrs }">
                       <span
                         class="font-weight-light"
                         :class="ptcp.active ? 'green--text':'red--text'"

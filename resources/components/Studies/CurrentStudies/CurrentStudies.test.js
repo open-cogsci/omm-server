@@ -6,9 +6,9 @@ import axios from 'axios'
 // import { Breakpoint } from 'vuetify/lib/services'
 import { mount, createLocalVue } from '@vue/test-utils'
 import { Model } from '@vuex-orm/core'
-import CurrentStudies from './CurrentStudies.vue'
 import { STUDIES } from '@/assets/js/endpoints'
 import * as storeIndex from '@/store'
+import CurrentStudies from './CurrentStudies.vue'
 
 jest.mock('axios')
 Model.setAxios(axios)

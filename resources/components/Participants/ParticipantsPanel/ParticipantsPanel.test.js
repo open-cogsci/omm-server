@@ -5,9 +5,8 @@ import { mount, createLocalVue } from '@vue/test-utils'
 // import flushPromises from 'flush-promises'
 import axios from 'axios'
 import { Model } from '@vuex-orm/core'
-import ParticipantsPanel from './ParticipantsPanel.vue'
-
 import * as storeIndex from '@/store'
+import ParticipantsPanel from './ParticipantsPanel.vue'
 
 jest.mock('axios')
 Model.setAxios(axios)

@@ -56,7 +56,7 @@
           </v-list-item>
         </template>
       </v-list>
-      <template v-slot:append>
+      <template #append>
         <language-switcher @switched-locale="saveLocaleForUser" />
       </template>
     </v-navigation-drawer>
@@ -80,7 +80,7 @@
       </v-toolbar-title>
       <v-spacer />
       <v-menu v-if="$vuetify.breakpoint.smAndUp" bottom offset-y left>
-        <template v-slot:activator="{ on }">
+        <template #activator="{ on }">
           <v-btn text v-on="on">
             <v-icon left>
               mdi-account-circle
@@ -162,6 +162,9 @@ export default {
       title: 'OpenMonkeyMind'
     }
   },
+  head () {
+    return this.$nuxtI18nSeo()
+  },
   computed: {
     User () {
       return this.$store.$db().model('users')
@@ -211,9 +214,6 @@ export default {
         this.$router.replace(this.switchLocalePath(this.$auth.user.locale))
       }
     }
-  },
-  head () {
-    return this.$nuxtI18nSeo()
   }
 }
 </script>

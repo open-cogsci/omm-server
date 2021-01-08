@@ -30,7 +30,7 @@
         height="calc(100vh - 268px)"
         class="py-0"
       >
-        <template v-slot="{ item }">
+        <template #default="{ item }">
           <v-list-item three-line :to="localePath(`/dashboard/studies/${item.id}`)" nuxt>
             <v-list-item-content class="px-3">
               <v-list-item-title v-text="item.name" />
@@ -38,7 +38,7 @@
             </v-list-item-content>
             <v-list-item-action v-if="!userIsOwner(item.id)" class="align-self-center">
               <v-tooltip bottom>
-                <template v-slot:activator="{on, attrs}">
+                <template #activator="{on, attrs}">
                   <v-icon color="primary" v-bind="attrs" v-on="on">
                     mdi-share-variant
                   </v-icon>

@@ -40,11 +40,11 @@
                         validate-on-blur
                         @input="errors.email = ''"
                       >
-                        <template v-if="$auth.user.account_status === 'pending'" v-slot:append>
+                        <template v-if="$auth.user.account_status === 'pending'" #append>
                           <v-tooltip
                             bottom
                           >
-                            <template v-slot:activator="{ on }">
+                            <template #activator="{ on }">
                               <v-icon color="warning" v-on="on">
                                 mdi-alert
                               </v-icon>
@@ -130,6 +130,11 @@ export default {
       resending: false
     }
   },
+  head () {
+    return {
+      title: 'Account'
+    }
+  },
   computed: {
     User () {
       return this.$store.$db().model('users')
@@ -184,11 +189,6 @@ export default {
         this.errors = processErrors(e, this.notify)
       }
       this.resending = false
-    }
-  },
-  head () {
-    return {
-      title: 'Account'
     }
   }
 }

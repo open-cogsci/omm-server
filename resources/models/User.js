@@ -1,8 +1,8 @@
 import { Model } from '@vuex-orm/core'
+import { USERS, SET_LOCALE, RESEND_VERIFICATION } from '@/assets/js/endpoints'
 import UserType from './UserType'
 import Study from './Study'
 import StudyUser from './StudyUser'
-import { USERS, SET_LOCALE, RESEND_VERIFICATION } from '@/assets/js/endpoints'
 
 export default class User extends Model {
   static entity = 'users'

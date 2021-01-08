@@ -118,6 +118,11 @@ export default {
       }
     }
   },
+  head () {
+    return {
+      title: 'Users'
+    }
+  },
   computed: {
     User () {
       return this.$store.$db().model('users')
@@ -241,11 +246,6 @@ export default {
         this.pagination.page = page
         this.fetchUsers()
       }
-    }
-  },
-  head () {
-    return {
-      title: 'Users'
     }
   }
 }
