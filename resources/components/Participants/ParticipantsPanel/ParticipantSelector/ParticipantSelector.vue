@@ -8,7 +8,7 @@
         max-height="calc(100vh - 575px)"
         @scroll.native="scrolling"
       >
-        <template v-slot="{ item }">
+        <template #default="{ item }">
           <v-list-item
             :value="item.id"
             :class="{'blue lighten-5': item.selected}"

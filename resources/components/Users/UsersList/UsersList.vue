@@ -30,7 +30,7 @@
                 </v-col>
                 <v-col cols="2">
                   <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ on, attrs }">
                       <v-icon
                         small
                         v-bind="attrs"
@@ -106,7 +106,7 @@
                     :item-height="65"
                     height="340"
                   >
-                    <template v-slot="{ item }">
+                    <template #default="{ item }">
                       <v-list-item>
                         <v-list-item-content>
                           <v-list-item-title v-text="item.name" />
@@ -116,7 +116,7 @@
                           <v-list-item-action-text class="info--text">
                             <div>
                               <v-tooltip bottom>
-                                <template v-slot:activator="{on, attrs}">
+                                <template #activator="{on, attrs}">
                                   <div class="d-inline-block" v-bind="attrs" v-on="on">
                                     <span>{{ item.participants_count }}</span>
                                     <v-icon color="info">
@@ -127,7 +127,7 @@
                                 {{ $t('layout.nav.participants') }}
                               </v-tooltip>
                               <v-tooltip bottom>
-                                <template v-slot:activator="{on, attrs}">
+                                <template #activator="{on, attrs}">
                                   <div class="d-inline-block" v-bind="attrs" v-on="on">
                                     <progress-circle :value="progress(item)" />
                                   </div>

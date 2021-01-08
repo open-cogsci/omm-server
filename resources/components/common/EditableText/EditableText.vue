@@ -13,7 +13,7 @@
           @keydown.esc="editing = false"
           @input="errors = null"
         >
-          <template v-slot:append-outer>
+          <template #append-outer>
             <save-cancel-icon-buttons
               :save-disabled="!validates"
               @clicked-save="save"
@@ -24,7 +24,7 @@
       </v-form>
     </v-col>
     <v-col v-else key="viewing" cols="12">
-      <v-hover v-slot:default="{ hover }">
+      <v-hover v-slot="{ hover }">
         <div class="d-flex align-center" :class="classes">
           <span class="py-1">
             {{ value }}&nbsp;

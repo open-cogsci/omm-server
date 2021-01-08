@@ -18,7 +18,7 @@
           :item-height="80"
           height="340"
         >
-          <template v-slot="{ item }">
+          <template #default="{ item }">
             <v-list-item>
               <v-list-item-content>
                 <v-list-item-title class="black--text" v-text="item.name" />
@@ -28,7 +28,7 @@
               <v-list-item-action>
                 <v-list-item-action-text class="info--text">
                   <v-tooltip bottom>
-                    <template v-slot:activator="{on, attrs}">
+                    <template #activator="{on, attrs}">
                       <div class="d-inline-block" v-bind="attrs" v-on="on">
                         <progress-circle :value="progress(item.id, participant.id)" />
                       </div>

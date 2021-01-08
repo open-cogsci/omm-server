@@ -1,14 +1,13 @@
 import Vuetify from 'vuetify'
 import Vuex from 'vuex'
 import axios from 'axios'
-import faker from 'faker'
 
 // import { Breakpoint } from 'vuetify/lib/services'
 import { mount, createLocalVue } from '@vue/test-utils'
 import { Model } from '@vuex-orm/core'
 import flushPromises from 'flush-promises'
-import ParticipationsPanel from './ParticipationsPanel.vue'
 import * as storeIndex from '@/store'
+import ParticipationsPanel from './ParticipationsPanel.vue'
 
 jest.mock('axios')
 Model.setAxios(axios)

@@ -2,8 +2,8 @@ import Vuetify from 'vuetify'
 import Vuex from 'vuex'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
-import NotificationBox from './NotificationBox.vue'
 import { state, mutations, actions } from '@/store/notifications'
+import NotificationBox from './NotificationBox.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)

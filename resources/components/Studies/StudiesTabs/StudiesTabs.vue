@@ -6,7 +6,7 @@
         {{ $t('layout.nav.studies') }}
       </v-toolbar-title>
       <v-spacer />
-      <template v-slot:extension>
+      <template #extension>
         <v-tabs v-model="openTab" grow centered slider-color="yellow">
           <v-tab :href="`#tab-current`">
             {{ $t('studies.list.current') }}

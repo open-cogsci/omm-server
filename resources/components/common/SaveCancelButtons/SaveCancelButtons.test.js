@@ -1,8 +1,8 @@
 import Vuetify from 'vuetify'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
-import componentToTest from './SaveCancelButtons.vue'
 import { FragmentWrapper } from '@/test/util'
+import componentToTest from './SaveCancelButtons.vue'
 
 const localVue = createLocalVue()
 

@@ -4,9 +4,8 @@ import axios from 'axios'
 
 import { mount, createLocalVue } from '@vue/test-utils'
 import { Model } from '@vuex-orm/core'
-import ManageDialog from './ManageDialog.vue'
-
 import * as storeIndex from '@/store'
+import ManageDialog from './ManageDialog.vue'
 
 jest.mock('axios')
 Model.setAxios(axios)

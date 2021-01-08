@@ -1,10 +1,11 @@
-export const API_PREFIX = '/api/v1'
+export const API_PREFIX = ''
 export const AUTH_PREFIX = `${API_PREFIX}/auth`
 
 // Resources
 export const USERS = `${API_PREFIX}/users`
 export const STUDIES = `${API_PREFIX}/studies`
 export const PARTICIPANTS = `${API_PREFIX}/participants`
+export const PARTICIPATIONS = `${API_PREFIX}/participations`
 export const JOBS = `${API_PREFIX}/jobs`
 
 // Misc routes

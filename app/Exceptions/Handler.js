@@ -22,7 +22,7 @@ class ExceptionHandler extends BaseExceptionHandler {
    */
   handle (error, { request, response }) {
     // response.status(error.status).send(error.message)
-    return super.handle(...arguments)
+    return super.handle(error, { request, response })
   }
 
   /**
@@ -36,6 +36,7 @@ class ExceptionHandler extends BaseExceptionHandler {
    * @return {void}
    */
   report (error, { request }) {
+    // eslint-disable-next-line no-console
     console.error(error)
   }
 }

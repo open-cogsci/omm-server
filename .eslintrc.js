@@ -2,29 +2,22 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    node: true,
-    jest: true
+    node: true
   },
   globals: {
     use: true
   },
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: 'babel-eslint',
+    sourceType: 'module'
   },
-  plugins: [
-    'vuetify'
-  ],
   extends: [
     '@nuxtjs',
-    'plugin:nuxt/recommended',
-    'plugin:vue/recommended'
+    'plugin:nuxt/recommended'
   ],
   // add your custom rules here
   rules: {
-    'nuxt/no-cjs-in-config': 'off',
-    'vuetify/no-deprecated-classes': 'error',
-    'vuetify/grid-unknown-attributes': 'error',
-    'vuetify/no-legacy-grid': 'error'
+    'nuxt/no-cjs-in-config': 'off'
   },
   ignorePatterns: ['resources/test/__snapshots__/**/*.js']
 }
