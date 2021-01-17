@@ -357,6 +357,35 @@ class Study extends Model {
     return finished
   }
 
+  async getParticipantQueues () {
+    await Database.query(`
+      select *
+        from (select
+            pp.id pp_id,
+            studies.id study_id,
+            pp.name participant,
+            studies.name study,
+            row_number() over (
+              partition by
+                pp.name
+              order by
+                ptcp.priority desc,
+                ptcp.status_id desc,
+                studies.created_at asc
+              ) as ranking
+          from participants as pp
+          left join
+            participations as ptcp on ptcp.participant_id = pp.id
+          left join
+            studies on studies.id = ptcp.study_id
+          order by
+            pp.name desc,
+            ranking asc
+          ) ranked
+        where ranked.study_id = ?
+      `)
+  }
+
   /* Private functions */
 
   /**
