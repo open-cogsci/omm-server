@@ -357,8 +357,8 @@ class Study extends Model {
     return finished
   }
 
-  async getParticipantQueues () {
-    await Database.query(`
+  async getParticipantQueues (ptcpId = null) {
+    let query = `
       select *
         from (select
             pp.id pp_id,
@@ -367,7 +367,7 @@ class Study extends Model {
             studies.name study,
             row_number() over (
               partition by
-                pp.name
+                pp.id
               order by
                 ptcp.priority desc,
                 ptcp.status_id desc,
@@ -382,8 +382,13 @@ class Study extends Model {
             pp.name desc,
             ranking asc
           ) ranked
-        where ranked.study_id = ?
-      `)
+        where ranked.study_id = ?`
+    const args = [this.id]
+    if (ptcpId !== null) {
+      args.push(ptcpId)
+      query += ' and pp.id = ?'
+    }
+    return await Database.raw(query, args)
   }
 
   /* Private functions */

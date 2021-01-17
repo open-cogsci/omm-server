@@ -64,13 +64,13 @@ Route.group(() => {
     .as('studies.assign_participants')
   Route.delete('/studies/:id/participants', 'StudyController.revokeParticipants')
     .as('studies.revoke_participants')
-
+  Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
+  Route.get('/studies/:id/queue/:ptcpid?', 'StudyController.participantQueue').as('studies.queue')
   Route.resource('studies', 'StudyController').apiOnly()
     .validator(new Map([
       [['studies.store'], ['SaveStudy']],
       [['studies.update'], ['SaveStudy']]
     ]))
-  Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
 
   Route.get('/participations/trend', 'DashboardController.participationTrend')
     .as('stats.participation_trend')
