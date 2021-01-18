@@ -1245,10 +1245,10 @@ class StudyController {
   */
   async participantQueue ({ params, auth }) {
     const { id, ptcpid } = params
-    const study = auth.studies.query()
+    const study = await auth.user.studies()
       .where('id', id)
       .first()
-    const data = await study.getParticipantQueues(ptcpid)
+    const data = await study.getParticipantQueuePositions(ptcpid)
     return { data }
   }
 }
