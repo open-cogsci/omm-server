@@ -20,12 +20,16 @@
             <v-list-item-title v-text="item.name" />
             <v-list-item-subtitle v-text="item.identifier" />
             <queue-status
+              :participant="item.id"
               :loading="loadingQueue"
               :position="queue[item.id]"
             />
           </v-list-item-content>
           <v-list-item-action v-if="editable" style="max-width: 65px">
-            <priority-dial :participation="item.pivot" />
+            <priority-dial
+              :participation="item.pivot"
+              @changed-priority="$emit('changed-priority', $event)"
+            />
           </v-list-item-action>
           <v-list-item-avatar>
             <progress-circle v-bind="progress(item)" :size="40" />

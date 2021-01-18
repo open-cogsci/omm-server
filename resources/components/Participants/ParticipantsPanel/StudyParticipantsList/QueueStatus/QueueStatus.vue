@@ -1,9 +1,9 @@
 <template>
   <v-list-item-subtitle v-bind="decorations">
-    <div v-if="loading === 'all' || loading === 1" class="pr-5">
+    <div v-if="loading === 'all' || loading === participant" class="pr-5">
       <v-progress-linear
         class="d-inline-block"
-        height="1px"
+        height="2px"
         indeterminate
       />
     </div>
@@ -23,6 +23,10 @@ export default {
         queue_position: -1
       })
     },
+    participant: {
+      type: Number,
+      required: true
+    },
     loading: {
       type: [String, Number, Boolean],
       default: false
@@ -31,9 +35,9 @@ export default {
   computed: {
     message () {
       if (this.position.queue_position > 1) {
-        return `Queued at position ${this.position.queue_position - 1}`
+        return this.$t('participants.priority.queued') + ` ${this.position.queue_position - 1}`
       } else {
-        return 'First to run'
+        return this.$t('participants.priority.first')
       }
     },
     decorations () {

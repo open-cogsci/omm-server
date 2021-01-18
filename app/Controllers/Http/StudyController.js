@@ -1244,7 +1244,7 @@ class StudyController {
   *         description: Unexpected error
   */
   async participantQueue ({ params, auth }) {
-    const { id, ptcpid } = params
+    const { id, ptcpid = null } = params
     const study = await auth.user.studies()
       .where('id', id)
       .first()

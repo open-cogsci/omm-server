@@ -54,6 +54,7 @@
             :loading-queue="loading.queue"
             :loading="loading.initial"
             :fetching-more="loading.participants"
+            @changed-priority="fetchQueue"
             @scroll-end="loadMore"
           />
         </v-card-text>

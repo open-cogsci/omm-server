@@ -388,10 +388,14 @@ class Study extends Model {
             queue_position asc
           ) ranked
         where ranked.study_id = ?`
+
     const args = [this.id]
-    if (isNumber(ptcpID)) {
-      args.push(ptcpID)
-      query += ' and pp.id = ?'
+    if (ptcpID !== null) {
+      const id = parseFloat(ptcpID)
+      if (!isNaN(id)) {
+        args.push(id)
+        query += ' and ranked.participant_id = ?'
+      }
     }
     const results = await Database.raw(query, args)
     return results.length ? results[0] : results
