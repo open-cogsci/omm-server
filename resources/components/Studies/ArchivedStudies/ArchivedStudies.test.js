@@ -72,10 +72,9 @@ describe('ArchivedStudies', () => {
     mountFunc()
     expect(axios.request).toHaveBeenCalledWith({
       method: 'get',
-      baseURL: STUDIES,
       save: true,
       dataKey: 'data',
-      url: '',
+      url: STUDIES,
       params: { active: false }
     })
   })
