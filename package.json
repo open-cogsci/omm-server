@@ -54,7 +54,7 @@
     "vuedraggable": "^2.24.3",
     "vuex-pathify": "^1.4.5",
     "vuex-router-sync": "^5.0.0",
-    "workerpool": "^6.0.3",
+    "workerpool": "^6.0.4",
     "xlsx": "^0.16.9"
   },
   "devDependencies": {
