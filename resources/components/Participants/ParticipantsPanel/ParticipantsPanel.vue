@@ -50,8 +50,11 @@
             :editable="userCanEdit"
             :total-jobs="study.jobs_count"
             :participants="participants"
+            :queue="queue"
+            :loading-queue="loading.queue"
             :loading="loading.initial"
             :fetching-more="loading.participants"
+            @changed-priority="fetchQueue"
             @scroll-end="loadMore"
           />
         </v-card-text>
@@ -87,6 +90,7 @@
 <script>
 import { mapActions } from 'vuex'
 import { processErrors } from '@/assets/js/errorhandling'
+import { keyBy } from 'lodash'
 
 export default {
   components: {
@@ -117,6 +121,7 @@ export default {
         initial: false,
         participants: false,
         stats: false,
+        queue: false,
         data: null
       },
       pagination: {
@@ -126,7 +131,8 @@ export default {
         total: 0
       },
       ptcpListCtrHeight: 0,
-      stats: {}
+      stats: {},
+      queue: {}
     }
   },
   computed: {
@@ -148,6 +154,7 @@ export default {
       }
       this.fetchParticipants()
       this.fetchStats()
+      this.fetchQueue()
     }
   },
   async mounted () {
@@ -155,6 +162,7 @@ export default {
     this.loading.initial = true
     await this.fetchParticipants()
     await this.fetchStats()
+    await this.fetchQueue()
     this.loading.initial = false
   },
   methods: {
@@ -185,6 +193,21 @@ export default {
         processErrors(e, this.notify)
       } finally {
         this.loading.stats = false
+      }
+    },
+    async fetchQueue (ptcpID = null) {
+      if (!this.study?.id) { return }
+      this.loading.queue = ptcpID ?? 'all'
+      try {
+        const results = await this.study.fetchParticipantQueuePositions(ptcpID)
+        this.queue = {
+          ...this.queue,
+          ...keyBy(results, 'participant_id')
+        }
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.loading.queue = false
       }
     },
     async generateDataFile (format) {

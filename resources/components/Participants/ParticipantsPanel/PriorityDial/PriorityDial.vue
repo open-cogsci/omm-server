@@ -45,6 +45,7 @@ export default {
     async update (val) {
       try {
         await this.participation.setPriority(val)
+        this.$emit('changed-priority', this.participation.participant_id)
       } catch (e) {
         if (isArray(e.response.data)) {
           this.notify({ message: e.response.data[0].message, color: 'error' })

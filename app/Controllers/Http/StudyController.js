@@ -1205,5 +1205,51 @@ class StudyController {
     }
     return { data }
   }
+
+  /**
+  * @swagger
+  * /studies/{id}/queue/{ptcpid}:
+  *   get:
+  *     tags:
+  *       - Studies
+  *     security:
+  *       - JWT: []
+  *     summary: >
+  *         Get queue positions of participants for the specified study.
+  *     parameters:
+  *       - in: path
+  *         name: id
+  *         required: true
+  *         type: integer
+  *         description: The ID of the study to retrieve
+  *       - in: path
+  *         name: ptcpid
+  *         required: false
+  *         type: integer
+  *         description: The ID of the participant
+  *     responses:
+  *       200:
+  *         description: The study with its related data.
+  *         schema:
+  *           properties:
+  *             data:
+  *               $ref: '#/definitions/StudyWithRelations'
+  *       400:
+  *         description: The specified id is invalid (e.g. not the expected dtype).
+  *       401:
+  *         description: Unauthorized.
+  *       404:
+  *         description: The study with the specified id was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+  async participantQueue ({ params, auth }) {
+    const { id, ptcpid = null } = params
+    const study = await auth.user.studies()
+      .where('id', id)
+      .first()
+    const data = await study.getParticipantQueuePositions(ptcpid)
+    return { data }
+  }
 }
 module.exports = StudyController

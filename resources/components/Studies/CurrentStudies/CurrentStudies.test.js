@@ -68,10 +68,9 @@ describe('CurrentStudies', () => {
     mountFunc()
     expect(axios.request).toHaveBeenCalledWith({
       method: 'get',
-      baseURL: STUDIES,
+      url: STUDIES,
       save: true,
-      dataKey: 'data',
-      url: ''
+      dataKey: 'data'
     })
   })
 
@@ -115,14 +114,13 @@ describe('CurrentStudies', () => {
     expect(wrapper.vm.saving).toBe(true)
     expect(axios.request).toHaveBeenCalledWith({
       method: 'post',
-      baseURL: '/api/v1/studies',
       data: {
         description: 'Beep',
         name: 'Boop'
       },
       dataKey: 'data',
       save: true,
-      url: ''
+      url: STUDIES
     })
     await flushPromises()
     // After the operation is complete, the saving indicator should be deactivated
