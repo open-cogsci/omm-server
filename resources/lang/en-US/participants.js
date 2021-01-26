@@ -34,5 +34,9 @@ export default {
       title: 'Add a new Participant',
       subtitle: 'Please enter the information below'
     }
+  },
+  priority: {
+    queued: 'Queued at position',
+    first: 'First to run'
   }
 }

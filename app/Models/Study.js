@@ -1,6 +1,6 @@
 'use strict'
-
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
+
 const fs = require('fs').promises
 const { isArray } = require('lodash')
 const { formatISO9075 } = require('date-fns')
@@ -284,7 +284,7 @@ class Study extends Model {
   /**
    * Exports the collected data of the study as json.
    *
-   * @param {string} [engine='mysql']
+   * @param {string} [db='mysql']
    * @returns Array
    * @memberof Study
    */
@@ -355,6 +355,50 @@ class Study extends Model {
         .update({ status_id: statusID })
     }
     return finished
+  }
+
+  /**
+   * Gets the participant queue positions for the current study
+   *
+   * @param {*} [ptcpID=null]
+   * @return {*}
+   * @memberof Study
+   */
+  async getParticipantQueuePositions (ptcpID = null) {
+    let query = `
+      select ranked.participant_id, ranked.queue_position
+        from (select
+            pp.id participant_id,
+            studies.id study_id,
+            row_number() over (
+              partition by
+                pp.id
+              order by
+                ptcp.priority desc,
+                ptcp.status_id desc,
+                studies.created_at asc
+              ) as queue_position
+          from participants as pp
+          left join
+            participations as ptcp on ptcp.participant_id = pp.id
+          left join
+            studies on studies.id = ptcp.study_id
+          order by
+            participant_id asc,
+            queue_position asc
+          ) ranked
+        where ranked.study_id = ?`
+
+    const args = [this.id]
+    if (ptcpID !== null) {
+      const id = parseFloat(ptcpID)
+      if (!isNaN(id)) {
+        args.push(id)
+        query += ' and ranked.participant_id = ?'
+      }
+    }
+    const results = await Database.raw(query, args)
+    return results.length ? results[0] : results
   }
 
   /* Private functions */

@@ -34,5 +34,9 @@ export default {
       title: 'Voeg participant toe',
       subtitle: 'Vul hieronder de informatie in'
     }
+  },
+  priority: {
+    queued: 'In de wachtrij op positie',
+    first: 'Aan de beurt'
   }
 }

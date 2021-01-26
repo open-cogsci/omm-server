@@ -1,5 +1,5 @@
 import { Model } from '@vuex-orm/core'
-import keyBy from 'lodash/keyBy'
+import { isNumber, keyBy } from 'lodash'
 import { STUDIES } from '@/assets/js/endpoints'
 import User from './User'
 import StudyUser from './StudyUser'
@@ -272,6 +272,18 @@ export default class Study extends Model {
    */
   async fetchParticipationStats (config) {
     const reply = await this.constructor.api().get(`${STUDIES}/${this.id}/stats`, {
+      save: false,
+      ...config
+    })
+    return reply.response.data.data
+  }
+
+  async fetchParticipantQueuePositions (ptcpID = null, config) {
+    let endpoint = `${STUDIES}/${this.id}/queue`
+    if (isNumber(ptcpID)) {
+      endpoint += `/${ptcpID}`
+    }
+    const reply = await this.constructor.api().get(endpoint, {
       save: false,
       ...config
     })

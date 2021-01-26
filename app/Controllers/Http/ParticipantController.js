@@ -412,7 +412,7 @@ class ParticipantController {
     }
 
     // Not very efficient to retrieve the participant from the DB twice (again in query below), but
-    // currently the simples solution...
+    // currently the simplest solution...
     const study = await ptcp.studies()
       .with('files')
       .with('participants', (query) => {

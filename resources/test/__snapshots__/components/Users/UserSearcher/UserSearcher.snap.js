@@ -3,7 +3,7 @@
 exports[`UserSearcher matches its snapshot 1`] = `
 <div class="row align-center">
   <div class="col-sm-9 col-12">
-    <div class="v-input v-input--hide-details theme--light v-text-field v-text-field--enclosed v-text-field--outlined v-select v-autocomplete">
+    <div class="v-input v-input--hide-details v-input--is-label-active v-input--is-dirty theme--light v-text-field v-text-field--enclosed v-text-field--outlined v-select v-autocomplete">
       <div class="v-input__prepend-outer">
         <div class="v-input__icon v-input__icon--prepend">
           <i aria-hidden="true" class="v-icon notranslate mdi mdi-account-search theme--light"></i>
@@ -17,7 +17,7 @@ exports[`UserSearcher matches its snapshot 1`] = `
             </legend>
           </fieldset>
           <div class="v-select__slot">
-            <label for="input-2" class="v-label theme--light" style="left: 0px; position: absolute;">studies.dialogs.collaborators.search</label>
+            <label for="input-2" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">studies.dialogs.collaborators.search</label>
             <input id="input-2" type="text" autocomplete="off">
             <div class="v-input__append-inner">
               <div class="v-input__icon v-input__icon--append">

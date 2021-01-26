@@ -19,9 +19,17 @@
           <v-list-item-content>
             <v-list-item-title v-text="item.name" />
             <v-list-item-subtitle v-text="item.identifier" />
+            <queue-status
+              :participant="item.id"
+              :loading="loadingQueue"
+              :position="queue[item.id]"
+            />
           </v-list-item-content>
           <v-list-item-action v-if="editable" style="max-width: 65px">
-            <priority-dial :participation="item.pivot" />
+            <priority-dial
+              :participation="item.pivot"
+              @changed-priority="$emit('changed-priority', $event)"
+            />
           </v-list-item-action>
           <v-list-item-avatar>
             <progress-circle v-bind="progress(item)" :size="40" />
@@ -37,16 +45,26 @@
 
 <script>
 import { debounce } from 'lodash'
+import QueueStatus from './QueueStatus/QueueStatus.vue'
 
 export default {
   components: {
     ProgressCircle: () => import('@/components/common/ProgressCircle'),
-    PriorityDial: () => import('@/components/Participants/ParticipantsPanel/PriorityDial')
+    PriorityDial: () => import('@/components/Participants/ParticipantsPanel/PriorityDial'),
+    QueueStatus
   },
   props: {
     participants: {
       type: Array,
       default: () => []
+    },
+    queue: {
+      type: Object,
+      default: () => ({})
+    },
+    loadingQueue: {
+      type: [String, Number, Boolean],
+      default: false
     },
     loading: {
       type: Boolean,
@@ -89,6 +107,12 @@ export default {
       const element = event.currentTarget || event.target
       if (element && element.scrollHeight - element.scrollTop === element.clientHeight) {
         this.$emit('scroll-end')
+      }
+    },
+    queueStatus (ptcpID) {
+      return {
+        text: 'Queued at position 4',
+        class: 'success--text'
       }
     }
   }
