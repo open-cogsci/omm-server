@@ -105,6 +105,7 @@ import { pick, debounce, isFunction } from 'lodash'
 import { mapActions } from 'vuex'
 import { sync } from 'vuex-pathify'
 import { processErrors } from '@/assets/js/errorhandling'
+import StudyActions from '@/components/Studies/page/StudyActions'
 
 const defaultPagination = {
   page: 1,
@@ -118,8 +119,8 @@ const defaultPagination = {
 export default {
   name: 'Study',
   components: {
+    StudyActions,
     StudyTitle: () => import('@/components/Studies/page/StudyTitle'),
-    StudyActions: () => import('@/components/Studies/page/StudyActions'),
     JobsTable: () => import('@/components/Studies/page/JobsTable'),
     UploadExperimentDialog: () => import('@/components/Studies/dialogs/UploadExperimentDialog'),
     UploadJobsDialog: () => import('@/components/Studies/dialogs/UploadJobsDialog'),
