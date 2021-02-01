@@ -27,7 +27,8 @@
       >
         <div>
           <div class="text-h4 text-md-h2">
-            {{ studyProgress }}<span class="caption">%</span>
+            {{ Math.round(studyProgress) }}
+            <span class="caption">%</span>
           </div>
           <div class="caption">
             {{ $t('stats.complete') }}
