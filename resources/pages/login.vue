@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card width="375px">
     <v-card-title class="justify-center">
       <v-img
         :src="require('@/assets/img/cogsci.png')"
@@ -38,9 +38,11 @@
           </v-col>
         </v-row>
       </v-form>
-      <v-alert v-if="status" :type="status.type">
-        {{ status.message }}
-      </v-alert>
+      <v-expand-transition>
+        <v-alert v-if="status" :type="status.type">
+          {{ status.message }}
+        </v-alert>
+      </v-expand-transition>
     </v-card-text>
     <v-card-actions>
       <v-spacer />

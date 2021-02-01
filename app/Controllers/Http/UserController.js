@@ -506,17 +506,18 @@ class UserController {
   async login ({ request, auth, response }) {
     const payload = request.only(['uid', 'password'])
 
+    let errorResponse = null
     const user = await Persona.verify(payload, (user) => {
       if (user.account_status === 'inactive') {
-        return response.unauthorized({
+        errorResponse = response.unauthorized({
           message: 'Your account has been suspended. Please contact your administrator'
         })
       }
     })
-
+    if (errorResponse !== null) { return errorResponse }
     if (user.account_status === 'pending') {
       return response.unauthorized({
-        message: 'Please verify your email address using the email that has been sent to it.'
+        message: 'Please verify your email address first. Check your mailbox.'
       })
     }
 
