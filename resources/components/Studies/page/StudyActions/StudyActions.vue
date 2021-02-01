@@ -92,6 +92,8 @@
         <div v-html="deleteBody" />
       </confirmation-dialog>
     </v-item-group>
+    <!-- Ugly hack to include v-btn-toggle class in final build -->
+    <v-btn-toggle v-if="alwaysFalse" />
   </v-skeleton-loader>
 </template>
 
@@ -129,7 +131,8 @@ export default {
   data () {
     return {
       deleteDialog: false,
-      archiveDialog: false
+      archiveDialog: false,
+      alwaysFalse: false
     }
   },
   computed: {
