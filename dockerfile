@@ -14,9 +14,6 @@ FROM node:14-alpine
 WORKDIR /img
 ENV ENV_SILENT=true
 ENV NODE_ENV=production
-ENV PORT=3000
-ENV BASE_URL=http://${HOST}:${PORT}
-ENV CACHE_VIEWS=false
 COPY --from=builder ./img .
 CMD node ace migration:run --force && \
     node ace seed --files ProductionSeeder.js --force && \
