@@ -9,7 +9,7 @@ export default class StudyUser extends Model {
     return {
       study_id: this.attr(null),
       user_id: this.attr(null),
-      is_owner: this.boolean(null),
+      is_owner: this.boolean(false),
       access_permission_id: this.attr(null)
     }
   }

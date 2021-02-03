@@ -109,9 +109,7 @@
       </v-menu>
     </v-app-bar>
     <v-main>
-      <v-container fluid class="fill-height py-3">
-        <nuxt />
-      </v-container>
+      <nuxt />
     </v-main>
     <v-footer :fixed="false" app>
       <span>&copy; 2019-2020 le Centre National de la Recherche</span>

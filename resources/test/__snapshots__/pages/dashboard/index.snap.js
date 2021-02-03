@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Dashboard Index matches its snapshot 1`] = `
-<div class="container fill-height py-0">
+<div class="container fill-height">
   <div class="row fill-height">
     <div class="d-flex flex-column fill-height col col-12">
       <div class="row" style="max-height: 64px;">

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height align-start">
+  <v-container class="fill-height">
     <new-participant-dialog
       ref="dialog"
       v-model="dialog"

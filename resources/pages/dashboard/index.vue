@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height py-0">
+  <v-container class="fill-height">
     <v-row class="fill-height">
       <v-col cols="12" class="d-flex flex-column fill-height">
         <v-row style="max-height: 64px">

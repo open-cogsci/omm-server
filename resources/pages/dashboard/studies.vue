@@ -1,5 +1,5 @@
 <template>
-  <v-row class="limit-height">
+  <v-row class="limit-height pt-3">
     <v-col cols="12" md="4" lg="3">
       <studies-tabs />
     </v-col>
@@ -40,7 +40,7 @@ export default {
 
 <style lang="scss">
   .limit-height {
-    height: calc(100% + 24px);
+    height: calc(100% + 32px);
     overflow: auto;
   }
 </style>

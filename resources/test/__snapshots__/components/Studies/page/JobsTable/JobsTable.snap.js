@@ -6,7 +6,7 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
     <div class="v-skeleton-loader theme--light">
       <transition-stub name="fade-transition">
         <div class="v-data-table v-data-table--dense v-data-table--fixed-header v-data-table--has-bottom theme--light">
-          <div class="v-data-table__wrapper" style="height: 368px;">
+          <div class="v-data-table__wrapper" style="height: 318px;">
             <table>
               <colgroup></colgroup>
               <thead class="v-data-table-header">

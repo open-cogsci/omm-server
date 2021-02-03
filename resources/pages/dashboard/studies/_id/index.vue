@@ -244,9 +244,10 @@ export default {
     async fetchStudy (studyID, options) {
       try {
         await this.Study.fetchById(studyID, {
-          persistOptions: {
-            create: ['users']
-          },
+          /* Below breaks the studies list, if studies are shared */
+          // persistOptions: {
+          //   create: ['users']
+          // },
           ...options
         })
       } catch (e) {

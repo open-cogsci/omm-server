@@ -73,6 +73,7 @@ export default {
   computed: {
     studyOwners () {
       return this.studies.reduce((result, study) => {
+        console.log(study.id, study.users)
         result[study.id] = study?.users.find(user => user.pivot.is_owner)
         return result
       }, {})
@@ -80,6 +81,7 @@ export default {
   },
   methods: {
     userIsOwner (studyID) {
+      console.log(this.studyOwners)
       return this.$auth.user.id === this.studyOwners[studyID].id
     }
   }
