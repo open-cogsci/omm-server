@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Login matches its snapshot 1`] = `
-<div class="v-card v-sheet theme--light">
+<div class="v-card v-sheet theme--light" style="width: 375px;">
   <div class="v-card__title justify-center">
     <div class="v-image v-responsive mx-2 theme--light" style="max-height: 40px; max-width: 40px;">
       <div class="v-responsive__content"></div>
@@ -50,6 +50,8 @@ exports[`Login matches its snapshot 1`] = `
         </div>
       </div>
     </form>
+    <transition-stub name="expand-transition">
+    </transition-stub>
   </div>
   <div class="v-card__actions">
     <div class="spacer"></div>
