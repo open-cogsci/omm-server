@@ -36,12 +36,12 @@ exports[`Password wrapper matches its snapshot 1`] = `
   </div>
   <div class="v-card__actions">
     <div class="spacer"></div>
-    <nuxt-link-stub class="v-btn v-btn--contained v-btn--router theme--light v-size--default primary">
+    <nuxt-link-stub class="v-btn v-btn--is-elevated v-btn--has-bg v-btn--router theme--light v-size--default primary">
       <span class="v-btn__content">
         password_recover.buttons.signin
       </span>
     </nuxt-link-stub>
-    <button type="button" class="v-btn v-btn--contained theme--light v-size--default success">
+    <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default success">
       <span class="v-btn__content">
         password_recover.buttons.email
         <i aria-hidden="true" class="v-icon notranslate v-icon--right mdi mdi-send theme--light"></i>

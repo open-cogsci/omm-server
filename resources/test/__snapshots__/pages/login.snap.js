@@ -55,8 +55,8 @@ exports[`Login matches its snapshot 1`] = `
   </div>
   <div class="v-card__actions">
     <div class="spacer"></div>
-    <nuxt-link-stub class="v-btn v-btn--contained v-btn--router theme--light v-size--default">login.buttons.recover</nuxt-link-stub>
-    <button type="button" class="v-btn v-btn--contained theme--light v-size--default primary">
+    <nuxt-link-stub class="v-btn v-btn--is-elevated v-btn--has-bg v-btn--router theme--light v-size--default">login.buttons.recover</nuxt-link-stub>
+    <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary">
       <span class="v-btn__content">
         login.buttons.signin
         <i aria-hidden="true" class="v-icon notranslate v-icon--right mdi mdi-login theme--light"></i>

@@ -38,14 +38,14 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
             </div>
             <div class="v-data-footer__pagination">–</div>
             <div class="v-data-footer__icons-before">
-              <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--flat v-btn--icon v-btn--round v-btn--text theme--light v-size--default" aria-label="Previous page">
+              <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--icon v-btn--round v-btn--text theme--light v-size--default" aria-label="Previous page">
                 <span class="v-btn__content">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-left theme--light"></i>
                 </span>
               </button>
             </div>
             <div class="v-data-footer__icons-after">
-              <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--flat v-btn--icon v-btn--round v-btn--text theme--light v-size--default" aria-label="Next page">
+              <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--icon v-btn--round v-btn--text theme--light v-size--default" aria-label="Next page">
                 <span class="v-btn__content">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-right theme--light"></i>
                 </span>
