@@ -58,7 +58,7 @@
     "xlsx": "^0.16.9"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/plugin-transform-runtime": "^7.12.10",
     "@mdi/font": "^5.9.55",
     "@nuxtjs/eslint-config": "^5.0.0",
