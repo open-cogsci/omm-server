@@ -34,7 +34,7 @@
     "@adonisjs/shield": "^1.0.4",
     "@adonisjs/validator": "^5.0.6",
     "@nuxtjs/auth": "^4.9.1",
-    "@nuxtjs/axios": "^5.12.5",
+    "@nuxtjs/axios": "^5.13.0",
     "@vuex-orm/core": "^0.36.3",
     "@vuex-orm/plugin-axios": "^0.9.4",
     "adonis-bumblebee": "^2.2.0",
@@ -58,8 +58,8 @@
     "xlsx": "^0.16.9"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/plugin-transform-runtime": "^7.12.13",
     "@mdi/font": "^5.9.55",
     "@nuxtjs/eslint-config": "^5.0.0",
     "@nuxtjs/eslint-module": "^3.0.2",
