@@ -15,7 +15,7 @@ services:
 
   server:
     container_name: openmonkeymind
-    image: 57d32f2847c3 # docker.pkg.github.com/open-cogsci/omm-server/omm-server:latest
+    image: docker.pkg.github.com/open-cogsci/omm-server/omm-server:latest
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0
