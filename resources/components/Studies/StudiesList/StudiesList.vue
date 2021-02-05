@@ -36,16 +36,20 @@
               <v-list-item-title v-text="item.name" />
               <v-list-item-subtitle v-text="item.description" />
             </v-list-item-content>
-            <v-list-item-action v-if="!userIsOwner(item.id)" class="align-self-center">
-              <v-tooltip bottom>
-                <template #activator="{on, attrs}">
-                  <v-icon color="primary" v-bind="attrs" v-on="on">
-                    mdi-share-variant
-                  </v-icon>
-                </template>
-                {{ $t('studies.list.shared_by') }} {{ studyOwners[item.id].name }}
-              </v-tooltip>
-            </v-list-item-action>
+            <v-fab-transition>
+              <v-list-item-action v-show="!userIsOwner(item.id)" class="align-self-center">
+                <v-tooltip bottom>
+                  <template #activator="{on, attrs}">
+                    <v-icon color="primary" v-bind="attrs" v-on="on">
+                      mdi-share-variant
+                    </v-icon>
+                  </template>
+                  {{ $t('studies.list.shared_by') }} {{
+                    studyOwners[item.id] && studyOwners[item.id].name
+                  }}
+                </v-tooltip>
+              </v-list-item-action>
+            </v-fab-transition>
           </v-list-item>
           <v-divider />
         </template>
@@ -73,7 +77,6 @@ export default {
   computed: {
     studyOwners () {
       return this.studies.reduce((result, study) => {
-        console.log(study.id, study.users)
         result[study.id] = study?.users.find(user => user.pivot.is_owner)
         return result
       }, {})
@@ -81,7 +84,7 @@ export default {
   },
   methods: {
     userIsOwner (studyID) {
-      console.log(this.studyOwners)
+      if (!this.studyOwners[studyID]) { return true }
       return this.$auth.user.id === this.studyOwners[studyID].id
     }
   }

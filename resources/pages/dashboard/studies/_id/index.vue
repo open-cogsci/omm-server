@@ -117,7 +117,7 @@ const defaultPagination = {
 }
 
 export default {
-  name: 'Study',
+  name: 'StudyPage',
   components: {
     StudyActions,
     StudyTitle: () => import('@/components/Studies/page/StudyTitle'),
@@ -244,10 +244,9 @@ export default {
     async fetchStudy (studyID, options) {
       try {
         await this.Study.fetchById(studyID, {
-          /* Below breaks the studies list, if studies are shared */
-          // persistOptions: {
-          //   create: ['users']
-          // },
+          persistOptions: {
+            create: ['users']
+          },
           ...options
         })
       } catch (e) {
