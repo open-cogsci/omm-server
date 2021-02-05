@@ -168,7 +168,7 @@ export default {
     },
     tableHeight () {
       const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
-      return vh - 400
+      return vh - 450
     }
   },
   methods: {

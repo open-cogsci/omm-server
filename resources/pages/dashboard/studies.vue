@@ -1,6 +1,6 @@
 <template>
-  <v-row class="limit-height">
-    <v-col cols="12" md="4" lg="3" class="py-0">
+  <v-row class="limit-height pt-3">
+    <v-col cols="12" md="4" lg="3">
       <studies-tabs />
     </v-col>
     <v-col v-if="$vuetify.breakpoint.mdAndUp" cols="12" md="8" lg="9">
@@ -40,7 +40,7 @@ export default {
 
 <style lang="scss">
   .limit-height {
-    height: calc(100% + 24px);
+    height: calc(100% + 32px);
     overflow: auto;
   }
 </style>

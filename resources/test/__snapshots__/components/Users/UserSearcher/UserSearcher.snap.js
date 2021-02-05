@@ -34,12 +34,12 @@ exports[`UserSearcher matches its snapshot 1`] = `
   </div>
   <div class="text-right col-sm-3 col-12">
     <div class="v-btn-toggle v-item-group theme--light">
-      <button type="button" disabled="disabled" class="v-btn v-btn--contained v-btn--disabled theme--light v-size--default">
+      <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--has-bg theme--light v-size--default">
         <span class="v-btn__content">
           <i aria-hidden="true" class="v-icon notranslate mdi mdi-plus theme--light white--text"></i>
         </span>
       </button>
-      <button type="button" class="v-btn v-btn--contained theme--light v-size--default">
+      <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default">
         <span class="v-btn__content">
           <i aria-hidden="true" class="v-icon notranslate mdi mdi-cancel theme--light"></i>
         </span>

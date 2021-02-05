@@ -21,7 +21,7 @@ exports[`ParticipantsPanel matches its snapshot 1`] = `
       </div>
       <div class="v-card__actions">
         <div class="spacer"></div>
-        <button type="button" class="v-btn v-btn--contained theme--light v-size--default primary">
+        <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary">
           <span class="v-btn__content">
             <i aria-hidden="true" class="v-icon notranslate v-icon--left mdi mdi-download theme--light"></i>
             study_participants.participants.data

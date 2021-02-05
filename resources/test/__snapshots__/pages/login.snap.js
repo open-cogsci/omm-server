@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Login matches its snapshot 1`] = `
-<div class="v-card v-sheet theme--light">
+<div class="v-card v-sheet theme--light" style="width: 375px;">
   <div class="v-card__title justify-center">
     <div class="v-image v-responsive mx-2 theme--light" style="max-height: 40px; max-width: 40px;">
       <div class="v-responsive__content"></div>
@@ -50,11 +50,13 @@ exports[`Login matches its snapshot 1`] = `
         </div>
       </div>
     </form>
+    <transition-stub name="expand-transition">
+    </transition-stub>
   </div>
   <div class="v-card__actions">
     <div class="spacer"></div>
-    <nuxt-link-stub class="v-btn v-btn--contained v-btn--router theme--light v-size--default">login.buttons.recover</nuxt-link-stub>
-    <button type="button" class="v-btn v-btn--contained theme--light v-size--default primary">
+    <nuxt-link-stub class="v-btn v-btn--is-elevated v-btn--has-bg v-btn--router theme--light v-size--default">login.buttons.recover</nuxt-link-stub>
+    <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary">
       <span class="v-btn__content">
         login.buttons.signin
         <i aria-hidden="true" class="v-icon notranslate v-icon--right mdi mdi-login theme--light"></i>

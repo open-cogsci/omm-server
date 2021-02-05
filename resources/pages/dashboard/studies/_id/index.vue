@@ -117,7 +117,7 @@ const defaultPagination = {
 }
 
 export default {
-  name: 'Study',
+  name: 'StudyPage',
   components: {
     StudyActions,
     StudyTitle: () => import('@/components/Studies/page/StudyTitle'),

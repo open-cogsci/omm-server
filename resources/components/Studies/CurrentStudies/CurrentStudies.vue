@@ -60,15 +60,7 @@ export default {
     async loadStudies () {
       this.loading = true
       try {
-        const response = await this.Study.fetch()
-        // Attach studies to local representation of logged in user.
-        this.User.insertOrUpdate({
-          where: this.$auth.user.id,
-          data: {
-            id: this.$auth.user.id,
-            studies: response.entities.studies
-          }
-        })
+        await this.Study.fetch()
       } catch (e) {
         processErrors(e, this.notify)
       } finally {

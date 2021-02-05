@@ -58,7 +58,7 @@ exports[`ResetPasswordForm wrapper matches its snapshot 1`] = `
     </div>
     <div class="row">
       <div class="text-right col col-12">
-        <button type="button" class="v-btn v-btn--contained theme--light v-size--default primary">password_reset.buttons.change</button>
+        <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary">password_reset.buttons.change</button>
       </div>
     </div>
   </div>

@@ -59,7 +59,7 @@ exports[`Account matches its snapshot 1`] = `
                 </div>
                 <div class="row">
                   <div class="text-right col col-12">
-                    <button type="button" class="v-btn v-btn--contained theme--light v-size--default primary">
+                    <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary">
                       <span class="v-btn__content">
                         buttons.save
                       </span>

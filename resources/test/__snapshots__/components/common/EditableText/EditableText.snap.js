@@ -8,7 +8,7 @@ exports[`EditableText should match its snapshot 1`] = `
         Test value&nbsp;
       </span>
       <transition-stub name="fab-transition" mode="out-in">
-        <button type="button" class="v-btn v-btn--flat v-btn--icon v-btn--round theme--light v-size--default" style="display: none;">
+        <button type="button" class="v-btn v-btn--icon v-btn--round theme--light v-size--default" style="display: none;">
           <span class="v-btn__content">
             <i aria-hidden="true" class="v-icon notranslate mdi mdi-pencil theme--light primary--text"></i>
           </span>

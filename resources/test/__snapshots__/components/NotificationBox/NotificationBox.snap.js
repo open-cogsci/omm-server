@@ -8,7 +8,7 @@ exports[`NotificationBox should match its snapshot 1`] = `
 
       </div>
       <div class="v-snack__action ">
-        <button type="button" class="v-btn v-btn--flat v-btn--text theme--dark v-size--default v-snack__btn">
+        <button type="button" class="v-btn v-btn--text theme--dark v-size--default v-snack__btn">
           <span class="v-btn__content">
             Close
           </span>

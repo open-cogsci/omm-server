@@ -11,11 +11,10 @@ const User = use('App/Models/User')
 const Helpers = use('Helpers')
 const pool = use('Workers/Sheets')
 
-const fs = require('fs')
+const fs = require('fs/promises')
 const { isArray, isInteger } = require('lodash')
 const { format } = require('date-fns')
 
-const removeFile = Helpers.promisify(fs.unlink)
 const processTrend = require('../../Util/trend')
 
 /**
@@ -437,7 +436,7 @@ class StudyController {
 
     // Remove previous file(s) of this type
     for (const fl of study.getRelated('files').rows.filter(fl => fl.type === type)) {
-      await removeFile(Helpers.publicPath(fl.path))
+      await fs.unlink(Helpers.publicPath(fl.path))
     }
 
     await uploadedFile.move(storagePath, {
@@ -1002,17 +1001,25 @@ class StudyController {
     const study = await auth.user.studies().where('id', id).firstOrFail()
     const data = await study.getCollectedData(Database.connection().connectionClient)
     const destFolder = Helpers.publicPath(`files/${study.id}`)
+
+    // Even though this rarely occurs, check if folder for the study has already been
+    // created in the files folder.
+    try {
+      await fs.mkdir(destFolder, { recursive: true })
+    } catch (e) {
+      return response.internalServerError('Could not create data folder')
+    }
+
     const timestamp = format(new Date(), 'yyyyMMddHHmmss')
     const filename = `data_${timestamp}.${filetype}`
     const path = `${destFolder}/${filename}`
     const type = `data-${filetype}`
     // Offload file creation to worker thread
     await pool.exec('writeSheet', [data, path, filetype])
-
     // Delete any previous occurrences of the file in the current format
     const previousFile = await study.files().where('type', type).first()
     if (previousFile) {
-      await removeFile(Helpers.publicPath(previousFile.path))
+      await fs.unlink(Helpers.publicPath(previousFile.path))
       await previousFile.delete()
     }
 

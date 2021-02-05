@@ -10,6 +10,12 @@ exports[`Study Index matches its snapshot 1`] = `
       </div>
       <div class="row no-gutters">
         <div class="text-md-right col-lg-8 col-xl-9 col-12">
+          <div aria-busy="true" aria-live="polite" role="alert" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light">
+            <div class="v-skeleton-loader__actions v-skeleton-loader__bone">
+              <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
+              <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
+            </div>
+          </div>
         </div>
         <div class="col-lg-4 col-xl-3 order-lg-first col-12">
           <div class="v-tabs theme--light">

@@ -51,7 +51,8 @@ exports[`ParticipationStats matches its snapshot 1`] = `
       <div class="v-progress-circular__info">
         <div>
           <div class="text-h4 text-md-h2">
-            0<span class="caption">%</span>
+            0
+            <span class="caption">%</span>
           </div>
           <div class="caption">
             stats.complete

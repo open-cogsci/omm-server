@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Participants matches its snapshot 1`] = `
-<div class="container fill-height align-start">
+<div class="container fill-height">
   <div class="row fill-height">
     <div class="d-flex flex-column py-0 col-xl-8 offset-xl-2 col-12">
       <div class="row">
