@@ -112,7 +112,9 @@
       <nuxt />
     </v-main>
     <v-footer :fixed="false" app>
-      <span>&copy; 2019-2020 le Centre National de la Recherche</span>
+      <span>&copy; 2019-{{ new Date().getFullYear() }} le Centre National de la Recherche</span>
+      <v-spacer />
+      v{{ $config.version }}
     </v-footer>
     <notification-box />
   </v-app>

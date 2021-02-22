@@ -6,6 +6,7 @@ module.exports = {
   srcDir: resolve(__dirname, '..', 'resources'),
 
   publicRuntimeConfig: {
+    version: process.env.npm_package_version,
     axios: {
       browserBaseURL: process.env.API_URL
     }
