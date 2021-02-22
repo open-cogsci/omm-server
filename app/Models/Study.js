@@ -345,9 +345,9 @@ class Study extends Model {
       let statusID
 
       if (finished) {
-        statusID = 3
+        statusID = 3 // Finished
       } else {
-        statusID = 2
+        statusID = 2 // In progress
       }
       await this.participants()
         .pivotQuery()

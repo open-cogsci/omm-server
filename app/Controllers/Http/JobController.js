@@ -218,20 +218,11 @@ class JobController {
     return transform.item(job, 'JobTransformer')
   }
 
-  /**
-   * Delete a job with id.
-   * DELETE jobs/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async destroy ({ params, request, response }) {
   }
 
   /**
    * Movejob with id to new position.
-   * DELETE jobs/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
