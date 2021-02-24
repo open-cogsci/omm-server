@@ -228,6 +228,7 @@ export default {
         }
       })
       this.fetchStats()
+      this.fetchQueue()
     },
     setPtcpListCtrHeight () {
       this.ptcpListCtrHeight = this.$refs.ptcpListContainer?.clientHeight || 0
