@@ -330,14 +330,17 @@ class Study extends Model {
     if (ptcpID && !isNumber(ptcpID)) {
       throw new Error('Participant ID should be null or number')
     }
-    const query = this.participants()
-    if (ptcpID) {
-      query.where('participants.id', ptcpID)
-    }
-    query.whereHas('jobs', (q) => {
-      q.whereInPivot('status_id', [1, 2])
-    })
 
+    const query = Study.query()
+      .select('job_states.status_id', 'job_states.participant_id')
+      .leftJoin('jobs', 'studies.id', 'jobs.study_id')
+      .leftJoin('job_states', 'jobs.id', 'job_states.job_id')
+      .where('studies.id', this.id)
+      .whereIn('job_states.status_id', [1, 2])
+
+    if (ptcpID) {
+      query.where('job_states.participant_id', ptcpID)
+    }
     const finished = !await query.getCount()
 
     // If the study is finished, update the participant's status
