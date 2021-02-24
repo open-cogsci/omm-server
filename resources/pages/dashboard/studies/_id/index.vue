@@ -87,6 +87,7 @@
                 </v-tab-item>
                 <v-tab-item class="fill-height">
                   <participants-panel
+                    ref="ptcpPanel"
                     :visible="ptcpPanelVisible"
                     :study="study"
                   />
@@ -360,6 +361,9 @@ export default {
           }
         })
         this.fetchJobs(this.study.id, { refresh: true })
+        if (this.$refs.ptcpPanel) {
+          this.$refs.ptcpPanel.refresh()
+        }
       }
     },
     async searchUsers (val) {

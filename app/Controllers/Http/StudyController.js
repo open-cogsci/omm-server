@@ -456,6 +456,7 @@ class StudyController {
       await study.processJobs(jsonData)
       // Attach study participants (if any) to jobs
       await study.attachParticipantsToJobs()
+      await study.resetParticipationStatuses()
     }
 
     await study.files().create({

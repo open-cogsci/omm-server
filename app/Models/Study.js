@@ -404,6 +404,17 @@ class Study extends Model {
     return results.length ? results[0] : results
   }
 
+  /**
+   * Reset the participation status of each assigned participant to 'pending'
+   *
+   * @memberof Study
+   */
+  async resetParticipationStatuses () {
+    await this.participants()
+      .pivotQuery()
+      .update({ status_id: 1 })
+  }
+
   /* Private functions */
 
   /**
