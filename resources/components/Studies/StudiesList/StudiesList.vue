@@ -36,20 +36,9 @@
               <v-list-item-title v-text="item.name" />
               <v-list-item-subtitle v-text="item.description" />
             </v-list-item-content>
-            <v-fab-transition>
-              <v-list-item-action v-show="!userIsOwner(item.id)" class="align-self-center">
-                <v-tooltip bottom>
-                  <template #activator="{on, attrs}">
-                    <v-icon color="primary" v-bind="attrs" v-on="on">
-                      mdi-share-variant
-                    </v-icon>
-                  </template>
-                  {{ $t('studies.list.shared_by') }} {{
-                    studyOwners[item.id] && studyOwners[item.id].name
-                  }}
-                </v-tooltip>
-              </v-list-item-action>
-            </v-fab-transition>
+            <share-icon
+              :owner="studyOwner(item.id)"
+            />
           </v-list-item>
           <v-divider />
         </template>
@@ -59,7 +48,9 @@
 </template>
 
 <script>
+import ShareIcon from './ShareIcon/ShareIcon.vue'
 export default {
+  components: { ShareIcon },
   props: {
     studies: {
       type: Array,
@@ -75,17 +66,24 @@ export default {
     }
   },
   computed: {
-    studyOwners () {
-      return this.studies.reduce((result, study) => {
-        result[study.id] = study?.users.find(user => user.pivot.is_owner)
-        return result
-      }, {})
+    StudyUser () {
+      return this.$store.$db().model('study_user')
+    },
+    User () {
+      return this.$store.$db().model('users')
     }
   },
   methods: {
-    userIsOwner (studyID) {
-      if (!this.studyOwners[studyID]) { return true }
-      return this.$auth.user.id === this.studyOwners[studyID].id
+    studyOwner (studyID) {
+      const record = this.StudyUser.query()
+        .where('study_id', studyID)
+        .where('is_owner', true)
+        .first()
+      if (!record) {
+        return {}
+      }
+      const ownerID = record.user_id
+      return this.User.find(ownerID) || {}
     }
   }
 }
