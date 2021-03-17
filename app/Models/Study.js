@@ -330,14 +330,17 @@ class Study extends Model {
     if (ptcpID && !isNumber(ptcpID)) {
       throw new Error('Participant ID should be null or number')
     }
-    const query = this.participants()
-    if (ptcpID) {
-      query.where('participants.id', ptcpID)
-    }
-    query.whereHas('jobs', (q) => {
-      q.whereInPivot('status_id', [1, 2])
-    })
 
+    const query = Study.query()
+      .select('job_states.status_id', 'job_states.participant_id')
+      .leftJoin('jobs', 'studies.id', 'jobs.study_id')
+      .leftJoin('job_states', 'jobs.id', 'job_states.job_id')
+      .where('studies.id', this.id)
+      .whereIn('job_states.status_id', [1, 2])
+
+    if (ptcpID) {
+      query.where('job_states.participant_id', ptcpID)
+    }
     const finished = !await query.getCount()
 
     // If the study is finished, update the participant's status
@@ -345,9 +348,9 @@ class Study extends Model {
       let statusID
 
       if (finished) {
-        statusID = 3
+        statusID = 3 // Finished
       } else {
-        statusID = 2
+        statusID = 2 // In progress
       }
       await this.participants()
         .pivotQuery()
@@ -399,6 +402,17 @@ class Study extends Model {
     }
     const results = await Database.raw(query, args)
     return results.length ? results[0] : results
+  }
+
+  /**
+   * Reset the participation status of each assigned participant to 'pending'
+   *
+   * @memberof Study
+   */
+  async resetParticipationStatuses () {
+    await this.participants()
+      .pivotQuery()
+      .update({ status_id: 1 })
   }
 
   /* Private functions */

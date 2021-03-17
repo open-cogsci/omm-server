@@ -782,6 +782,13 @@ class ParticipantController {
     return response.noContent()
   }
 
+  /**
+   * Sets the priority of this participation
+   *
+   * @param {*} { params, request, response, auth }
+   * @return {*}
+   * @memberof ParticipantController
+   */
   async setParticipationPriority ({ params, request, response, auth }) {
     const { participantID, studyID } = params
     const study = await auth.user.studies()
