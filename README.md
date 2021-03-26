@@ -49,7 +49,13 @@ Once this is done, you should have access to the docker commands from your termi
 
 ### Start the Docker image
 
-Navigate to the folder in which you placed the contents of omm-server (e.g. `cd /folder/to/omm-server`) and execute the command
+Navigate to the folder in which you placed the contents of omm-server (e.g. `cd /folder/to/omm-server`). First copy `.env.docker` to `.env`. This is a file that sets certain environment variables, such as the port and server url, that determine how the server runs. You generally don't need to edit this file yourself.
+
+```
+cp .env.docker .env
+```
+
+Next, start the docker container:
 
 ```
 docker-compose up -d
