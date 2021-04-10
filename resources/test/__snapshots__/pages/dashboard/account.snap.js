@@ -19,7 +19,7 @@ exports[`Account matches its snapshot 1`] = `
             </div>
           </div>
           <div class="v-card__text">
-            <form novalidate="novalidate" class="v-form">
+            <form class="v-form" novalidate="novalidate">
               <div class="container container--fluid">
                 <div class="row">
                   <div class="col col-12">
@@ -27,13 +27,13 @@ exports[`Account matches its snapshot 1`] = `
                       <div class="v-input__control">
                         <div class="v-input__slot">
                           <div class="v-text-field__slot">
-                            <label for="input-7" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">account.details.name</label>
+                            <label class="v-label v-label--active theme--light" for="input-7" style="left: 0px; position: absolute;">account.details.name</label>
                             <input id="input-7" type="text">
                           </div>
                         </div>
                         <div class="v-text-field__details">
                           <div class="v-messages theme--light">
-                            <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+                            <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
                           </div>
                         </div>
                       </div>
@@ -44,13 +44,13 @@ exports[`Account matches its snapshot 1`] = `
                       <div class="v-input__control">
                         <div class="v-input__slot">
                           <div class="v-text-field__slot">
-                            <label for="input-10" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">account.details.email</label>
+                            <label class="v-label v-label--active theme--light" for="input-10" style="left: 0px; position: absolute;">account.details.email</label>
                             <input id="input-10" type="text">
                           </div>
                         </div>
                         <div class="v-text-field__details">
                           <div class="v-messages theme--light">
-                            <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+                            <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
                           </div>
                         </div>
                       </div>
@@ -59,7 +59,7 @@ exports[`Account matches its snapshot 1`] = `
                 </div>
                 <div class="row">
                   <div class="text-right col col-12">
-                    <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary">
+                    <button class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default primary" type="button">
                       <span class="v-btn__content">
                         buttons.save
                       </span>

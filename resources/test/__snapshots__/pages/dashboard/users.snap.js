@@ -26,7 +26,7 @@ exports[`Users matches its snapshot 1`] = `
                 </div>
                 <div class="v-input__append-inner">
                   <div class="v-input__icon v-input__icon--clear">
-                    <button disabled="disabled" type="button" aria-label="clear icon" class="v-icon notranslate v-icon--disabled v-icon--link mdi mdi-close theme--light"></button>
+                    <button aria-label="clear icon" class="v-icon notranslate v-icon--disabled v-icon--link mdi mdi-close theme--light" disabled="disabled" type="button"></button>
                   </div>
                 </div>
               </div>
@@ -42,15 +42,15 @@ exports[`Users matches its snapshot 1`] = `
       </div>
       <div class="row">
         <div class="col col-12">
-          <nav role="navigation" aria-label="Pagination Navigation">
+          <nav aria-label="Pagination Navigation" role="navigation">
             <ul class="v-pagination theme--light">
               <li>
-                <button type="button" aria-label="Previous page" class="v-pagination__navigation v-pagination__navigation--disabled">
+                <button aria-label="Previous page" class="v-pagination__navigation v-pagination__navigation--disabled" type="button">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-left theme--light"></i>
                 </button>
               </li>
               <li>
-                <button type="button" aria-label="Next page" class="v-pagination__navigation v-pagination__navigation--disabled">
+                <button aria-label="Next page" class="v-pagination__navigation v-pagination__navigation--disabled" type="button">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-right theme--light"></i>
                 </button>
               </li>
@@ -60,7 +60,7 @@ exports[`Users matches its snapshot 1`] = `
       </div>
     </div>
   </div>
-  <transition-stub name="fab-transition" mode="out-in">
+  <transition-stub mode="out-in" name="fab-transition">
   </transition-stub>
 </div>
 `;

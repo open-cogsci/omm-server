@@ -18,7 +18,7 @@ exports[`Dashboard Index matches its snapshot 1`] = `
               dashboard.title.most_recent_ptcp
             </div>
             <div class="v-card__text px-0">
-              <div aria-busy="true" aria-live="polite" role="alert" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light">
+              <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
                 <div class="v-skeleton-loader__list-item-two-line v-skeleton-loader__bone">
                   <div class="v-skeleton-loader__sentences v-skeleton-loader__bone">
                     <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
@@ -62,7 +62,7 @@ exports[`Dashboard Index matches its snapshot 1`] = `
               </span>
             </div>
             <div class="v-card__text px-0">
-              <div aria-busy="true" aria-live="polite" role="alert" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light">
+              <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
                 <div class="v-skeleton-loader__list-item-two-line v-skeleton-loader__bone">
                   <div class="v-skeleton-loader__sentences v-skeleton-loader__bone">
                     <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
@@ -106,7 +106,7 @@ exports[`Dashboard Index matches its snapshot 1`] = `
               </span>
             </div>
             <div class="v-card__text px-0">
-              <div aria-busy="true" aria-live="polite" role="alert" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light">
+              <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
                 <div class="v-skeleton-loader__list-item-two-line v-skeleton-loader__bone">
                   <div class="v-skeleton-loader__sentences v-skeleton-loader__bone">
                     <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
@@ -153,7 +153,7 @@ exports[`Dashboard Index matches its snapshot 1`] = `
               </div>
             </div>
             <div class="v-card__text d-flex flex-column justify-center fill-height">
-              <div aria-busy="true" aria-live="polite" role="alert" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light">
+              <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
                 <transition-stub name="fade-transition">
                   <div class="v-skeleton-loader__card v-skeleton-loader__bone">
                     <div class="v-skeleton-loader__image v-skeleton-loader__bone"></div>

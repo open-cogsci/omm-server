@@ -3,18 +3,18 @@
 exports[`ParticipantEditData matches its snapshot 1`] = `
 <div class="fill-height d-flex flex-column">
   <div class="v-card__text fill-height">
-    <form novalidate="novalidate" class="v-form">
+    <form class="v-form" novalidate="novalidate">
       <div class="v-input theme--light v-text-field">
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label for="input-3" class="v-label theme--light" style="left: 0px; position: absolute;">participants.fields.name.label</label>
+              <label class="v-label theme--light" for="input-3" style="left: 0px; position: absolute;">participants.fields.name.label</label>
               <input id="input-3" type="text">
             </div>
           </div>
           <div class="v-text-field__details">
             <div class="v-messages theme--light">
-              <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+              <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
             </div>
             <div class="v-counter theme--light">0 / 50</div>
           </div>
@@ -24,13 +24,13 @@ exports[`ParticipantEditData matches its snapshot 1`] = `
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label for="input-6" class="v-label theme--light" style="left: 0px; position: absolute;">participants.fields.identifier.label</label>
+              <label class="v-label theme--light" for="input-6" style="left: 0px; position: absolute;">participants.fields.identifier.label</label>
               <input id="input-6" type="text">
             </div>
           </div>
           <div class="v-text-field__details">
             <div class="v-messages theme--light">
-              <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+              <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
             </div>
           </div>
         </div>
@@ -39,13 +39,13 @@ exports[`ParticipantEditData matches its snapshot 1`] = `
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label for="input-9" class="v-label theme--light" style="left: 0px; position: absolute;">Extra information</label>
+              <label class="v-label theme--light" for="input-9" style="left: 0px; position: absolute;">Extra information</label>
               <textarea id="input-9" rows="3"></textarea>
             </div>
           </div>
           <div class="v-text-field__details">
             <div class="v-messages theme--light">
-              <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+              <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
             </div>
           </div>
         </div>
@@ -54,14 +54,14 @@ exports[`ParticipantEditData matches its snapshot 1`] = `
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-input--selection-controls__input">
-              <input aria-checked="true" id="input-12" role="switch" type="checkbox" aria-disabled="false" value>
+              <input aria-checked="true" aria-disabled="false" id="input-12" role="switch" type="checkbox" value>
               <div class="v-input--selection-controls__ripple primary--text"></div>
               <div class="v-input--switch__track theme--light primary--text"></div>
               <div class="v-input--switch__thumb theme--light primary--text">
-                <transition-stub name="fab-transition" mode="out-in"></transition-stub>
+                <transition-stub mode="out-in" name="fab-transition"></transition-stub>
               </div>
             </div>
-            <label for="input-12" class="v-label theme--light" style="left: 0px; position: relative;">participants.active</label>
+            <label class="v-label theme--light" for="input-12" style="left: 0px; position: relative;">participants.active</label>
           </div>
         </div>
       </div>

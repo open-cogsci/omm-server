@@ -11,7 +11,7 @@ exports[`ParticipationsPanel matches its snapshot 1`] = `
       <div class="v-virtual-scroll" style="height: 340px;">
         <div class="v-virtual-scroll__container" style="height: 80px;">
           <div class="v-virtual-scroll__item" style="top: 0px;">
-            <div tabindex="-1" class="v-list-item theme--light">
+            <div class="v-list-item theme--light" tabindex="-1">
               <div class="v-list-item__content">
                 <div class="v-list-item__title black--text">Study name</div>
                 <div class="v-list-item__subtitle font-weight-medium"></div>
@@ -21,7 +21,7 @@ exports[`ParticipationsPanel matches its snapshot 1`] = `
                 <span class="v-list-item__action-text info--text"></span>
               </div>
             </div>
-            <hr role="separator" aria-orientation="horizontal" class="v-divider theme--light">
+            <hr aria-orientation="horizontal" class="v-divider theme--light" role="separator">
           </div>
         </div>
       </div>

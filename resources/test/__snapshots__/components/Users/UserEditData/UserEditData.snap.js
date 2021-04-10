@@ -3,18 +3,18 @@
 exports[`UserEditData matches its snapshot 1`] = `
 <div class="fill-height d-flex flex-column">
   <div class="v-card__text fill-height">
-    <form novalidate="novalidate" class="v-form">
+    <form class="v-form" novalidate="novalidate">
       <div class="v-input theme--light v-text-field">
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label for="input-6" class="v-label theme--light" style="left: 0px; position: absolute;">users.fields.name.label</label>
+              <label class="v-label theme--light" for="input-6" style="left: 0px; position: absolute;">users.fields.name.label</label>
               <input id="input-6" type="text">
             </div>
           </div>
           <div class="v-text-field__details">
             <div class="v-messages theme--light">
-              <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+              <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
             </div>
             <div class="v-counter theme--light">0 / 50</div>
           </div>
@@ -24,24 +24,24 @@ exports[`UserEditData matches its snapshot 1`] = `
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label for="input-9" class="v-label theme--light" style="left: 0px; position: absolute;">users.fields.email.label</label>
+              <label class="v-label theme--light" for="input-9" style="left: 0px; position: absolute;">users.fields.email.label</label>
               <input id="input-9" type="text">
             </div>
           </div>
           <div class="v-text-field__details">
             <div class="v-messages theme--light">
-              <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+              <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
             </div>
           </div>
         </div>
       </div>
       <div class="v-input theme--light v-text-field v-select">
         <div class="v-input__control">
-          <div role="button" aria-haspopup="listbox" aria-expanded="false" aria-owns="list-12" class="v-input__slot">
+          <div aria-expanded="false" aria-haspopup="listbox" aria-owns="list-12" class="v-input__slot" role="button">
             <div class="v-select__slot">
-              <label for="input-12" class="v-label theme--light" style="left: 0px; position: absolute;">users.fields.user_type.label</label>
+              <label class="v-label theme--light" for="input-12" style="left: 0px; position: absolute;">users.fields.user_type.label</label>
               <div class="v-select__selections">
-                <input id="input-12" readonly="readonly" type="text" aria-readonly="false" autocomplete="off">
+                <input aria-readonly="false" autocomplete="off" id="input-12" readonly="readonly" type="text">
               </div>
               <div class="v-input__append-inner">
                 <div class="v-input__icon v-input__icon--append">
@@ -55,7 +55,7 @@ exports[`UserEditData matches its snapshot 1`] = `
           </div>
           <div class="v-text-field__details">
             <div class="v-messages theme--light">
-              <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+              <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
             </div>
           </div>
         </div>
