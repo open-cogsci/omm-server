@@ -17,11 +17,11 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
           <div class="v-data-footer">
             <div class="v-data-footer__select">Rows per page:<div class="v-input v-input--hide-details v-input--is-label-active v-input--is-dirty theme--light v-text-field v-select">
                 <div class="v-input__control">
-                  <div role="button" aria-haspopup="listbox" aria-expanded="false" aria-owns="list-9" class="v-input__slot">
+                  <div aria-expanded="false" aria-haspopup="listbox" aria-owns="list-9" class="v-input__slot" role="button">
                     <div class="v-select__slot">
                       <div class="v-select__selections">
                         <div class="v-select__selection v-select__selection--comma">50</div>
-                        <input aria-label="Rows per page:" id="input-9" readonly="readonly" type="text" aria-readonly="false" autocomplete="off">
+                        <input aria-label="Rows per page:" aria-readonly="false" autocomplete="off" id="input-9" readonly="readonly" type="text">
                       </div>
                       <div class="v-input__append-inner">
                         <div class="v-input__icon v-input__icon--append">
@@ -38,14 +38,14 @@ exports[`JobsTable wrapper matches its snapshot 1`] = `
             </div>
             <div class="v-data-footer__pagination">–</div>
             <div class="v-data-footer__icons-before">
-              <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--icon v-btn--round v-btn--text theme--light v-size--default" aria-label="Previous page">
+              <button aria-label="Previous page" class="v-btn v-btn--disabled v-btn--icon v-btn--round v-btn--text theme--light v-size--default" disabled="disabled" type="button">
                 <span class="v-btn__content">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-left theme--light"></i>
                 </span>
               </button>
             </div>
             <div class="v-data-footer__icons-after">
-              <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--icon v-btn--round v-btn--text theme--light v-size--default" aria-label="Next page">
+              <button aria-label="Next page" class="v-btn v-btn--disabled v-btn--icon v-btn--round v-btn--text theme--light v-size--default" disabled="disabled" type="button">
                 <span class="v-btn__content">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-right theme--light"></i>
                 </span>

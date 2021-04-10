@@ -12,20 +12,20 @@ exports[`Password wrapper matches its snapshot 1`] = `
     <p class="text-center">
       password_recover.subheader
     </p>
-    <form novalidate="novalidate" class="v-form">
+    <form class="v-form" novalidate="novalidate">
       <div class="row">
         <div class="col col-12">
           <div class="v-input theme--light v-text-field">
             <div class="v-input__control">
               <div class="v-input__slot">
                 <div class="v-text-field__slot">
-                  <label for="input-5" class="v-label theme--light" style="left: 0px; position: absolute;">password_recover.fields.email.label</label>
+                  <label class="v-label theme--light" for="input-5" style="left: 0px; position: absolute;">password_recover.fields.email.label</label>
                   <input id="input-5" type="text">
                 </div>
               </div>
               <div class="v-text-field__details">
                 <div class="v-messages theme--light">
-                  <transition-group-stub tag="div" name="message-transition" class="v-messages__wrapper"></transition-group-stub>
+                  <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
                 </div>
               </div>
             </div>
@@ -41,7 +41,7 @@ exports[`Password wrapper matches its snapshot 1`] = `
         password_recover.buttons.signin
       </span>
     </nuxt-link-stub>
-    <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default success">
+    <button class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default success" type="button">
       <span class="v-btn__content">
         password_recover.buttons.email
         <i aria-hidden="true" class="v-icon notranslate v-icon--right mdi mdi-send theme--light"></i>

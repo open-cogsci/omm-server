@@ -43,10 +43,10 @@ exports[`ParticipationStats matches its snapshot 1`] = `
     <p class="text-subtitle-2 secondary--text text-left text-sm-center">
       stats.progress
     </p>
-    <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" class="v-progress-circular text-center green--text" style="height: 175px; width: 175px;">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="23.333333333333332 23.333333333333332 46.666666666666664 46.666666666666664" style="transform: rotate(-90deg);">
-        <circle fill="transparent" cx="46.666666666666664" cy="46.666666666666664" r="20" stroke-width="6.666666666666666" stroke-dasharray="125.664" stroke-dashoffset="0" class="v-progress-circular__underlay" />
-        <circle fill="transparent" cx="46.666666666666664" cy="46.666666666666664" r="20" stroke-width="6.666666666666666" stroke-dasharray="125.664" stroke-dashoffset="125.66370614359172px" class="v-progress-circular__overlay" />
+    <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="v-progress-circular text-center green--text" role="progressbar" style="height: 175px; width: 175px;">
+      <svg style="transform: rotate(-90deg);" viewBox="23.333333333333332 23.333333333333332 46.666666666666664 46.666666666666664" xmlns="http://www.w3.org/2000/svg">
+        <circle class="v-progress-circular__underlay" cx="46.666666666666664" cy="46.666666666666664" fill="transparent" r="20" stroke-dasharray="125.664" stroke-dashoffset="0" stroke-width="6.666666666666666" />
+        <circle class="v-progress-circular__overlay" cx="46.666666666666664" cy="46.666666666666664" fill="transparent" r="20" stroke-dasharray="125.664" stroke-dashoffset="125.66370614359172px" stroke-width="6.666666666666666" />
       </svg>
       <div class="v-progress-circular__info">
         <div>

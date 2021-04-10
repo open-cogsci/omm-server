@@ -10,7 +10,7 @@ exports[`Study Index matches its snapshot 1`] = `
       </div>
       <div class="row no-gutters">
         <div class="text-md-right col-lg-8 col-xl-9 col-12">
-          <div aria-busy="true" aria-live="polite" role="alert" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light">
+          <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
             <div class="v-skeleton-loader__actions v-skeleton-loader__bone">
               <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
               <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
@@ -19,7 +19,7 @@ exports[`Study Index matches its snapshot 1`] = `
         </div>
         <div class="col-lg-4 col-xl-3 order-lg-first col-12">
           <div class="v-tabs theme--light">
-            <div role="tablist" class="v-item-group theme--light v-slide-group v-tabs-bar v-tabs-bar--is-mobile primary--text">
+            <div class="v-item-group theme--light v-slide-group v-tabs-bar v-tabs-bar--is-mobile primary--text" role="tablist">
               <div class="v-slide-group__prev v-slide-group__prev--disabled">
                 <transition-stub name="fade-transition"></transition-stub>
               </div>
@@ -28,8 +28,8 @@ exports[`Study Index matches its snapshot 1`] = `
                   <div class="v-tabs-slider-wrapper" style="transition: none;">
                     <div class="v-tabs-slider"></div>
                   </div>
-                  <div tabindex="0" aria-selected="true" role="tab" class="v-tab v-tab--active">studies.tabs.jobs</div>
-                  <div tabindex="0" aria-selected="false" role="tab" class="v-tab">studies.tabs.participants</div>
+                  <div aria-selected="true" class="v-tab v-tab--active" role="tab" tabindex="0">studies.tabs.jobs</div>
+                  <div aria-selected="false" class="v-tab" role="tab" tabindex="0">studies.tabs.participants</div>
                 </div>
               </div>
               <div class="v-slide-group__next v-slide-group__next--disabled">
@@ -47,7 +47,7 @@ exports[`Study Index matches its snapshot 1`] = `
                 <div class="v-window-item v-window-item--active">
                 </div>
               </transition-stub>
-              <transition-stub name class="fill-height">
+              <transition-stub class="fill-height" name>
               </transition-stub>
             </div>
           </div>

@@ -10,15 +10,15 @@ exports[`UserSearcher matches its snapshot 1`] = `
         </div>
       </div>
       <div class="v-input__control">
-        <div role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="list-2" class="v-input__slot">
+        <div aria-expanded="false" aria-haspopup="listbox" aria-owns="list-2" class="v-input__slot" role="combobox">
           <fieldset aria-hidden="true">
             <legend style="width: 0px;">
               <span>​</span>
             </legend>
           </fieldset>
           <div class="v-select__slot">
-            <label for="input-2" class="v-label v-label--active theme--light" style="left: 0px; position: absolute;">studies.dialogs.collaborators.search</label>
-            <input id="input-2" type="text" autocomplete="off">
+            <label class="v-label v-label--active theme--light" for="input-2" style="left: 0px; position: absolute;">studies.dialogs.collaborators.search</label>
+            <input autocomplete="off" id="input-2" type="text">
             <div class="v-input__append-inner">
               <div class="v-input__icon v-input__icon--append">
                 <i aria-hidden="true" class="v-icon notranslate mdi mdi-menu-down theme--light"></i>
@@ -34,12 +34,12 @@ exports[`UserSearcher matches its snapshot 1`] = `
   </div>
   <div class="text-right col-sm-3 col-12">
     <div class="v-btn-toggle v-item-group theme--light">
-      <button type="button" disabled="disabled" class="v-btn v-btn--disabled v-btn--has-bg theme--light v-size--default">
+      <button class="v-btn v-btn--disabled v-btn--has-bg theme--light v-size--default" disabled="disabled" type="button">
         <span class="v-btn__content">
           <i aria-hidden="true" class="v-icon notranslate mdi mdi-plus theme--light white--text"></i>
         </span>
       </button>
-      <button type="button" class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default">
+      <button class="v-btn v-btn--is-elevated v-btn--has-bg theme--light v-size--default" type="button">
         <span class="v-btn__content">
           <i aria-hidden="true" class="v-icon notranslate mdi mdi-cancel theme--light"></i>
         </span>
