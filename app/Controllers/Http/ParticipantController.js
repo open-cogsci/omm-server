@@ -815,6 +815,46 @@ class ParticipantController {
 
     return response.noContent()
   }
+
+  /**
+  * @swagger
+  * /participants/{identifier}/canonical:
+  *   get:
+  *     tags:
+  *       - Participants
+  *     summary: >
+  *         Retrieves the canonical identifier for a participant.
+  *     parameters:
+  *       - in: path
+  *         name: identifier
+  *         required: true
+  *         type: string
+  *         description: The identifier of the participant to retrieve
+  *     responses:
+  *       200:
+  *         description: The participant's canonical identifier.
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: object
+  *               properties:
+  *                 identifier:
+  *                   type: string
+  *                   example: abc
+  *       404:
+  *         description: The participant with the specified identifier was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+  async canonicalIdentifier ({ params }) {
+    const { identifier } = params
+    const result = await Participant.query()
+      .select('identifier')
+      .where('identifier', identifier)
+      .orWhere('alternate_identifier', identifier)
+      .firstOrFail()
+    return { data: { identifier: result.identifier } }
+  }
 }
 
 module.exports = ParticipantController

@@ -90,6 +90,7 @@ Route.group(() => {
   Route.post('/auth/password/reset/:token', 'UserController.updatePasswordByToken').as('users.reset_password')
   Route.post('/auth/email/verify/:token', 'UserController.verifyEmailAddress').as('users.verify_email')
 
+  Route.get('participants/:identifier/canonical', 'ParticipantController.canonicalIdentifier')
   Route.get('participants/:identifier/announce', 'ParticipantController.announce').as('participants.announce')
   Route.get('/participants/:identifier/:studyID/currentjob', 'ParticipantController.fetchJob')
     .as('participants.fetch_job')
