@@ -35,12 +35,27 @@ exports[`ParticipantEditData matches its snapshot 1`] = `
           </div>
         </div>
       </div>
+      <div class="v-input theme--light v-text-field">
+        <div class="v-input__control">
+          <div class="v-input__slot">
+            <div class="v-text-field__slot">
+              <label class="v-label theme--light" for="input-9" style="left: 0px; position: absolute;">participants.fields.alternate_identifier.label</label>
+              <input id="input-9" type="text">
+            </div>
+          </div>
+          <div class="v-text-field__details">
+            <div class="v-messages theme--light">
+              <transition-group-stub class="v-messages__wrapper" name="message-transition" tag="div"></transition-group-stub>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="v-input v-textarea v-textarea--no-resize theme--light v-text-field">
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-text-field__slot">
-              <label class="v-label theme--light" for="input-9" style="left: 0px; position: absolute;">Extra information</label>
-              <textarea id="input-9" rows="3"></textarea>
+              <label class="v-label theme--light" for="input-12" style="left: 0px; position: absolute;">Extra information</label>
+              <textarea id="input-12" rows="3"></textarea>
             </div>
           </div>
           <div class="v-text-field__details">
@@ -54,14 +69,14 @@ exports[`ParticipantEditData matches its snapshot 1`] = `
         <div class="v-input__control">
           <div class="v-input__slot">
             <div class="v-input--selection-controls__input">
-              <input aria-checked="true" aria-disabled="false" id="input-12" role="switch" type="checkbox" value>
+              <input aria-checked="true" aria-disabled="false" id="input-15" role="switch" type="checkbox" value>
               <div class="v-input--selection-controls__ripple primary--text"></div>
               <div class="v-input--switch__track theme--light primary--text"></div>
               <div class="v-input--switch__thumb theme--light primary--text">
                 <transition-stub mode="out-in" name="fab-transition"></transition-stub>
               </div>
             </div>
-            <label class="v-label theme--light" for="input-12" style="left: 0px; position: relative;">participants.active</label>
+            <label class="v-label theme--light" for="input-15" style="left: 0px; position: relative;">participants.active</label>
           </div>
         </div>
       </div>

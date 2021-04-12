@@ -182,7 +182,9 @@ export default {
       if (this.saving) { return }
       this.saving = true
       try {
-        const payload = pick(ptcpData, ['$id', 'id', 'name', 'identifier', 'meta', 'active'])
+        const payload = pick(ptcpData, [
+          '$id', 'id', 'name', 'identifier', 'alternate_identifier', 'meta', 'active'
+        ])
         if (!isString(payload.meta)) {
           payload.meta = JSON.stringify(payload.meta)
         }

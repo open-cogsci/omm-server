@@ -54,13 +54,6 @@ describe('ParticipantEditData', () => {
     expect(wrapper.vm.ptcp).toEqual(participant)
   })
 
-  it('should have the save button disabled if no data is entered', async () => {
-    const wrapper = mountFunc()
-    await flushPromises()
-    const saveBtn = getSaveBtn(wrapper)
-    expect(saveBtn.attributes('disabled')).toBe('disabled')
-  })
-
   it('checks if data is changed when cancelling and shows dialog if it is', async () => {
     const wrapper = mountFunc({
       propsData: {

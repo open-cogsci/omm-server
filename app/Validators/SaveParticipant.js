@@ -6,14 +6,16 @@ class SaveParticipant {
     return {
       // validation rules
       name: 'required|max:50',
-      identifier: `required|unique:participants,identifier,id,${ptcpId}`,
+      identifier: `required|different:alternate_identifier|unique:participants,identifier,id,${ptcpId}|unique:participants,alternate_identifier,id,${ptcpId}`,
+      alternate_identifier: `required|different:identifier|unique:participants,identifier,id,${ptcpId}|unique:participants,alternate_identifier,id,${ptcpId}`,
       meta: 'json'
     }
   }
 
   get messages () {
     return {
-      'identifier.unique': 'This identifier is already used.'
+      'identifier.unique': 'This identifier is already used.',
+      'alternate_identifier.unique': 'This identifier is already used.'
     }
   }
 }

@@ -1,6 +1,7 @@
 export default {
   search: 'Search participants by name or identifier',
   identifier: 'Identifier',
+  alternate_identifier: 'Alt. identifier',
   participations: 'Participations',
   meta: 'Extra info',
   status: 'Status',
@@ -25,7 +26,15 @@ export default {
     identifier: {
       label: 'Identifier',
       errors: {
-        notEmpty: 'identifier cannot be empty'
+        notEmpty: 'identifier cannot be empty',
+        sameAsAlt: 'Must be different from alternate identifier'
+      }
+    },
+    alternate_identifier: {
+      label: 'Alternate identifier',
+      errors: {
+        notEmpty: 'identifier cannot be empty',
+        sameAsPrimary: 'Must be different from identifier'
       }
     }
   },

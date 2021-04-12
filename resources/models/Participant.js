@@ -11,6 +11,7 @@ export default class Participant extends Model {
       id: this.number(null),
       name: this.string(''),
       identifier: this.string(''),
+      alternate_identifier: this.string(''),
       active: this.boolean(true),
       meta: this.attr(''),
       studies_count: this.number(0),

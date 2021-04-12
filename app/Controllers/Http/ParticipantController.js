@@ -144,7 +144,10 @@ class ParticipantController {
    * @param {Response} ctx.response
    */
   async store ({ request, response, transform }) {
-    const data = request.only(['name', 'identifier', 'active'])
+    const data = request.only(['name', 'identifier', 'alternate_identifier', 'meta', 'active'])
+    if (data.meta === '') {
+      delete data.meta
+    }
     const ptcp = await Participant.create(data)
     await ptcp.reload() // Refresh data otherwise some parameters are missing
     response.status(201)
@@ -304,7 +307,7 @@ class ParticipantController {
    */
   async update ({ params, request, response, transform }) {
     const ptcp = await Participant.findOrFail(params.id)
-    const data = request.only(['name', 'identifier', 'active', 'meta'])
+    const data = request.only(['name', 'identifier', 'alternate_identifier', 'active', 'meta'])
     ptcp.merge(data)
     try {
       await ptcp.save()
