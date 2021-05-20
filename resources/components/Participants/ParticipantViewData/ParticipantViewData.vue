@@ -1,6 +1,6 @@
 <template>
   <div class="fill-height d-flex flex-column">
-    <v-card-text class="fill-height" style="max-height:340px; overflow:auto">
+    <v-card-text class="fill-height" style="max-height:420px; overflow:auto">
       <template v-for="(value, field) in listable(participant)">
         <v-row
           v-if="field !== 'meta'"
@@ -91,7 +91,8 @@ export default {
     }
   },
   methods: {
-    listable: ptcp => pick(ptcp, ['name', 'identifier', 'meta', 'active', 'created_at', 'updated_at']),
+    listable: ptcp => pick(ptcp, ['name', 'identifier', 'alternate_identifier', 'meta', 'active',
+      'created_at', 'updated_at']),
     label (val) {
       return this.$t(`participants.${val}`)
     },

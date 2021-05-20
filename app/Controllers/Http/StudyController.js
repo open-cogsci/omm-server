@@ -818,7 +818,9 @@ class StudyController {
       return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
     }
 
+    const study = await Study.findOrFail(id)
     const participant = await Participant.findByOrFail('identifier', ptcpID)
+
     let rowsUpdated = 0
     // SQLite doesn't support inner joins, therefore we need this ugly way:
     if (Database.connection().connectionClient === 'sqlite3') {
@@ -842,6 +844,10 @@ class StudyController {
           .update({ status_id: state })
       })
     }
+
+    // Check if the study if finished for this participant (i.e. there are not open jobs),
+    // and set this status accordingly
+    await study.checkIfFinished(participant.id)
 
     return response.json({
       data: { jobs_updated: rowsUpdated }

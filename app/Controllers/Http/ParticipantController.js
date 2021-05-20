@@ -144,7 +144,10 @@ class ParticipantController {
    * @param {Response} ctx.response
    */
   async store ({ request, response, transform }) {
-    const data = request.only(['name', 'identifier', 'active'])
+    const data = request.only(['name', 'identifier', 'alternate_identifier', 'meta', 'active'])
+    if (data.meta === '') {
+      delete data.meta
+    }
     const ptcp = await Participant.create(data)
     await ptcp.reload() // Refresh data otherwise some parameters are missing
     response.status(201)
@@ -304,7 +307,7 @@ class ParticipantController {
    */
   async update ({ params, request, response, transform }) {
     const ptcp = await Participant.findOrFail(params.id)
-    const data = request.only(['name', 'identifier', 'active', 'meta'])
+    const data = request.only(['name', 'identifier', 'alternate_identifier', 'active', 'meta'])
     ptcp.merge(data)
     try {
       await ptcp.save()
@@ -814,6 +817,46 @@ class ParticipantController {
       .update({ priority })
 
     return response.noContent()
+  }
+
+  /**
+  * @swagger
+  * /participants/{identifier}/canonical:
+  *   get:
+  *     tags:
+  *       - Participants
+  *     summary: >
+  *         Retrieves the canonical identifier for a participant.
+  *     parameters:
+  *       - in: path
+  *         name: identifier
+  *         required: true
+  *         type: string
+  *         description: The identifier of the participant to retrieve
+  *     responses:
+  *       200:
+  *         description: The participant's canonical identifier.
+  *         schema:
+  *           properties:
+  *             data:
+  *               type: object
+  *               properties:
+  *                 identifier:
+  *                   type: string
+  *                   example: abc
+  *       404:
+  *         description: The participant with the specified identifier was not found.
+  *       default:
+  *         description: Unexpected error
+  */
+  async canonicalIdentifier ({ params }) {
+    const { identifier } = params
+    const result = await Participant.query()
+      .select('identifier')
+      .where('identifier', identifier)
+      .orWhere('alternate_identifier', identifier)
+      .firstOrFail()
+    return { data: { identifier: result.identifier } }
   }
 }
 

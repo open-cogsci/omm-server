@@ -76,7 +76,7 @@
       <v-expansion-panel-content>
         <v-row>
           <v-col cols="12" md="6">
-            <v-card outlined class="fill-height d-flex flex-column" height="450">
+            <v-card outlined class="fill-height d-flex flex-column" height="525">
               <v-card-title class="subtitle-1 blue-grey lighten-5">
                 {{ $t('common.properties') }}
               </v-card-title>

@@ -6,7 +6,7 @@
       @clicked-no="dialog = false"
     />
     <v-card-text class="fill-height">
-      <v-form ref="form" v-model="validates" @submit.prevent="save">
+      <v-form ref="form" v-model="validates" lazy-validation @submit.prevent="save">
         <v-text-field
           v-model="ptcp.name"
           :rules="validation.name"
@@ -22,6 +22,15 @@
           :label="$t('participants.fields.identifier.label')"
           @input="removeErrors('identifier')"
         />
+
+        <v-text-field
+          v-model="ptcp.alternate_identifier"
+          :rules="validation.alternate_identifier"
+          :error-messages="errors.alternate_identifier"
+          :label="$t('participants.fields.alternate_identifier.label')"
+          @input="removeErrors('alternate_identifier')"
+        />
+
         <v-textarea
           :value="metaToYaml"
           no-resize
@@ -59,6 +68,7 @@ import servererrors from '@/mixins/servererrors'
 const EMPTY_VALUES = {
   name: '',
   identifier: '',
+  alternate_identifier: '',
   meta: '',
   active: true
 }
@@ -96,7 +106,11 @@ export default {
             this.$t('participants.fields.name.errors.maxLength') + this.maxNameLength
         ],
         identifier: [
-          v => !isEmpty(v) || this.$t('participants.fields.identifier.errors.notEmpty')
+          v => !isEmpty(v) || this.$t('participants.fields.identifier.errors.notEmpty'),
+          v => v !== this.ptcp.alternate_identifier || this.$t('participants.fields.identifier.errors.sameAsAlt')
+        ],
+        alternate_identifier: [
+          v => v !== this.ptcp.identifier || this.$t('participants.fields.alternate_identifier.errors.sameAsPrimary')
         ]
       }
     }
