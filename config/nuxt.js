@@ -118,9 +118,6 @@ module.exports = {
   build: {
     watch: [
       'lang/**/*.js'
-    ],
-    babel: {
-      plugins: ['@babel/plugin-proposal-class-properties']
-    }
+    ]
   }
 }

@@ -11,7 +11,7 @@ exports[`Verify matches its snapshot 1`] = `
   <div class="v-card__text">
     <p>
     </p>
-    <div aria-valuemax="100" aria-valuemin="0" class="v-progress-linear theme--light" role="progressbar" style="height: 4px;">
+    <div aria-valuemax="100" aria-valuemin="0" class="v-progress-linear v-progress-linear--visible theme--light" role="progressbar" style="height: 4px;">
       <div class="v-progress-linear__background green" style="opacity: 0.3; left: 0%; width: 100%;"></div>
       <div class="v-progress-linear__buffer"></div>
       <transition-stub name="fade-transition">

@@ -25,9 +25,7 @@ exports[`Users matches its snapshot 1`] = `
                   <input id="input-5" placeholder="users.search" type="text">
                 </div>
                 <div class="v-input__append-inner">
-                  <div class="v-input__icon v-input__icon--clear">
-                    <button aria-label="clear icon" class="v-icon notranslate v-icon--disabled v-icon--link mdi mdi-close theme--light" disabled="disabled" type="button"></button>
-                  </div>
+                  <div></div>
                 </div>
               </div>
             </div>
@@ -45,12 +43,12 @@ exports[`Users matches its snapshot 1`] = `
           <nav aria-label="Pagination Navigation" role="navigation">
             <ul class="v-pagination theme--light">
               <li>
-                <button aria-label="Previous page" class="v-pagination__navigation v-pagination__navigation--disabled" type="button">
+                <button aria-label="Previous page" class="v-pagination__navigation v-pagination__navigation--disabled" disabled="disabled" type="button">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-left theme--light"></i>
                 </button>
               </li>
               <li>
-                <button aria-label="Next page" class="v-pagination__navigation v-pagination__navigation--disabled" type="button">
+                <button aria-label="Next page" class="v-pagination__navigation v-pagination__navigation--disabled" disabled="disabled" type="button">
                   <i aria-hidden="true" class="v-icon notranslate mdi mdi-chevron-right theme--light"></i>
                 </button>
               </li>

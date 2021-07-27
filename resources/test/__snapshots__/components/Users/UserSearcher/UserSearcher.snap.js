@@ -3,7 +3,7 @@
 exports[`UserSearcher matches its snapshot 1`] = `
 <div class="row align-center">
   <div class="col-sm-9 col-12">
-    <div class="v-input v-input--hide-details v-input--is-label-active v-input--is-dirty theme--light v-text-field v-text-field--enclosed v-text-field--outlined v-select v-autocomplete">
+    <div class="v-input v-input--hide-details theme--light v-text-field v-text-field--enclosed v-text-field--outlined v-select v-autocomplete">
       <div class="v-input__prepend-outer">
         <div class="v-input__icon v-input__icon--prepend">
           <i aria-hidden="true" class="v-icon notranslate mdi mdi-account-search theme--light"></i>
@@ -13,11 +13,11 @@ exports[`UserSearcher matches its snapshot 1`] = `
         <div aria-expanded="false" aria-haspopup="listbox" aria-owns="list-2" class="v-input__slot" role="combobox">
           <fieldset aria-hidden="true">
             <legend style="width: 0px;">
-              <span>​</span>
+              <span class="notranslate">​</span>
             </legend>
           </fieldset>
           <div class="v-select__slot">
-            <label class="v-label v-label--active theme--light" for="input-2" style="left: 0px; position: absolute;">studies.dialogs.collaborators.search</label>
+            <label class="v-label theme--light" for="input-2" style="left: 0px; position: absolute;">studies.dialogs.collaborators.search</label>
             <input autocomplete="off" id="input-2" type="text">
             <div class="v-input__append-inner">
               <div class="v-input__icon v-input__icon--append">
