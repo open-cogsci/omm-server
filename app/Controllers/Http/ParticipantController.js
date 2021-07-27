@@ -421,7 +421,7 @@ class ParticipantController {
       .with('participants', (query) => {
         query
           .where('participants.id', ptcp.id)
-          .select(['id', 'meta'])
+          .select(['id', 'name', 'meta'])
       })
       .whereInPivot('status_id', [1, 2])
       .orderBy('priority', 'desc')
