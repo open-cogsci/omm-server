@@ -17,7 +17,8 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
-    'nuxt/no-cjs-in-config': 'off'
+    'nuxt/no-cjs-in-config': 'off',
+    'vue/script-setup-uses-vars': 'off'
   },
   ignorePatterns: ['resources/test/__snapshots__/**/*.js']
 }
