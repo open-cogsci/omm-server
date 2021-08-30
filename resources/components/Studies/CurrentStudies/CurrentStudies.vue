@@ -31,7 +31,7 @@ export default {
       dialog: false,
       saving: false,
       loading: false,
-      errors: { name: '', description: '' }
+      errors: { name: '', description: '', information: '' }
     }
   },
   computed: {
@@ -75,7 +75,8 @@ export default {
       try {
         await this.Study.persist({
           name: newStudyData.name,
-          description: newStudyData.description
+          description: newStudyData.description,
+          information: newStudyData.information
         })
         this.notify({
           message: this.$t('studies.notifications.created'),

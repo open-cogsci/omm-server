@@ -117,7 +117,7 @@ class StudyController {
    * @param {Transform} ctx.transform
    */
   async store ({ request, response, auth, transform }) {
-    const data = request.only(['name', 'description'])
+    const data = request.only(['name', 'description', 'information'])
     try {
       const study = await auth.user.studies().create(data, (row) => {
         row.is_owner = true
@@ -296,7 +296,7 @@ class StudyController {
       })
     }
 
-    study.merge(request.only(['name', 'description', 'active']))
+    study.merge(request.only(['name', 'description', 'information', 'active']))
     study.save()
 
     return transform.item(study, 'StudyTransformer')

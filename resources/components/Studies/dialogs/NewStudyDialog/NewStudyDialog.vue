@@ -28,6 +28,14 @@
             :error-messages="errors.description"
             @input="removeErrors('description')"
           />
+          <v-textarea
+            v-model="study.information"
+            rows="4"
+            auto-grow
+            label="Information"
+            :error-messages="errors.information"
+            @input="removeErrors('information')"
+          />
         </v-form>
       </v-card-text>
       <v-card-actions>
@@ -47,6 +55,12 @@
 import { isEmpty, isLength } from 'validator'
 import serverErrors from '@/mixins/servererrors'
 import SaveCancelButtons from '@/components/common/SaveCancelButtons'
+
+const emptyStudy = {
+  name: '',
+  description: '',
+  information: ''
+}
 
 export default {
   components: {
@@ -69,10 +83,7 @@ export default {
   },
   data () {
     return {
-      study: {
-        name: '',
-        description: ''
-      },
+      study: { ...emptyStudy },
       formValid: true,
       maxNameLength: 50,
       maxDescLength: 100,
@@ -106,8 +117,7 @@ export default {
       }
     },
     clear () {
-      this.study.name = ''
-      this.study.description = ''
+      this.study = { ...emptyStudy }
       this.$refs.form.resetValidation()
     }
   }

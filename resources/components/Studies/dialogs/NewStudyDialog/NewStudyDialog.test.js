@@ -76,7 +76,7 @@ describe('NewStudyDialog', () => {
   })
 
   it('should handle save button presses correctly', async () => {
-    const study = { name: 'Something', description: 'Something' }
+    const study = { name: 'Something', description: 'Something', information: 'Something' }
     const wrapper = mountFunc()
     await flushPromises()
     // The button should be disabled at first
@@ -108,7 +108,7 @@ describe('NewStudyDialog', () => {
     })
     await flushPromises()
     await wrapper.setProps({ value: false })
-    expect(wrapper.vm.study).toEqual({ name: '', description: '' })
+    expect(wrapper.vm.study).toEqual({ name: '', description: '', information: '' })
   })
 
   it('should clear server validation errors when new input is provided', async () => {

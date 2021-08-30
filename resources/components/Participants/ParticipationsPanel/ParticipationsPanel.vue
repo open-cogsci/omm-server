@@ -79,7 +79,7 @@ export default {
       // This is such an ugly hack, but inevitable with the belongsToMany bug that vuex-orm
       // experiences. Once that is fixed, this hoop is no longer necessary
       const edge = this.Participation.find([studyID, ptcpID])
-      if (!edge.jobs_count) {
+      if (!edge?.jobs_count) {
         return 0
       }
       return parseInt(edge.completed_jobs_count / edge.jobs_count * 100)
