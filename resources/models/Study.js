@@ -28,6 +28,7 @@ export default class Study extends Model {
       id: this.attr(''),
       name: this.string(''),
       description: this.string(''),
+      information: this.string(''),
       active: this.boolean(true),
       created_at: this.attr(''),
       updated_at: this.attr(''),

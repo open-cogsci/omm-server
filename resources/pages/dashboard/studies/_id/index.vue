@@ -62,6 +62,7 @@
             </v-col>
             <v-col cols="12" lg="4" xl="3" order-lg="first">
               <v-tabs v-model="tab">
+                <v-tab>{{ $t('studies.tabs.information') }}</v-tab>
                 <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
                 <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
               </v-tabs>
@@ -70,6 +71,20 @@
           <v-row class="fill-height">
             <v-col cols="12" class="pt-6 pb-0 mb-0">
               <v-tabs-items v-model="tab" class="fill-height">
+                <v-tab-item>
+                  <v-row justify="center">
+                    <v-col xl="10">
+                      <v-card outlined>
+                        <v-card-text>
+                          <v-skeleton-loader v-if="status.loading" type="text" />
+                          <p v-else>
+                            {{ study.information }}
+                          </p>
+                        </v-card-text>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-tab-item>
                 <v-tab-item>
                   <jobs-table
                     :editable="userCanEdit"
