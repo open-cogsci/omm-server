@@ -28,7 +28,8 @@ exports[`Study Index matches its snapshot 1`] = `
                   <div class="v-tabs-slider-wrapper" style="transition: none;">
                     <div class="v-tabs-slider"></div>
                   </div>
-                  <div aria-selected="true" class="v-tab v-tab--active" role="tab" tabindex="0">studies.tabs.jobs</div>
+                  <div aria-selected="true" class="v-tab v-tab--active" role="tab" tabindex="0">studies.tabs.information</div>
+                  <div aria-selected="false" class="v-tab" role="tab" tabindex="0">studies.tabs.jobs</div>
                   <div aria-selected="false" class="v-tab" role="tab" tabindex="0">studies.tabs.participants</div>
                 </div>
               </div>
@@ -43,9 +44,38 @@ exports[`Study Index matches its snapshot 1`] = `
         <div class="pt-6 pb-0 mb-0 col col-12">
           <div class="v-window fill-height v-item-group theme--light v-tabs-items">
             <div class="v-window__container">
-              <transition-stub name>
+              <transition-stub class="fill-height" name>
                 <div class="v-window-item v-window-item--active">
+                  <div class="row fill-height justify-center">
+                    <div class="col-xl-10 col">
+                      <div class="fill-height v-card v-sheet v-sheet--outlined theme--light">
+                        <div class="v-card__text">
+                          <div>
+                            <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                              <div class="v-skeleton-loader__text v-skeleton-loader__bone"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </transition-stub>
+              <transition-stub name>
               </transition-stub>
               <transition-stub class="fill-height" name>
               </transition-stub>

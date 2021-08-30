@@ -68,6 +68,7 @@ module.exports = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/auth',
+    '@nuxtjs/markdownit',
     'nuxt-i18n'
   ],
   /*
@@ -111,6 +112,12 @@ module.exports = {
   telemetry: {
     enabled: true,
     consent: true
+  },
+  markdownit: {
+    preset: 'default',
+    runtime: true,
+    linkify: true,
+    breaks: true
   },
   /*
   ** Build configuration

@@ -4,3 +4,19 @@
 .page-enter, .page-leave-to {
   opacity: 0;
 }
+
+.study-info-content {
+  h1 {
+    margin: 20px 0px 20px 0px;
+  }
+  h2, h3 {
+    margin: 20px 0px 10px 0px;
+  }
+  p, li {
+    font-size: 115%;
+    line-height: 140%;
+  }
+  ul, ol {
+    margin-bottom: 20px;
+  }
+}

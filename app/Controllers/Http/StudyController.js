@@ -296,7 +296,7 @@ class StudyController {
       })
     }
 
-    study.merge(request.only(['name', 'description', 'active']))
+    study.merge(request.only(['name', 'description', 'information', 'active']))
     study.save()
 
     return transform.item(study, 'StudyTransformer')
