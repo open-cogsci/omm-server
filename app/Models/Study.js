@@ -25,6 +25,9 @@ const Helpers = use('Helpers')
 *        description:
 *          type: string
 *          example: This task is awesome
+*        information:
+*          type: string
+*          example: Some extra info about this study
 *        active:
 *          type: boolean
 *        created_at:
