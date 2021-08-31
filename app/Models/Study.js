@@ -380,7 +380,7 @@ class Study extends Model {
               partition by
                 pp.id
               order by
-                ptcp.priority desc,
+                ptcp.priority asc,
                 ptcp.status_id desc,
                 studies.created_at asc
               ) as queue_position

@@ -78,6 +78,7 @@
                         <v-card-text>
                           <study-info
                             :loading="status.loading"
+                            :user-can-edit="userCanEdit"
                             :study="study"
                             @editted="saveStudyInfo"
                           />

@@ -26,7 +26,7 @@
         </div>
         <div v-else key="view">
           <div class="d-flex justify-end">
-            <v-btn color="primary" @click="editMode=true">
+            <v-btn v-if="userCanEdit" color="primary" @click="editMode=true">
               <v-icon left>
                 mdi-pencil
               </v-icon>
@@ -51,6 +51,10 @@ export default {
     study: {
       type: Object,
       default: () => ({})
+    },
+    userCanEdit: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

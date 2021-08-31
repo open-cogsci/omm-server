@@ -10,7 +10,7 @@ exports[`PriorityDial matches its snapshot 1`] = `
         </legend>
       </fieldset>
       <div class="v-text-field__slot">
-        <input id="input-2" max="99" min="1" type="number">
+        <input id="input-2" max="999" min="1" type="number">
       </div>
     </div>
   </div>

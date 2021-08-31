@@ -424,7 +424,7 @@ class ParticipantController {
           .select(['id', 'name', 'meta'])
       })
       .whereInPivot('status_id', [1, 2])
-      .orderBy('priority', 'desc')
+      .orderBy('priority', 'asc')
       .orderBy('status_id', 'desc')
       .orderBy('studies.created_at', 'asc')
       .withPivot(['status_id', 'priority'])
@@ -805,7 +805,7 @@ class ParticipantController {
     }
 
     const validation = await validate(request.all(), {
-      priority: 'integer|range:0,100'
+      priority: 'integer|range:0,1000'
     })
     if (validation.fails()) {
       return response.badRequest(validation.messages())
