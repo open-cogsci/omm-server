@@ -130,8 +130,11 @@ Route.group(() => {
   // The client deletes a list of jobs in the job table of the server. The index parameters are specified
   // in the url for making them required (and thus for safety of not deleting all records)
   Route.delete('/studies/:id/jobs/:from/:to', 'StudyController.deleteJobs').as('jobs.delete_sequence')
-
   Route.get('/studies/:id/jobs/count', 'StudyController.countJobs').as('jobs.count')
+
+  Route.get('/sessions', 'SessionController.show').as('sessions.show')
+  Route.put('/sessions', 'SessionController.update').as('sessions.update')
+
   Route.get('/healthz', () => 'OK').as('health')
 
   Route.any('*', ({ response }) => {
