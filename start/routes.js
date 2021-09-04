@@ -134,6 +134,7 @@ Route.group(() => {
 
   Route.get('/sessions', 'SessionController.show').as('sessions.show')
   Route.put('/sessions', 'SessionController.update').as('sessions.update')
+  Route.delete('/sessions', 'SessionController.destroy').as('sessions.delete')
 
   Route.get('/healthz', () => 'OK').as('health')
 

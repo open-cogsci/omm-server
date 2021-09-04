@@ -6,7 +6,7 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Session = use('App/Models/Session')
-
+const { validate } = use('Validator')
 /**
  * Resourceful controller for interacting with sessions
  */
@@ -18,7 +18,7 @@ class SessionController {
   *     tags:
   *       - Sessions
   *     summary: >
-  *         Retrieves a single session
+  *         Retrieves session data
   *     parameters:
   *       - in: query
   *         name: study_id
@@ -53,6 +53,7 @@ class SessionController {
   async show ({ request, response }) {
     const studyID = request.input('study_id', null)
     const participantID = request.input('participant_id', null)
+
     const result = await Session.query()
       .where('study_id', studyID)
       .where('participant_id', participantID)
@@ -79,14 +80,14 @@ class SessionController {
   *               type: integer
   *               description: The study id to set the data for
   *               example: 23
-  *             participanty_id:
+  *             participant_id:
   *               type: string
   *               description: The participant identifier to set the data for
   *               example: pp12345
   *             data:
-  *               type: json
+  *               type: string
   *               description: The data to set
-  *               example: {"rt": 500}
+  *               example: "{\"rt\": 500}"
   *     responses:
   *       204:
   *         description: OK. The data has been saved.
@@ -109,14 +110,59 @@ class SessionController {
    * @param {Response} ctx.response
    */
   async update ({ request, response }) {
-    const study_id = request.input('study_id', null)
-    const participant_id = request.input('participant_id', null)
+    const validation = await validate(request.all(), {
+      study_id: 'integer',
+      participant_id: 'string',
+      data: 'required|json'
+    })
+    if (validation.fails()) {
+      return response.status(422).json(validation.messages())
+    }
+    const studyID = request.input('study_id', null)
+    const participantID = request.input('participant_id', null)
     const data = request.input('data', {})
-    const session = new Session()
-    session.fill({ study_id, participant_id, data: JSON.stringify(data) })
-    await session.save()
+    const record = await Session.query()
+      .where('study_id', studyID)
+      .where('participant_id', participantID)
+      .first()
+    if (record === null) {
+      await Session.create({
+        study_id: studyID,
+        participant_id: participantID,
+        data
+      })
+    } else {
+      record.data = data
+      await record.save()
+    }
     return response.noContent()
   }
+
+  /**
+  * @swagger
+  * /sessions:
+  *   delete:
+  *     tags:
+  *       - Sessions
+  *     summary: >
+  *         Deletes session data.
+  *     parameters:
+  *       - in: query
+  *         name: study_id
+  *         type: integer
+  *         description: The ID of the study
+  *       - in: query
+  *         name: participant_id
+  *         type: string
+  *         description: The identifier of the participant
+  *     responses:
+  *       204:
+  *         description: The session data has been deleted.
+  *       404:
+  *         description: The session with the specified parameters was not found.
+  *       default:
+  *         description: Unexpected error
+  */
 
   /**
    * Delete a session with id.

@@ -6,6 +6,7 @@ const Schema = use('Schema')
 class SessionSchema extends Schema {
   up () {
     this.create('sessions', (table) => {
+      table.increments('id')
       table.integer('study_id').unsigned()
       table.string('participant_id')
       table.json('data').notNullable()
