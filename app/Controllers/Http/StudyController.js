@@ -1152,7 +1152,12 @@ class StudyController {
     if (!ptcpIDs) {
       return response.badRequest({ message: 'No participants were specified' })
     }
+
+    let ptcpIdentifiers = await study.participants().pair('id', 'identifier')
+    ptcpIdentifiers = Object.entries(ptcpIdentifiers).map(([_k, v]) => v)
     await study.participants().detach(ptcpIDs)
+    // Clear any session data pertaining to revoked participants
+    await study.sessions().whereIn('participant_id', ptcpIdentifiers).delete()
 
     const jobIDs = await study.jobs().ids()
     // Also clean up noncompleted jobs

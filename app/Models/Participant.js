@@ -54,6 +54,18 @@ class Participant extends Model {
       .withPivot(['data', 'status_id'])
   }
 
+  /**
+   * Session data
+   *
+   * @method sessions
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
+  sessions () {
+    return this.hasMany('App/Models/Session', 'identifier', 'participant_id')
+  }
+
   async getStudiesProgress () {
     return (await Database.raw(`
       SELECT

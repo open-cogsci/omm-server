@@ -152,6 +152,18 @@ class Study extends Model {
   }
 
   /**
+   * Session data
+   *
+   * @method sessions
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
+  sessions () {
+    return this.hasMany('App/Models/Session')
+  }
+
+  /**
    * Checks if the passed user has sufficient privileges to edit this study
    *
    * @param {User} user
