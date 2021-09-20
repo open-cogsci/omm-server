@@ -6,9 +6,9 @@
     outlined
     type="number"
     hide-details
-    :rules="[v => !!v && v > 0 && v < 100]"
+    :rules="[v => !!v && v > 0 && v < 1000]"
     min="1"
-    max="99"
+    max="999"
   />
 </template>
 
@@ -38,7 +38,7 @@ export default {
     }
   },
   created () {
-    this.update = debounce(this.update, 500)
+    this.update = debounce(this.update, 250)
   },
   methods: {
     ...mapActions('notifications', ['notify']),

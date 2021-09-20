@@ -25,7 +25,7 @@
               :position="queue[item.id]"
             />
           </v-list-item-content>
-          <v-list-item-action v-if="editable" style="max-width: 65px">
+          <v-list-item-action v-if="editable" style="max-width: 100px">
             <priority-dial
               :participation="item.pivot"
               @changed-priority="$emit('changed-priority', $event)"

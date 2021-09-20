@@ -17,7 +17,8 @@ export default {
   },
   tabs: {
     jobs: 'Jobs',
-    participants: 'Participants'
+    participants: 'Participants',
+    information: 'Info'
   },
   actions: {
     upload_experiment: 'Experiment',

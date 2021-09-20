@@ -6,11 +6,11 @@ exports[`PriorityDial matches its snapshot 1`] = `
     <div class="v-input__slot">
       <fieldset aria-hidden="true">
         <legend style="width: 0px;">
-          <span>​</span>
+          <span class="notranslate">​</span>
         </legend>
       </fieldset>
       <div class="v-text-field__slot">
-        <input id="input-2" max="99" min="1" type="number">
+        <input id="input-2" max="999" min="1" type="number">
       </div>
     </div>
   </div>

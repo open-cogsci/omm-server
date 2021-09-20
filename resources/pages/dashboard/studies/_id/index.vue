@@ -35,11 +35,11 @@
           <v-col cols="12">
             <study-title
               :study="study"
-              :saving="status.savingTitle"
+              :saving="status.savingStudyInfo"
               :loading="status.loading"
               :errors.sync="errors.title"
               :editable="userCanEdit"
-              @editted="saveTitleInfo"
+              @editted="saveStudyInfo"
             />
           </v-col>
         </v-row>
@@ -62,6 +62,7 @@
             </v-col>
             <v-col cols="12" lg="4" xl="3" order-lg="first">
               <v-tabs v-model="tab">
+                <v-tab>{{ $t('studies.tabs.information') }}</v-tab>
                 <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
                 <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
               </v-tabs>
@@ -70,6 +71,22 @@
           <v-row class="fill-height">
             <v-col cols="12" class="pt-6 pb-0 mb-0">
               <v-tabs-items v-model="tab" class="fill-height">
+                <v-tab-item class="fill-height">
+                  <v-row justify="center" class="fill-height">
+                    <v-col xl="10">
+                      <v-card outlined class="fill-height">
+                        <v-card-text>
+                          <study-info
+                            :loading="status.loading"
+                            :user-can-edit="userCanEdit"
+                            :study="study"
+                            @editted="saveStudyInfo"
+                          />
+                        </v-card-text>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </v-tab-item>
                 <v-tab-item>
                   <jobs-table
                     :editable="userCanEdit"
@@ -107,6 +124,7 @@ import { mapActions } from 'vuex'
 import { sync } from 'vuex-pathify'
 import { processErrors } from '@/assets/js/errorhandling'
 import StudyActions from '@/components/Studies/page/StudyActions'
+import StudyInfo from '@/components/Studies/page/StudyInfo'
 
 const defaultPagination = {
   page: 1,
@@ -126,7 +144,8 @@ export default {
     UploadExperimentDialog: () => import('@/components/Studies/dialogs/UploadExperimentDialog'),
     UploadJobsDialog: () => import('@/components/Studies/dialogs/UploadJobsDialog'),
     CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog'),
-    ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel')
+    ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel'),
+    StudyInfo
   },
   beforeRouteUpdate (to, from, next) {
     // The component is reused if the id simply changed, so mounted is not called in this case.
@@ -144,7 +163,8 @@ export default {
   data () {
     return {
       status: {
-        savingTitle: false,
+        savingStudyInfo: false,
+        savingInfo: false,
         loading: false,
         refreshingJobs: false
       },
@@ -285,19 +305,19 @@ export default {
       await this.fetchJobs(studyID)
       this.status.loading = false
     },
-    async saveTitleInfo (data) {
+    async saveStudyInfo (data) {
       const payload = {
-        ...pick(this.study, ['id', 'name', 'description']),
+        ...pick(this.study, ['id', 'name', 'description', 'information']),
         ...data
       }
-      this.status.savingTitle = true
+      this.status.savingStudyInfo = true
       try {
         await this.Study.persist(payload)
         this.errors.title = {}
       } catch (e) {
         this.errors.title = processErrors(e, this.notify)
       } finally {
-        this.status.savingTitle = false
+        this.status.savingStudyInfo = false
       }
     },
     async deleteStudy () {

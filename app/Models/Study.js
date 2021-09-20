@@ -25,6 +25,9 @@ const Helpers = use('Helpers')
 *        description:
 *          type: string
 *          example: This task is awesome
+*        information:
+*          type: string
+*          example: Some extra info about this study
 *        active:
 *          type: boolean
 *        created_at:
@@ -146,6 +149,18 @@ class Study extends Model {
    */
   files () {
     return this.hasMany('App/Models/StudyFile')
+  }
+
+  /**
+   * Session data
+   *
+   * @method sessions
+   *
+   * @returns {Object}
+   * @memberof Study
+   */
+  sessions () {
+    return this.hasMany('App/Models/Session')
   }
 
   /**
@@ -377,7 +392,7 @@ class Study extends Model {
               partition by
                 pp.id
               order by
-                ptcp.priority desc,
+                ptcp.priority asc,
                 ptcp.status_id desc,
                 studies.created_at asc
               ) as queue_position
