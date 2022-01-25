@@ -19,7 +19,7 @@ class ParticipantSeeder {
   async run () {
     // Don't seed any studies if there already are some.
     if (await Participant.getCount() === 0) {
-      return Factory.model('App/Models/Participant').createMany(25)
+      return Factory.model('App/Models/Participant').createMany(100)
     }
   }
 }
