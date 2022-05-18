@@ -39,7 +39,7 @@
     "@vuex-orm/core": "^0.36.3",
     "@vuex-orm/plugin-axios": "^0.9.4",
     "adonis-bumblebee": "^2.2.0",
-    "adonis-swagger": "ahmadarif/adonis-swagger#v1.3.0",
+    "adonis-swagger": "^1.2.9",
     "cross-env": "^7.0.3",
     "date-fns": "^2.20.1",
     "flat": "^5.0.2",
