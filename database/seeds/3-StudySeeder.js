@@ -20,7 +20,9 @@ async function createCaptureJobs (study) {
     dtype_id: 1
   })
 
-  for (const [key, value] of Object.entries(['present', 'absent'])) {
+  for (const [key, value] of Object.entries([
+    'red', 'green', 'blue', 'yellow', 'purple', 'magenta'
+  ])) {
     const job = await study.jobs().create({
       position: parseInt(key) + 1
     })

@@ -346,6 +346,7 @@ class Study extends Model {
       throw new Error('Participant ID should be null or number')
     }
 
+    // Count the number of open jobs
     const query = Study.query()
       .select('job_states.status_id', 'job_states.participant_id')
       .leftJoin('jobs', 'studies.id', 'jobs.study_id')
@@ -356,6 +357,7 @@ class Study extends Model {
     if (ptcpID) {
       query.where('job_states.participant_id', ptcpID)
     }
+    // If the number of open jobs is 0, the study is finished
     const finished = !await query.getCount()
 
     // If the study is finished, update the participant's status
@@ -367,9 +369,11 @@ class Study extends Model {
       } else {
         statusID = 2 // In progress
       }
+
       await this.participants()
         .pivotQuery()
         .where('participant_id', ptcpID)
+        .whereNot('status_id', statusID)
         .update({ status_id: statusID })
     }
     return finished

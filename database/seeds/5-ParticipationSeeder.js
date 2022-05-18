@@ -1,6 +1,6 @@
 'use strict'
 
-const { sampleSize } = require('lodash')
+// const { sampleSize } = require('lodash')
 
 const Participant = use('App/Models/Participant')
 const Study = use('App/Models/Study')
@@ -34,8 +34,8 @@ class ParticipationSeeder {
     }
 
     for (const job of jobs.rows) {
-      const sampledPtcp = sampleSize(ptcpIds, 7)
-      for (const ptcpID of sampledPtcp) {
+      // const sampledPtcp = sampleSize(ptcpIds, 7)
+      for (const ptcpID of ptcpIds) {
         await job.participants().pivotQuery()
           .where('participant_id', ptcpID)
           .update({
