@@ -311,24 +311,25 @@ class Study extends Model {
       aggVars = Database.raw('JSON_OBJECTAGG(variables.name, job_variable.value) as trial_vars')
     }
 
-    return await Database
-      .select('jobs.id as job_id', 'jobs.position', 'jobs.study_id', 'job_states.data',
-        'job_statuses.name as status', 'participants.identifier as participant', 'participants.meta',
-        aggVars)
+    const jobVariables = Database.select('jobs.id as job_id', aggVars)
       .from('jobs')
       .leftJoin('job_variable', 'jobs.id', 'job_variable.job_id')
       .leftJoin('variables', 'variables.id', 'job_variable.variable_id')
+      .where('jobs.study_id', this.id)
+      .groupBy('jobs.id')
+
+    return await Database
+      .select(
+        'jobs.id as job_id', 'jobs.position', 'jobs.study_id',
+        'job_statuses.name as status', 'participants.identifier as participant',
+        'job_states.data', 'job_variables.trial_vars', 'participants.meta')
+      .from('jobs')
       .leftJoin('job_states', 'jobs.id', 'job_states.job_id')
       .leftJoin('participants', 'job_states.participant_id', 'participants.id')
       .leftJoin('job_statuses', 'job_states.status_id', 'job_statuses.id')
+      .leftJoin(jobVariables.as('job_variables'), 'jobs.id', 'job_variables.job_id')
       .where('jobs.study_id', this.id)
       .whereNotNull('job_states.data')
-      .groupBy('job_id')
-      .groupBy('job_states.data')
-      .groupBy('status')
-      .groupBy('participant_id')
-      .groupBy('participants.identifier')
-      .groupBy('participants.meta')
   }
 
   /**
