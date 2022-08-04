@@ -1,13 +1,13 @@
 <template>
   <studies-list
-    :studies="studies"
+    :studies="filteredStudies"
     :loading="loading"
   />
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-
+import Fuse from 'fuse.js'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
@@ -31,6 +31,18 @@ export default {
     },
     User () {
       return this.$store.$db().model('users')
+    },
+    filteredStudies () {
+      if (!this.filter || this.filter.length < 2) {
+        return this.studies
+      }
+      return this.searchableStudies.search(this.filter)
+        .map(result => result.item)
+    },
+    searchableStudies () {
+      return new Fuse(this.studies, {
+        keys: ['title', 'description']
+      })
     },
     studies () {
       return this.Study.query()
