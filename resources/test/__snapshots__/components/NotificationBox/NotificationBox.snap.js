@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NotificationBox should match its snapshot 1`] = `
-<div class="v-snack v-snack--bottom v-snack--has-background v-snack--left" style="padding-bottom: 0px; padding-top: 0px;">
+<div class="v-snack v-snack--bottom v-snack--has-background v-snack--left">
   <transition-stub name="v-snack-transition">
     <div class="v-snack__wrapper v-sheet theme--dark primary" style="display: none;">
       <div aria-live="polite" class="v-snack__content" role="status">
