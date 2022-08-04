@@ -41,7 +41,7 @@ export default {
     },
     searchableStudies () {
       return new Fuse(this.studies, {
-        keys: ['title', 'description']
+        keys: ['name', 'description']
       })
     },
     studies () {
