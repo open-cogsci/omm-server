@@ -6,7 +6,7 @@
   >
     <v-progress-linear v-if="fetchingMore" height="2" indeterminate />
     <v-virtual-scroll
-      v-if="participants.length"
+      v-show="participants.length"
       v-resize="setHeight"
       :items="participants"
       :item-height="65"
@@ -37,7 +37,7 @@
         </v-list-item>
       </template>
     </v-virtual-scroll>
-    <h3 v-else class="px-4 font-weight-light">
+    <h3 v-show="!participants.length" class="px-4 font-weight-light">
       {{ $t('study_participants.participants.none') }}
     </h3>
   </v-skeleton-loader>
