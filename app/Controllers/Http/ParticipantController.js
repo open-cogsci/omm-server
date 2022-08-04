@@ -424,11 +424,11 @@ class ParticipantController {
           .where('participants.id', ptcp.id)
           .select(['id', 'name', 'meta'])
       })
+      .withPivot(['status_id', 'priority'])
       .whereInPivot('status_id', [1, 2])
       .orderBy('priority', 'asc')
       .orderBy('status_id', 'desc')
       .orderBy('studies.created_at', 'asc')
-      .withPivot(['status_id', 'priority'])
       .withCount('jobs')
       .firstOrFail()
 
