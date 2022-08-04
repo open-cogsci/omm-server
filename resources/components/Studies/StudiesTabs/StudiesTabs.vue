@@ -21,6 +21,7 @@
     <v-col class="py-0 my-0 pr-0">
       <v-text-field
         v-model="search"
+        class="my-1"
         solo
         hide-details
         prepend-inner-icon="mdi-magnify"
