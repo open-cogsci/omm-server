@@ -14,6 +14,12 @@ export default {
   components: {
     StudiesList: () => import('../StudiesList')
   },
+  props: {
+    filter: {
+      type: String,
+      default: ''
+    }
+  },
   data () {
     return {
       loading: false

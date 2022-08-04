@@ -26,6 +26,12 @@ export default {
     StudiesList: () => import('../StudiesList'),
     newStudyDialog: () => import('../dialogs/NewStudyDialog')
   },
+  props: {
+    filter: {
+      type: String,
+      default: ''
+    }
+  },
   data () {
     return {
       dialog: false,

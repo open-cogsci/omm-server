@@ -3,7 +3,8 @@ export default {
     add: 'Add new study',
     current: 'Current',
     archived: 'Archived',
-    shared_by: 'Shared by'
+    shared_by: 'Shared by',
+    search: 'Search'
   },
   notifications: {
     created: 'The study has been created',

@@ -3,7 +3,8 @@ export default {
     add: 'Voeg nieuw experiment toe',
     current: 'Actueel',
     archived: 'Gearchiveerd',
-    shared_by: 'Gedeeld door'
+    shared_by: 'Gedeeld door',
+    search: 'Zoek'
   },
   notifications: {
     created: 'Het experiment is aangemaakt',
