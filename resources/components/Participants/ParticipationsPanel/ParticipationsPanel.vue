@@ -9,11 +9,17 @@
         type="divided-list-item@5"
         :types="{'divided-list-item': 'list-item-two-line, divider'}"
       >
+        <v-list-item v-if="!participant.studies.length">
+          <v-list-item-content>
+            <v-list-item-title class="font-weight-light text-center">
+              {{ $t('participants.no_studies') }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <!-- With only a virtual scroll here, the skeleton loader never leaves the
                   loading state. Therefore there also is an empty div -->
-        <div />
         <v-virtual-scroll
-          v-if="participant.studies.length"
           :items="participant.studies"
           :item-height="80"
           height="340"
@@ -41,14 +47,6 @@
             <v-divider :key="`divider-${item.id}`" />
           </template>
         </v-virtual-scroll>
-
-        <v-list-item v-else>
-          <v-list-item-content>
-            <v-list-item-title class="font-weight-light text-center">
-              {{ $t('participants.no_studies') }}
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
       </v-skeleton-loader>
     </v-card-text>
   </v-card>
