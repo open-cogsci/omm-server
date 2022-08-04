@@ -18,12 +18,24 @@
       </template>
     </v-toolbar>
 
+    <v-col class="py-0 my-0 pr-0">
+      <v-text-field
+        v-model="search"
+        class="my-1"
+        solo
+        hide-details
+        prepend-inner-icon="mdi-magnify"
+        clearable
+        :label="$t('studies.list.search')"
+      />
+    </v-col>
+
     <v-tabs-items v-model="openTab" class="fill-height">
       <v-tab-item value="tab-current" class="fill-height">
-        <current-studies />
+        <current-studies :filter="search" />
       </v-tab-item>
       <v-tab-item value="tab-archived">
-        <archived-studies />
+        <archived-studies :filter="search" />
       </v-tab-item>
     </v-tabs-items>
   </v-row>
@@ -39,6 +51,7 @@ export default {
   },
   data () {
     return {
+      search: '',
       openTab: 'tab-current'
     }
   }

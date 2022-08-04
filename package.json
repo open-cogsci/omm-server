@@ -1,6 +1,6 @@
 {
   "name": "omm-server",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "OpenMonkeyMind",
   "author": "Daniel Schreij",
   "contributors": [
@@ -43,6 +43,7 @@
     "cross-env": "^7.0.3",
     "date-fns": "^2.20.1",
     "flat": "^5.0.2",
+    "fuse.js": "^6.6.2",
     "js-yaml": "^3.14.1",
     "mysql2": "^2.2.5",
     "nuxt": "^2.15.4",

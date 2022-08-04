@@ -7,8 +7,8 @@ import faker from 'faker'
 import { mount, createLocalVue } from '@vue/test-utils'
 import { Model } from '@vuex-orm/core'
 import flushPromises from 'flush-promises'
-import * as storeIndex from '@/store'
 import UserEditData from './UserEditData.vue'
+import * as storeIndex from '@/store'
 
 jest.mock('axios')
 Model.setAxios(axios)

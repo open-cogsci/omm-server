@@ -9,7 +9,7 @@
       @input="clearErrors"
     />
     <studies-list
-      :studies="studies"
+      :studies="filteredStudies"
       :loading="loading"
       :add-study-button="true"
       @clicked-new-study="dialog = true"
@@ -19,12 +19,19 @@
 
 <script>
 import { mapActions } from 'vuex'
+import Fuse from 'fuse.js'
 import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   components: {
     StudiesList: () => import('../StudiesList'),
     newStudyDialog: () => import('../dialogs/NewStudyDialog')
+  },
+  props: {
+    filter: {
+      type: String,
+      default: ''
+    }
   },
   data () {
     return {
@@ -41,6 +48,18 @@ export default {
     User () {
       return this.$store.$db().model('users')
     },
+    filteredStudies () {
+      if (!this.filter || this.filter.length < 2) {
+        return this.studies
+      }
+      return this.searchableStudies.search(this.filter)
+        .map(result => result.item)
+    },
+    searchableStudies () {
+      return new Fuse(this.studies, {
+        keys: ['title', 'description']
+      })
+    },
     studies () {
       return this.Study.query()
         .whereHas('users', (q) => {
@@ -53,6 +72,7 @@ export default {
     }
   },
   created () {
+    // this.search = debounce(this.search, 200)
     return this.loadStudies()
   },
   methods: {
@@ -97,6 +117,9 @@ export default {
       if (!val) {
         this.errors = { name: '', description: '' }
       }
+    },
+    search (term) {
+      return this.searchableStudies.search(term)
     }
   }
 }

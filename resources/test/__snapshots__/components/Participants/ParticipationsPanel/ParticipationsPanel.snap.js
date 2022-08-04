@@ -7,7 +7,6 @@ exports[`ParticipationsPanel matches its snapshot 1`] = `
   </div>
   <div class="v-card__text pa-0">
     <div class="v-skeleton-loader theme--light">
-      <div></div>
       <div class="v-virtual-scroll" style="height: 340px;">
         <div class="v-virtual-scroll__container" style="height: 80px;">
           <div class="v-virtual-scroll__item" style="top: 0px;">
