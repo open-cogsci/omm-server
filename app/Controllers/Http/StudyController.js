@@ -9,6 +9,7 @@ const Study = use('App/Models/Study')
 const Participant = use('App/Models/Participant')
 const User = use('App/Models/User')
 const Helpers = use('Helpers')
+const Logger = use('Logger')
 const pool = use('Workers/Sheets')
 
 const fs = require('fs/promises')
@@ -1026,8 +1027,12 @@ class StudyController {
     // Delete any previous occurrences of the file in the current format
     const previousFile = await study.files().where('type', type).first()
     if (previousFile) {
-      await fs.unlink(Helpers.publicPath(previousFile.path))
-      await previousFile.delete()
+      try {
+        await fs.unlink(Helpers.publicPath(previousFile.path))
+        await previousFile.delete()
+      } catch (e) {
+        Logger.error('error while deleting previous data file: %s', e.toString())
+      }
     }
 
     const newFile = await study.files().create({
