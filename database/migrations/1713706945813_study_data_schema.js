@@ -8,11 +8,9 @@ class StudyDataSchema extends Schema {
     this.create('study_data', (table) => {
       table.increments()
       table.integer('study_id').unsigned().notNullable()
-      table.integer('participant_id').unsigned().notNullable()
-      table.specificType('data', 'json')
+      table.json('data')
       table.timestamps()
 
-      table.foreign('participant_id').references('id').inTable('participants').onDelete('cascade')
       table.foreign('study_id').references('id').inTable('studies').onDelete('cascade')
     })
   }

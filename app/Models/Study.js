@@ -315,17 +315,20 @@ class Study extends Model {
    */
   async getCollectedData () {
     return await Database
-      .select('study.name as name', 'participants.identifier as participant', 'participants.meta as meta', 'data')
+      .select('name', 'data')
       .from('study_data')
-      .leftJoin('participants', 'study_data.participant_id', 'participants.id')
       .leftJoin('studies', 'study_data.study_id', 'studies.id')
   }
 
   async storeJobData (data, jobId, ptcpId) {
     const job = await this.jobs().with('variables').find(jobId)
-
     if (!job) {
       throw new Error('Job not found')
+    }
+
+    const ptcp = await this.participants().find(ptcpId)
+    if (!ptcp) {
+      throw new Error('Participant not found')
     }
 
     // Get the variables for the job and convert them to key:value pairs so that the variable name is the
@@ -339,12 +342,14 @@ class Study extends Model {
     }
 
     return await this.data().create({
-      participant_id: ptcpId,
       data: JSON.stringify({
-        ...varData,
-        ...data,
+        participant_name: ptcp.name,
+        participant_identifier: ptcp.identifier,
+        participant_meta: ptcp.meta,
         job_id: job.id,
-        job_position: job.position
+        job_position: job.position,
+        ...varData,
+        ...data
       })
     })
   }
