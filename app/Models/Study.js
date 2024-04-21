@@ -164,6 +164,16 @@ class Study extends Model {
   }
 
   /**
+   * Study data
+   * @method studyData
+   * @returns {Object}
+   * @memberof Study
+   * */
+  data () {
+    return this.hasMany('App/Models/StudyData')
+  }
+
+  /**
    * Checks if the passed user has sufficient privileges to edit this study
    *
    * @param {User} user
@@ -303,33 +313,40 @@ class Study extends Model {
    * @returns Array
    * @memberof Study
    */
-  async getCollectedData (db = 'mysql2') {
-    let aggVars
-    if (db === 'sqlite3') {
-      aggVars = Database.raw('json_group_object(variables.name, job_variable.value) as trial_vars')
-    } else {
-      aggVars = Database.raw('JSON_OBJECTAGG(variables.name, job_variable.value) as trial_vars')
+  async getCollectedData () {
+    return await Database
+      .select('study.name as name', 'participants.identifier as participant', 'participants.meta as meta', 'data')
+      .from('study_data')
+      .leftJoin('participants', 'study_data.participant_id', 'participants.id')
+      .leftJoin('studies', 'study_data.study_id', 'studies.id')
+  }
+
+  async storeJobData (data, jobId, ptcpId) {
+    const job = await this.jobs().with('variables').find(jobId)
+
+    if (!job) {
+      throw new Error('Job not found')
     }
 
-    const jobVariables = Database.select('jobs.id as job_id', aggVars)
-      .from('jobs')
-      .leftJoin('job_variable', 'jobs.id', 'job_variable.job_id')
-      .leftJoin('variables', 'variables.id', 'job_variable.variable_id')
-      .where('jobs.study_id', this.id)
-      .groupBy('jobs.id')
+    // Get the variables for the job and convert them to key:value pairs so that the variable name is the
+    // key and the value is its value
+    const vars = job.getRelated('variables')
+    let varData = []
+    if (vars && vars.length) {
+      varData = vars.map(v => ({
+        [v.name]: [v.pivot?.value]
+      }))
+    }
 
-    return await Database
-      .select(
-        'jobs.id as job_id', 'jobs.position', 'jobs.study_id',
-        'job_statuses.name as status', 'participants.identifier as participant',
-        'job_states.data', 'job_variables.trial_vars', 'participants.meta')
-      .from('jobs')
-      .leftJoin('job_states', 'jobs.id', 'job_states.job_id')
-      .leftJoin('participants', 'job_states.participant_id', 'participants.id')
-      .leftJoin('job_statuses', 'job_states.status_id', 'job_statuses.id')
-      .leftJoin(jobVariables.as('job_variables'), 'jobs.id', 'job_variables.job_id')
-      .where('jobs.study_id', this.id)
-      .whereNotNull('job_states.data')
+    return await this.data().create({
+      participant_id: ptcpId,
+      data: JSON.stringify({
+        ...varData,
+        ...data,
+        job_id: job.id,
+        job_position: job.position
+      })
+    })
   }
 
   /**

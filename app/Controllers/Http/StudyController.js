@@ -1007,7 +1007,7 @@ class StudyController {
       return response.badRequest(`Invalid file format, possible values are ${allowedFormats}`)
     }
     const study = await auth.user.studies().where('id', id).firstOrFail()
-    const data = await study.getCollectedData(Database.connection().connectionClient)
+    const data = await study.getCollectedData()
     const destFolder = Helpers.publicPath(`files/${study.id}`)
 
     // Even though this rarely occurs, check if folder for the study has already been
