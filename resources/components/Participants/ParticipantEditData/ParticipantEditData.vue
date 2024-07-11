@@ -68,7 +68,7 @@ import servererrors from '@/mixins/servererrors'
 const EMPTY_VALUES = {
   name: '',
   identifier: '',
-  alternate_identifier: '',
+  alternate_identifier: null,
   meta: '',
   active: true
 }

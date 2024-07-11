@@ -6,8 +6,8 @@ class SaveParticipant {
     return {
       // validation rules
       name: 'required|max:50',
-      identifier: `required|different:alternate_identifier|unique:participants,identifier,id,${ptcpId}|unique:participants,alternate_identifier,id,${ptcpId}`,
-      alternate_identifier: `required|different:identifier|unique:participants,identifier,id,${ptcpId}|unique:participants,alternate_identifier,id,${ptcpId}`,
+      identifier: `required|unique:participants,identifier,id,${ptcpId}|unique:participants,alternate_identifier,id,${ptcpId}`,
+      alternate_identifier: `unique:participants,identifier,id,${ptcpId}|unique:participants,alternate_identifier,id,${ptcpId}`,
       meta: 'json'
     }
   }
