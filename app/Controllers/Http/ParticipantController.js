@@ -308,6 +308,10 @@ class ParticipantController {
   async update ({ params, request, response, transform }) {
     const ptcp = await Participant.findOrFail(params.id)
     const data = request.only(['name', 'identifier', 'alternate_identifier', 'active', 'meta'])
+    // Clean alternate_identifier
+    if (!data.alternate_identifier || data.alternate_identifier === 'null') {
+      data.alternate_identifier = null
+    }
     ptcp.merge(data)
     try {
       await ptcp.save()

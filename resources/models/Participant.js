@@ -1,7 +1,7 @@
 import { Model } from '@vuex-orm/core'
-import { PARTICIPANTS } from '@/assets/js/endpoints'
 import Participation from './Participation'
 import Study from './Study'
+import { PARTICIPANTS } from '@/assets/js/endpoints'
 
 export default class Participant extends Model {
   static entity = 'participants'
@@ -11,7 +11,7 @@ export default class Participant extends Model {
       id: this.number(null),
       name: this.string(''),
       identifier: this.string(''),
-      alternate_identifier: this.string(''),
+      alternate_identifier: this.string(null),
       active: this.boolean(true),
       meta: this.attr(''),
       studies_count: this.number(0),
