@@ -58,7 +58,7 @@
     "vuex-pathify": "^1.4.5",
     "vuex-router-sync": "^5.0.0",
     "workerpool": "^6.1.4",
-    "xlsx": "^0.16.9"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.13.15",
