@@ -41,7 +41,7 @@
     "adonis-bumblebee": "^2.2.0",
     "adonis-swagger": "^1.2.9",
     "cross-env": "^7.0.3",
-    "date-fns": "^2.20.1",
+    "date-fns": "^3.6.0",
     "flat": "^5.0.2",
     "fuse.js": "^6.6.2",
     "js-yaml": "^3.14.1",
