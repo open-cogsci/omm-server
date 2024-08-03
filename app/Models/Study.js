@@ -333,11 +333,11 @@ class Study extends Model {
     // Get the variables for the job and convert them to key:value pairs so that the variable name is the
     // key and the value is its value
     const variables = job.getRelated('variables')
-    let variableData = []
+    let variableData = {}
     if (variables && variables.size() > 0) {
-      variableData = variables.rows.map(v => ({
-        [v.name]: v.$relations.pivot.$attributes.value
-      }))
+      variables.rows.forEach(v => {
+        variableData[v.name] = v.$relations.pivot.$attributes.value
+      })
     }
 
     return await this.jobResults().create({
