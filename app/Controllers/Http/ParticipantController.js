@@ -700,7 +700,7 @@ class ParticipantController {
   /**
   * @swagger
   * /participants/{identifier}/{job_id}/result:
-  *   patch:
+  *   post:
   *     tags:
   *       - Jobs
   *     summary: >
