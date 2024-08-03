@@ -13,7 +13,7 @@ class JobResultSchema extends Schema {
       table.timestamps()
 
       // table.foreign('participant_id').references('id').inTable('participants').onDelete('cascade')
-      table.foreign('study_id').references('id').inTable('studies').onDelete('cascade')
+      table.foreign('study_id').references('id').inTable('studies')
     })
   }
 
