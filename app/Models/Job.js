@@ -85,7 +85,7 @@ class Job extends Model {
     return this
       .belongsToMany('App/Models/Participant')
       .pivotModel('App/Models/JobState')
-      .withPivot(['data', 'status_id'])
+      .withPivot(['status_id'])
   }
 }
 

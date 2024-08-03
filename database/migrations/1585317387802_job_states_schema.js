@@ -9,7 +9,6 @@ class JobStatesSchema extends Schema {
       table.integer('participant_id').unsigned().notNullable()
       table.integer('job_id').unsigned().notNullable()
       table.integer('status_id').unsigned().notNullable().defaultTo(1)
-      table.specificType('data', 'json')
       table.timestamps()
 
       table.foreign('participant_id').references('id').inTable('participants').onDelete('cascade')

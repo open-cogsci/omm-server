@@ -39,11 +39,7 @@ class ParticipationSeeder {
         await job.participants().pivotQuery()
           .where('participant_id', ptcpID)
           .update({
-            status_id: 3,
-            data: JSON.stringify({
-              correct: Math.random() <= 0.5,
-              RT: parseInt(Math.random() * 1000)
-            })
+            status_id: 3
           })
       }
     }

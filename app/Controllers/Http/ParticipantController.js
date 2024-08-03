@@ -1,7 +1,5 @@
 'use strict'
 
-const isArray = require('lodash/isArray')
-const formatISO9075 = require('date-fns/formatISO9075')
 const { keyBy } = require('lodash')
 const { ModelNotFoundException } = require('@adonisjs/lucid/src/Exceptions')
 const { validate } = use('Validator')
@@ -753,38 +751,19 @@ class ParticipantController {
       })
       .firstOrFail()
 
-    let data = request.input('data')
-    // Add timestamp field to data so multiple iterations of the same job can be discriminated by time
-    data.timestamp = formatISO9075(new Date())
+    const jobResultData = request.input('data')
     const job = ptcp.getRelated('jobs').first()
     if (!job) {
       throw new ModelNotFoundException(`Cannot find job with ID ${jobID} for participant ${identifier}`)
     }
 
     const study = await job.study().first()
-    const previousData = job.getRelated('pivot')?.data
-    // Check if data has already been stored
-    if (previousData) {
-      if (isArray(previousData)) {
-        // If previous data already has multiple entries, simply push the current entry
-        previousData.push(data)
-        data = previousData
-      } else {
-        // If it is an object, place it in an array and add the current data instance
-        data = [previousData, data]
-      }
-    }
-
-    // Try to convert the data to json string
-    try {
-      data = JSON.stringify(data)
-    } catch (e) {
-      return response.unprocessableEntity({ message: 'Data cannot be converted to JSON' })
-    }
 
     await ptcp.jobs().pivotQuery()
       .where('job_id', jobID)
-      .update({ data, status_id: 3 })
+      .update({ status_id: 3 })
+
+    await study.storeJobResultData(jobResultData, jobID, ptcp.id)
     await study.checkIfFinished(ptcp.id)
 
     return response.noContent()
