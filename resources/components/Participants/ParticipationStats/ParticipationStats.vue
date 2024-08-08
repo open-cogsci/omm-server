@@ -47,9 +47,11 @@
             {{ $t('stats.trend') }}
           </p>
           <v-sparkline
-          v-bind="sparkline"
-          type="trend"
-          auto-draw
+            v-bind="sparkline"
+            :line-width="1"
+            type="trend"
+            auto-draw
+            label-size="3"
           />
         </v-col>
       </v-row>
