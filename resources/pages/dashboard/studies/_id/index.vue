@@ -65,6 +65,7 @@
                 <v-tab>{{ $t('studies.tabs.information') }}</v-tab>
                 <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
                 <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.stats') }}</v-tab>
               </v-tabs>
             </v-col>
           </v-row>
@@ -109,6 +110,13 @@
                     :study="study"
                   />
                 </v-tab-item>
+                <v-tab-item>
+                  <participation-stats
+                    ref="participationStats"
+                    :visible="participationStatsVisible"
+                    :study="study"
+                  />
+                </v-tab-item>
               </v-tabs-items>
             </v-col>
           </v-row>
@@ -145,6 +153,7 @@ export default {
     UploadJobsDialog: () => import('@/components/Studies/dialogs/UploadJobsDialog'),
     CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog'),
     ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel'),
+    ParticipationStats: () => import('@/components/Participants/ParticipationStats'),
     StudyInfo
   },
   beforeRouteUpdate (to, from, next) {
@@ -209,6 +218,9 @@ export default {
   },
   computed: {
     tab: sync('studyTab'),
+    participationStatsVisible () {
+      return this.tab === 1
+    },
     ptcpPanelVisible () {
       return this.tab === 1
     },

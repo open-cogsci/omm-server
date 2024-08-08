@@ -13,88 +13,70 @@
     />
     <v-col
       cols="12"
-      lg="6"
-      xl="7"
       class="pb-5"
     >
       <v-card outlined class="fill-height d-flex flex-column">
-        <v-card-title>
-          {{ $t('study_participants.stats.title') }}
-        </v-card-title>
-        <v-card-text>
-          <participation-stats :data="stats" />
-        </v-card-text>
-      </v-card>
-    </v-col>
-    <v-col
-      cols="12"
-      lg="6"
-      xl="5"
-      class="pb-5"
-    >
-      <v-card outlined class="fill-height d-flex flex-column">
-        <v-card-title>
-          {{ $t('study_participants.participants.title') }}
-          <v-spacer />
-          <div v-if="participants.length">
-            <span class="caption mr-6">
-              Priority
-            </span>
-            <span class="caption">
-              {{ $t('study_participants.participants.perc_complete') }}
-            </span>
-          </div>
-        </v-card-title>
-        <v-card-text class="pa-0 fill-height">
-          <study-participants-list
-            :editable="userCanEdit"
-            :total-jobs="study.jobs_count"
-            :participants="participants"
-            :queue="queue"
-            :loading-queue="loading.queue"
-            :loading="loading.initial"
-            :fetching-more="loading.participants"
-            @changed-priority="fetchQueue"
-            @scroll-end="loadMore"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            :disabled="study.completed_jobs_count < 1"
-            color="primary"
-            :loading="!!loading.data"
-            @click="dialog.download = true"
-          >
-            <v-icon left>
-              mdi-download
-            </v-icon>
-            {{ $t('study_participants.participants.data') }}
-          </v-btn>
-          <v-btn
-            v-if="userCanEdit"
-            color="primary"
-            @click="dialog.manage = true"
-          >
-            <v-icon left>
-              mdi-account-group
-            </v-icon>
-            {{ $t('study_participants.participants.manage') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+    <v-card-title>
+      {{ $t('study_participants.participants.title') }}
+      <v-spacer />
+      <div v-if="participants.length">
+        <span class="caption mr-6">
+          Priority
+        </span>
+        <span class="caption">
+          {{ $t('study_participants.participants.perc_complete') }}
+        </span>
+      </div>
+    </v-card-title>
+    <v-card-text class="pa-0 fill-height">
+      <study-participants-list
+        :editable="userCanEdit"
+        :total-jobs="study.jobs_count"
+        :participants="participants"
+        :queue="queue"
+        :loading-queue="loading.queue"
+        :loading="loading.initial"
+        :fetching-more="loading.participants"
+        @changed-priority="fetchQueue"
+        @scroll-end="loadMore"
+      />
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer />
+      <v-btn
+        :disabled="study.completed_jobs_count < 1"
+        color="primary"
+        :loading="!!loading.data"
+        @click="dialog.download = true"
+      >
+        <v-icon left>
+          mdi-download
+        </v-icon>
+        {{ $t('study_participants.participants.data') }}
+      </v-btn>
+      <v-btn
+        v-if="userCanEdit"
+        color="primary"
+        @click="dialog.manage = true"
+      >
+        <v-icon left>
+          mdi-account-group
+        </v-icon>
+        {{ $t('study_participants.participants.manage') }}
+      </v-btn>
+    </v-card-actions>
+  </v-card>
     </v-col>
   </v-row>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import { processErrors } from '@/assets/js/errorhandling'
 import { keyBy } from 'lodash'
+import { processErrors } from '@/assets/js/errorhandling'
 
 export default {
   components: {
-    ParticipationStats: () => import('./ParticipationStats'),
     StudyParticipantsList: () => import('./StudyParticipantsList'),
     DataDownloadDialog: () => import('@/components/Participants/dialogs/DataDownloadDialog'),
     ManageDialog: () => import('@/components/Participants/dialogs/ManageDialog')
@@ -120,7 +102,6 @@ export default {
       loading: {
         initial: false,
         participants: false,
-        stats: false,
         queue: false,
         data: null
       },
@@ -131,7 +112,6 @@ export default {
         total: 0
       },
       ptcpListCtrHeight: 0,
-      stats: {},
       queue: {}
     }
   },
@@ -153,7 +133,6 @@ export default {
         return
       }
       this.fetchParticipants()
-      this.fetchStats()
       this.fetchQueue()
     }
   },
@@ -161,7 +140,6 @@ export default {
     this.setStartpage()
     this.loading.initial = true
     await this.fetchParticipants()
-    await this.fetchStats()
     await this.fetchQueue()
     this.loading.initial = false
   },
@@ -182,17 +160,6 @@ export default {
         processErrors(e, this.notify)
       } finally {
         this.loading.participants = false
-      }
-    },
-    async fetchStats () {
-      if (!this.study?.id) { return }
-      this.loading.stats = true
-      try {
-        this.stats = await this.study.fetchParticipationStats()
-      } catch (e) {
-        processErrors(e, this.notify)
-      } finally {
-        this.loading.stats = false
       }
     },
     async fetchQueue (ptcpID = null) {
@@ -227,7 +194,6 @@ export default {
           perPage: this.pagination.perPage
         }
       })
-      this.fetchStats()
       this.fetchQueue()
     },
     setPtcpListCtrHeight () {
