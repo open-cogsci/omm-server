@@ -57,6 +57,7 @@
                 @clicked-archive="archiveStudy"
                 @clicked-upload-exp="openUploadExpDialog"
                 @clicked-upload-jobs="openUploadJobsDialog"
+                @clicked-download-result-data="downloadResultData"
                 @clicked-collaborators="collaborators.dialog = true"
               />
             </v-col>
@@ -127,7 +128,7 @@
 </template>
 
 <script>
-import { pick, debounce, isFunction } from 'lodash'
+import { pick, debounce, isFunction, keyBy } from 'lodash'
 import { mapActions } from 'vuex'
 import { sync } from 'vuex-pathify'
 import { processErrors } from '@/assets/js/errorhandling'
@@ -266,6 +267,9 @@ export default {
     userCanEdit () {
       return !!this.study?.users.find(user => user.id === this.$auth.user.id &&
         user.pivot.access_permission_id === 2)
+    },
+    dataFiles () {
+      return keyBy(this.study.files.filter(file => file.type.includes('data-')), 'type')
     }
   },
   async created () {
@@ -458,6 +462,18 @@ export default {
     },
     resetPagination () {
       this.pagination = { ...defaultPagination }
+    },
+    async generateDataFile (format) {
+      try {
+        await this.study.generateDataFile({ params: { format } })
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
+    },
+    downloadResultData () {
+      this.generateDataFile('csv')
+      const url = this.dataFiles['data-csv'].path
+      window.location.assign(url)
     }
   }
 }

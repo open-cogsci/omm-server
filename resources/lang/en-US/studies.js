@@ -25,6 +25,7 @@ export default {
   actions: {
     upload_experiment: 'Experiment',
     upload_jobs: 'Jobs',
+    download_result_data: 'Data',
     sharing: 'Sharing',
     archive: 'Archive',
     reactivate: 'Reactivate',

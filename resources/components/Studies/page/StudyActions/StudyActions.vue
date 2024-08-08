@@ -27,13 +27,13 @@
 
     <v-item-group v-if="userIsOwner" class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
       <v-btn
-        @click="$emit('clicked-collaborators')"
+        @click="$emit('clicked-download-result-data')"
       >
         <v-icon v-bind="shareIconAttrs">
-          mdi-share-variant
+          mdi-download
         </v-icon>
         <span class="d-none d-sm-inline">
-          {{ $t('studies.actions.sharing') }}
+          {{ $t('studies.actions.download_result_data') }}
         </span>
       </v-btn>
     </v-item-group>
@@ -92,6 +92,20 @@
         <div v-html="deleteBody" />
       </confirmation-dialog>
     </v-item-group>
+
+    <v-item-group v-if="userIsOwner" class="v-btn-toggle" :class="{'pl-5': $vuetify.breakpoint.mdAndUp}">
+      <v-btn
+        @click="$emit('clicked-collaborators')"
+      >
+        <v-icon v-bind="shareIconAttrs">
+          mdi-share-variant
+        </v-icon>
+        <span class="d-none d-sm-inline">
+          {{ $t('studies.actions.sharing') }}
+        </span>
+      </v-btn>
+    </v-item-group>
+
     <!-- Ugly hack to include v-btn-toggle class in final build -->
     <v-btn-toggle v-if="alwaysFalse" />
   </v-skeleton-loader>

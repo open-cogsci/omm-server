@@ -1,11 +1,5 @@
 <template>
   <v-row id="participants-panel" class="fill-height">
-    <data-download-dialog
-      v-model="dialog.download"
-      :files="study.files"
-      :generating="loading.data"
-      @generate="generateDataFile"
-    />
     <manage-dialog
       v-model="dialog.manage"
       :study="study"
@@ -44,17 +38,6 @@
     <v-card-actions>
       <v-spacer />
       <v-btn
-        :disabled="study.completed_jobs_count < 1"
-        color="primary"
-        :loading="!!loading.data"
-        @click="dialog.download = true"
-      >
-        <v-icon left>
-          mdi-download
-        </v-icon>
-        {{ $t('study_participants.participants.data') }}
-      </v-btn>
-      <v-btn
         v-if="userCanEdit"
         color="primary"
         @click="dialog.manage = true"
@@ -78,7 +61,6 @@ import { processErrors } from '@/assets/js/errorhandling'
 export default {
   components: {
     StudyParticipantsList: () => import('./StudyParticipantsList'),
-    DataDownloadDialog: () => import('@/components/Participants/dialogs/DataDownloadDialog'),
     ManageDialog: () => import('@/components/Participants/dialogs/ManageDialog')
   },
   props: {

@@ -5,7 +5,6 @@ export default {
   participants: {
     title: 'Participants',
     perc_complete: '% complete',
-    data: 'Data',
     manage: 'Manage',
     none: 'No participants assigned'
   },
