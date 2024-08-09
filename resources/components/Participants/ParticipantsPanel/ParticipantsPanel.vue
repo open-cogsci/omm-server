@@ -10,6 +10,19 @@
       class="pb-5"
     >
       <v-card outlined class="fill-height d-flex flex-column">
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            v-if="userCanEdit"
+            color="primary"
+            @click="dialog.manage = true"
+          >
+            <v-icon left>
+              mdi-account-group
+            </v-icon>
+            {{ $t('study_participants.participants.manage') }}
+          </v-btn>
+        </v-card-actions>
     <v-card-title>
       {{ $t('study_participants.participants.title') }}
       <v-spacer />
@@ -35,19 +48,6 @@
         @scroll-end="loadMore"
       />
     </v-card-text>
-    <v-card-actions>
-      <v-spacer />
-      <v-btn
-        v-if="userCanEdit"
-        color="primary"
-        @click="dialog.manage = true"
-      >
-        <v-icon left>
-          mdi-account-group
-        </v-icon>
-        {{ $t('study_participants.participants.manage') }}
-      </v-btn>
-    </v-card-actions>
   </v-card>
     </v-col>
   </v-row>
