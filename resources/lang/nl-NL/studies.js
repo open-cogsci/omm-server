@@ -18,11 +18,14 @@ export default {
   },
   tabs: {
     jobs: 'Taken',
-    participants: 'Participanten'
+    participants: 'Participanten',
+    information: 'Info',
+    stats: 'Statistics'
   },
   actions: {
     upload_experiment: 'Experiment',
     upload_jobs: 'Taken',
+    download_result_data: 'Data',
     sharing: 'Delen',
     archive: 'Archiveren',
     reactivate: 'Reactiveren',

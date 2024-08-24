@@ -45,8 +45,16 @@
         </v-row>
 
         <template v-if="status.loading || study">
-          <v-row no-gutters>
-            <v-col cols="12" lg="8" xl="9" class="text-md-right">
+          <v-row class="flex-nowrap" no-gutters>
+            <v-col class="flex-grow-0 flex-shrink-0">
+              <v-tabs v-model="tab">
+                <v-tab>{{ $t('studies.tabs.information') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.stats') }}</v-tab>
+              </v-tabs>
+            </v-col>
+            <v-col class="flex-grow-1 flex-shrink-0 text-md-right">
               <study-actions
                 :loading="status.loading"
                 :study="study"
@@ -57,15 +65,9 @@
                 @clicked-archive="archiveStudy"
                 @clicked-upload-exp="openUploadExpDialog"
                 @clicked-upload-jobs="openUploadJobsDialog"
+                @clicked-download-result-data="downloadResultData"
                 @clicked-collaborators="collaborators.dialog = true"
               />
-            </v-col>
-            <v-col cols="12" lg="4" xl="3" order-lg="first">
-              <v-tabs v-model="tab">
-                <v-tab>{{ $t('studies.tabs.information') }}</v-tab>
-                <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
-                <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
-              </v-tabs>
             </v-col>
           </v-row>
           <v-row class="fill-height">
@@ -109,6 +111,13 @@
                     :study="study"
                   />
                 </v-tab-item>
+                <v-tab-item>
+                  <participation-stats
+                    ref="participationStats"
+                    :visible="participationStatsVisible"
+                    :study="study"
+                  />
+                </v-tab-item>
               </v-tabs-items>
             </v-col>
           </v-row>
@@ -119,7 +128,7 @@
 </template>
 
 <script>
-import { pick, debounce, isFunction } from 'lodash'
+import { pick, debounce, isFunction, keyBy } from 'lodash'
 import { mapActions } from 'vuex'
 import { sync } from 'vuex-pathify'
 import { processErrors } from '@/assets/js/errorhandling'
@@ -145,6 +154,7 @@ export default {
     UploadJobsDialog: () => import('@/components/Studies/dialogs/UploadJobsDialog'),
     CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog'),
     ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel'),
+    ParticipationStats: () => import('@/components/Participants/ParticipationStats'),
     StudyInfo
   },
   beforeRouteUpdate (to, from, next) {
@@ -209,6 +219,9 @@ export default {
   },
   computed: {
     tab: sync('studyTab'),
+    participationStatsVisible () {
+      return this.tab === 1
+    },
     ptcpPanelVisible () {
       return this.tab === 1
     },
@@ -254,6 +267,9 @@ export default {
     userCanEdit () {
       return !!this.study?.users.find(user => user.id === this.$auth.user.id &&
         user.pivot.access_permission_id === 2)
+    },
+    dataFiles () {
+      return keyBy(this.study.files.filter(file => file.type.includes('data-')), 'type')
     }
   },
   async created () {
@@ -446,6 +462,18 @@ export default {
     },
     resetPagination () {
       this.pagination = { ...defaultPagination }
+    },
+    async generateDataFile (format) {
+      try {
+        await this.study.generateDataFile({ params: { format } })
+      } catch (e) {
+        processErrors(e, this.notify)
+      }
+    },
+    downloadResultData () {
+      this.generateDataFile('csv')
+      const url = this.dataFiles['data-csv'].path
+      window.location.assign(url)
     }
   }
 }

@@ -8,16 +8,8 @@ exports[`Study Index matches its snapshot 1`] = `
         <div class="col col-12">
         </div>
       </div>
-      <div class="row no-gutters">
-        <div class="text-md-right col-lg-8 col-xl-9 col-12">
-          <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
-            <div class="v-skeleton-loader__actions v-skeleton-loader__bone">
-              <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
-              <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-xl-3 order-lg-first col-12">
+      <div class="row flex-nowrap no-gutters">
+        <div class="flex-grow-0 flex-shrink-0 col">
           <div class="v-tabs theme--light">
             <div class="v-item-group theme--light v-slide-group v-tabs-bar v-tabs-bar--is-mobile primary--text" role="tablist">
               <div class="v-slide-group__prev v-slide-group__prev--disabled">
@@ -31,11 +23,20 @@ exports[`Study Index matches its snapshot 1`] = `
                   <div aria-selected="true" class="v-tab v-tab--active" role="tab" tabindex="0">studies.tabs.information</div>
                   <div aria-selected="false" class="v-tab" role="tab" tabindex="0">studies.tabs.jobs</div>
                   <div aria-selected="false" class="v-tab" role="tab" tabindex="0">studies.tabs.participants</div>
+                  <div aria-selected="false" class="v-tab" role="tab" tabindex="0">studies.tabs.stats</div>
                 </div>
               </div>
               <div class="v-slide-group__next v-slide-group__next--disabled">
                 <transition-stub name="fade-transition"></transition-stub>
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-grow-1 flex-shrink-0 text-md-right col">
+          <div aria-busy="true" aria-live="polite" class="v-skeleton-loader v-skeleton-loader--is-loading theme--light" role="alert">
+            <div class="v-skeleton-loader__actions v-skeleton-loader__bone">
+              <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
+              <div class="v-skeleton-loader__button v-skeleton-loader__bone"></div>
             </div>
           </div>
         </div>
@@ -78,6 +79,8 @@ exports[`Study Index matches its snapshot 1`] = `
               <transition-stub name>
               </transition-stub>
               <transition-stub class="fill-height" name>
+              </transition-stub>
+              <transition-stub name>
               </transition-stub>
             </div>
           </div>

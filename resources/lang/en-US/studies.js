@@ -19,11 +19,13 @@ export default {
   tabs: {
     jobs: 'Jobs',
     participants: 'Participants',
-    information: 'Info'
+    information: 'Info',
+    stats: 'Statistics'
   },
   actions: {
     upload_experiment: 'Experiment',
     upload_jobs: 'Jobs',
+    download_result_data: 'Data',
     sharing: 'Sharing',
     archive: 'Archive',
     reactivate: 'Reactivate',
