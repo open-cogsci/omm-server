@@ -45,8 +45,16 @@
         </v-row>
 
         <template v-if="status.loading || study">
-          <v-row no-gutters>
-            <v-col cols="12" lg="8" xl="9" class="text-md-right">
+          <v-row class="flex-nowrap" no-gutters>
+            <v-col class="flex-grow-0 flex-shrink-0">
+              <v-tabs v-model="tab">
+                <v-tab>{{ $t('studies.tabs.information') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
+                <v-tab>{{ $t('studies.tabs.stats') }}</v-tab>
+              </v-tabs>
+            </v-col>
+            <v-col class="flex-grow-1 flex-shrink-0 text-md-right">
               <study-actions
                 :loading="status.loading"
                 :study="study"
@@ -60,14 +68,6 @@
                 @clicked-download-result-data="downloadResultData"
                 @clicked-collaborators="collaborators.dialog = true"
               />
-            </v-col>
-            <v-col cols="12" lg="4" xl="3" order-lg="first">
-              <v-tabs v-model="tab">
-                <v-tab>{{ $t('studies.tabs.information') }}</v-tab>
-                <v-tab>{{ $t('studies.tabs.jobs') }}</v-tab>
-                <v-tab>{{ $t('studies.tabs.participants') }}</v-tab>
-                <v-tab>{{ $t('studies.tabs.stats') }}</v-tab>
-              </v-tabs>
             </v-col>
           </v-row>
           <v-row class="fill-height">
