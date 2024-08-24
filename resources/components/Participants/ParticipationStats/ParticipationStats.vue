@@ -6,20 +6,20 @@
     <v-card-text>
       <v-row id="participants-stats" class="fill-height">
         <v-col cols="6" class="pb-5">
-            <p class="text-subtitle-2 secondary--text">
-              {{ $t('stats.overview') }}
-            </p>
-            <v-row v-for="line of overview" :key="line.label" :class="line.classes" no-gutters>
-              <v-col v-bind="labelColSizes">
-                {{ line.label }}
-              </v-col>
-              <v-col v-bind="valueColSizes">
-                {{ line.value }}
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="6" class="pb-5">
-            <p class="text-subtitle-2 secondary--text">
+          <p class="text-subtitle-2 secondary--text">
+            {{ $t('stats.overview') }}
+          </p>
+          <v-row v-for="line of overview" :key="line.label" :class="line.classes" no-gutters>
+            <v-col v-bind="labelColSizes">
+              {{ line.label }}
+            </v-col>
+            <v-col v-bind="valueColSizes">
+              {{ line.value }}
+            </v-col>
+          </v-row>
+        </v-col>
+        <v-col cols="6" class="pb-5">
+          <p class="text-subtitle-2 secondary--text">
             {{ $t('stats.progress') }}
           </p>
           <v-progress-circular
@@ -29,7 +29,7 @@
             :value="studyProgress"
             color="green"
             :width="25"
-            >
+          >
             <div>
               <div class="text-h4 text-md-h2">
                 {{ Math.round(studyProgress) }}
@@ -142,7 +142,6 @@ export default {
       this.loading.stats = true
       try {
         this.stats = await this.study.fetchParticipationStats()
-        console.log(JSON.stringify(this.stats))
       } catch (e) {
         processErrors(e, this.notify)
       } finally {

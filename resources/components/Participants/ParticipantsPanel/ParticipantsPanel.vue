@@ -23,32 +23,32 @@
             {{ $t('study_participants.participants.manage') }}
           </v-btn>
         </v-card-actions>
-    <v-card-title>
-      {{ $t('study_participants.participants.title') }}
-      <v-spacer />
-      <div v-if="participants.length">
-        <span class="caption mr-6">
-          Priority
-        </span>
-        <span class="caption">
-          {{ $t('study_participants.participants.perc_complete') }}
-        </span>
-      </div>
-    </v-card-title>
-    <v-card-text class="pa-0 fill-height">
-      <study-participants-list
-        :editable="userCanEdit"
-        :total-jobs="study.jobs_count"
-        :participants="participants"
-        :queue="queue"
-        :loading-queue="loading.queue"
-        :loading="loading.initial"
-        :fetching-more="loading.participants"
-        @changed-priority="fetchQueue"
-        @scroll-end="loadMore"
-      />
-    </v-card-text>
-  </v-card>
+        <v-card-title>
+          {{ $t('study_participants.participants.title') }}
+          <v-spacer />
+          <div v-if="participants.length">
+            <span class="caption mr-6">
+              Priority
+            </span>
+            <span class="caption">
+              {{ $t('study_participants.participants.perc_complete') }}
+            </span>
+          </div>
+        </v-card-title>
+        <v-card-text class="pa-0 fill-height">
+          <study-participants-list
+            :editable="userCanEdit"
+            :total-jobs="study.jobs_count"
+            :participants="participants"
+            :queue="queue"
+            :loading-queue="loading.queue"
+            :loading="loading.initial"
+            :fetching-more="loading.participants"
+            @changed-priority="fetchQueue"
+            @scroll-end="loadMore"
+          />
+        </v-card-text>
+      </v-card>
     </v-col>
   </v-row>
 </template>
