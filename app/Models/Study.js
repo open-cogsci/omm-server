@@ -340,6 +340,8 @@ class Study extends Model {
       })
     }
 
+    // A job result is stored as JSON in the database and consists of 1) the actual submitted data, 2) some info about the participant,
+    // 3) some info about the job, 4) the variables data.
     return await this.jobResults().create({
       data: JSON.stringify({
         participant_name: ptcp.name,
@@ -374,7 +376,7 @@ class Study extends Model {
       .leftJoin('jobs', 'studies.id', 'jobs.study_id')
       .leftJoin('job_states', 'jobs.id', 'job_states.job_id')
       .where('studies.id', this.id)
-      .whereIn('job_states.status_id', [1, 2])
+      .whereIn('job_states.status_id', [1, 2]) // job state status 'pending' or 'started'
 
     if (ptcpID) {
       query.where('job_states.participant_id', ptcpID)

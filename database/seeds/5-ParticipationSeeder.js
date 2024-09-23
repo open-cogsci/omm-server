@@ -39,7 +39,7 @@ class ParticipationSeeder {
         await job.participants().pivotQuery()
           .where('participant_id', ptcpID)
           .update({
-            status_id: 3
+            status_id: 3 // participation status 'finished'
           })
       }
     }

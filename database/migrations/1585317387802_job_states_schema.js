@@ -8,7 +8,7 @@ class JobStatesSchema extends Schema {
     this.create('job_states', (table) => {
       table.integer('participant_id').unsigned().notNullable()
       table.integer('job_id').unsigned().notNullable()
-      table.integer('status_id').unsigned().notNullable().defaultTo(1)
+      table.integer('status_id').unsigned().notNullable().defaultTo(1) // defaults to 'pending'
       table.timestamps()
 
       table.foreign('participant_id').references('id').inTable('participants').onDelete('cascade')

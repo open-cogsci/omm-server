@@ -427,7 +427,7 @@ class ParticipantController {
           .select(['id', 'name', 'meta'])
       })
       .withPivot(['status_id', 'priority'])
-      .whereInPivot('status_id', [1, 2])
+      .whereInPivot('status_id', [1, 2]) // participation status 'pending' or 'started'
       .orderBy('priority', 'asc')
       .orderBy('status_id', 'desc')
       .orderBy('studies.created_at', 'asc')
@@ -439,7 +439,7 @@ class ParticipantController {
       try {
         await ptcp.studies().pivotQuery()
           .where('study_id', study.id)
-          .update({ status_id: 2 })
+          .update({ status_id: 2 }) // participation status 'started'
       } catch (e) {
         return response.internalServerError({ message: 'Could not update study status' })
       }
@@ -504,7 +504,7 @@ class ParticipantController {
     try {
       job = await ptcp.jobs()
         .where('study_id', study.id)
-        .whereInPivot('status_id', [1, 2])
+        .whereInPivot('status_id', [1, 2]) // job state status 'pending' or 'started'
         .withPivot(['status_id'])
         .with('variables.dtype')
         .orderBy('pivot_status_id', 'desc')
@@ -517,11 +517,11 @@ class ParticipantController {
     }
 
     // Change the status of the job from pending to started
-    if (job.pivot_status_id === 1) {
+    if (job.pivot_status_id === 1) { // job state status 'pending'
       try {
         await ptcp.jobs().pivotQuery()
           .where('job_id', job.id)
-          .update({ status_id: 2 })
+          .update({ status_id: 2 }) // job state status 'started'
       } catch (e) {
         return response.internalServerError({
           message: 'Could not update status of the job.'
@@ -588,7 +588,7 @@ class ParticipantController {
 
     const job = await ptcp.jobs()
       .where('study_id', study.id)
-      .whereInPivot('status_id', [1, 2])
+      .whereInPivot('status_id', [1, 2]) // job state status 'pending' or 'started'
       .withPivot(['status_id'])
       .with('variables.dtype')
       .orderBy('pivot_status_id', 'desc')
@@ -761,7 +761,7 @@ class ParticipantController {
 
     await ptcp.jobs().pivotQuery()
       .where('job_id', jobID)
-      .update({ status_id: 3 })
+      .update({ status_id: 3 }) // job state status 'finished'
 
     await study.storeJobResultData(jobResultData, jobID, ptcp.id)
     await study.checkIfFinished(ptcp.id)

@@ -310,7 +310,7 @@ class UserController {
           .wherePivot('is_owner', true)
           .withCount('participants')
           .withCount('participants as finished_participants', (query) => {
-            query.wherePivot('status_id', 3)
+            query.wherePivot('status_id', 3) // participation status 'finished'
           })
       })
       .firstOrFail()

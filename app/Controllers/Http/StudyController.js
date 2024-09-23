@@ -186,7 +186,7 @@ class StudyController {
       .withCount('jobs')
       .withCount('jobs as completed_jobs', (query) => {
         query.whereHas('participants', (q) => {
-          q.wherePivot('status_id', 3)
+          q.wherePivot('status_id', 3) // participation status 'finished'
         })
       })
       .firstOrFail()
@@ -610,8 +610,8 @@ class StudyController {
     // Set participants with status 'finished' back started (since new jobs have been added)
     await study.participants()
       .pivotQuery()
-      .where('status_id', 3)
-      .update({ status_id: 2 })
+      .where('status_id', 3) // participation status 'finished'
+      .update({ status_id: 2 }) // participation status 'started'
 
     response.status(201)
     return transform.collection(jobs, 'JobTransformer')
@@ -1065,7 +1065,7 @@ class StudyController {
         q.where('study_id', study.id).select('id')
       })
       .withCount('jobs as completed_jobs', (query) => {
-        query.where('study_id', study.id).wherePivot('status_id', 3)
+        query.where('study_id', study.id).wherePivot('status_id', 3) // job state status 'finished'
       })
       .orderBy('name', 'asc')
       .paginate(page, perPage)
@@ -1188,13 +1188,13 @@ class StudyController {
       .where('id', id)
       .withCount('participants')
       .withCount('participants as finished_participants', (query) => {
-        query.wherePivot('status_id', 3)
+        query.wherePivot('status_id', 3) // participation status 'finished'
       })
       .withCount('participants as started_participants', (query) => {
-        query.wherePivot('status_id', 2)
+        query.wherePivot('status_id', 2) // participation status 'started'
       })
       .withCount('participants as pending_participants', (query) => {
-        query.wherePivot('status_id', 1)
+        query.wherePivot('status_id', 1) // participation status 'pending'
       })
       .firstOrFail()
 

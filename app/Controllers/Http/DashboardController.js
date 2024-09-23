@@ -74,7 +74,7 @@ class DashboardController {
       .leftJoin('studies', 'jobs.study_id', 'studies.id')
       .leftJoin('study_users', 'studies.id', 'study_users.study_id')
       .where('study_users.user_id', auth.user.id)
-      .where('job_states.status_id', 3)
+      .where('job_states.status_id', 3) // job state status 'finished'
       .where('studies.active', 1)
       .groupByRaw('identifier, participant, study')
       .orderBy('occurrence', 'desc')
@@ -105,7 +105,7 @@ class DashboardController {
       .where('study_users.user_id', auth.user.id)
       .where('studies.active', 1)
       .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
-      .whereNot('job_states.status_id', 1)
+      .whereNot('job_states.status_id', 1) // job state status 'pending'
       .groupByRaw('studies.name, studies.id')
       .limit(limit)
       .fetch()
@@ -129,7 +129,7 @@ class DashboardController {
       )
       .leftJoin('participants', 'job_states.participant_id', 'participants.id')
       .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
-      .whereNot('job_states.status_id', 1)
+      .whereNot('job_states.status_id', 1) // job state status 'pending'
       .groupByRaw('name, identifier')
       .limit(limit)
       .fetch()
