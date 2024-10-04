@@ -10,40 +10,7 @@
           </v-col>
         </v-row>
         <v-row class="fill-height">
-          <v-col cols="12" sm="6" xl="4" :style="colStyle">
-            <v-card class="fill-height" style="overflow: auto">
-              <v-card-title class="font-weight-normal">
-                {{ $t('dashboard.title.most_recent_ptcp') }}
-              </v-card-title>
-              <v-card-text class="px-0">
-                <v-skeleton-loader
-                  :loading="loading.mostRecentPtcp"
-                  type="list-item-two-line@5"
-                >
-                  <v-list v-if="mostRecentPtcp.length">
-                    <v-list-item v-for="item of mostRecentPtcp" :key="item.identifier">
-                      <v-list-item-content>
-                        <v-list-item-title>
-                          {{ item.participant }}
-                          <span class="caption grey--text text--darken-1">
-                            ({{ item.identifier }})
-                          </span>
-                          to <span class="font-weight-medium">{{ item.study }}</span>
-                        </v-list-item-title>
-                        <v-list-item-subtitle>
-                          {{ distanceFromNow(item.occurrence) }}
-                        </v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                  <div v-else class="px-4 text-subtitle-1 font-weight-light">
-                    {{ $t('dashboard.no_recent_ptcps') }}
-                  </div>
-                </v-skeleton-loader>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="6" xl="4" :style="colStyle">
+          <v-col cols="6" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title>
                 {{ $t('dashboard.title.most_active_studies') }}&nbsp;
@@ -80,7 +47,7 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6" xl="4" :style="colStyle">
+          <v-col cols="6" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title>
                 {{ $t('dashboard.title.most_active_ptcp') }}&nbsp;
