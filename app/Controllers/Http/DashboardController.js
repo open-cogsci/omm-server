@@ -63,7 +63,7 @@ class DashboardController {
    * @memberof DashboardController
    */
   async mostRecentParticipations ({ request, auth }) {
-    const limit = request.input('limit', 5)
+    const limit = request.input('limit', 1000)
     const data = await JobState.query()
       .select('participants.name AS participant',
         'participants.identifier',
