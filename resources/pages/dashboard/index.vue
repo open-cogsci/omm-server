@@ -9,7 +9,7 @@
             </h1>
           </v-col>
         </v-row>
-        <v-row class="fill-height">
+        <v-row>
           <v-col cols="6" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title>
@@ -23,7 +23,11 @@
                   :loading="loading.mostActiveStudies"
                   type="list-item-two-line@5"
                 >
-                  <v-list v-if="mostActiveStudies.length">
+                  <v-list
+                    v-if="mostActiveStudies.length"
+                    max-height="30vh"
+                    class="overflow-y-auto"
+                  >
                     <v-list-item
                       v-for="item of mostActiveStudies"
                       :key="item.identifier"
@@ -60,7 +64,11 @@
                   :loading="loading.mostActiveParticipants"
                   type="list-item-two-line@5"
                 >
-                  <v-list v-if="mostActiveParticipants.length">
+                  <v-list
+                    v-if="mostActiveParticipants.length"
+                    max-height="30vh"
+                    class="overflow-y-auto"
+                  >
                     <v-list-item
                       v-for="item of mostActiveParticipants"
                       :key="item.identifier"

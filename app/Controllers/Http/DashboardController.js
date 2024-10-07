@@ -91,7 +91,7 @@ class DashboardController {
    * @memberof DashboardController
    */
   async mostActiveStudies ({ request, auth }) {
-    const limit = request.input('limit', 5)
+    const limit = request.input('limit', 1000)
     const days = request.input('days', 7)
     const data = await JobState.query()
       .select(
@@ -107,6 +107,7 @@ class DashboardController {
       .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
       .whereNot('job_states.status_id', 1) // job state status 'pending'
       .groupByRaw('studies.name, studies.id')
+      .orderBy('participations', 'desc')
       .limit(limit)
       .fetch()
     return { data }
@@ -120,7 +121,7 @@ class DashboardController {
    * @memberof DashboardController
    */
   async mostActiveParticipants ({ request }) {
-    const limit = request.input('limit', 5)
+    const limit = request.input('limit', 1000)
     const days = request.input('days', 7)
     const data = await JobState.query()
       .select('participants.name',
@@ -131,6 +132,7 @@ class DashboardController {
       .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
       .whereNot('job_states.status_id', 1) // job state status 'pending'
       .groupByRaw('name, identifier')
+      .orderBy('participations', 'desc')
       .limit(limit)
       .fetch()
     return { data }
