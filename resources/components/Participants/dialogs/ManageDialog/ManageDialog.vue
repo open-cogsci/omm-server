@@ -23,7 +23,7 @@
           :loading="loading"
           type="list-item,list-item,list-item-two-line@3"
         >
-          <v-row class="mb-4" align="center">
+          <v-row dense class="mb-4" align="center">
             <v-col cols="12">
               <v-btn :disabled="allSelected" @click="assignAll">
                 <span v-if="!selected.length">
@@ -40,7 +40,7 @@
           </v-row>
           <v-expand-transition>
             <v-form v-show="!selected.length" v-model="randomValid">
-              <v-row align="start" dense>
+              <v-row dense align="start">
                 <v-col cols="12" class="text-body-2">
                   {{ $t('study_participants.dialogs.manage.assign_random') }}
                 </v-col>
@@ -66,8 +66,8 @@
               </v-row>
             </v-form>
           </v-expand-transition>
-          <v-row>
-            <v-col cols="12" class="text-body-2">
+          <v-row dense>
+            <v-col cols="12" class="text-body-2 mt-0 pt-0">
               {{ $t('study_participants.dialogs.manage.manually_select') }}:
             </v-col>
           </v-row>
@@ -107,7 +107,7 @@
               />
             </v-col>
           </v-row>
-          <v-row>
+          <v-row dense>
             <v-col cols="12" class="text-body-2">
               Select priority for all newly assigned participants:
             </v-col>
