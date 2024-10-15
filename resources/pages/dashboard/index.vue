@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height">
     <v-row class="fill-height">
-      <v-col cols="12" class="d-flex flex-column fill-height">
+      <v-col cols="12">
         <v-row style="max-height: 64px">
           <v-col cols="12">
             <h1 class="display-1 font-weight-light">
@@ -9,6 +9,7 @@
             </h1>
           </v-col>
         </v-row>
+
         <v-row>
           <v-col cols="6" :style="colStyle">
             <v-card class="fill-height">
@@ -91,8 +92,11 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6" xl="12" :style="colStyle">
-            <v-card class="fill-height d-flex flex-column">
+        </v-row>
+
+        <v-row>
+          <v-col cols="12" :style="colStyle">
+            <v-card>
               <v-card-title class="pb-0 mb-0">
                 <div>
                   {{ $t('dashboard.title.trend.main').replace('{days}', days) }}<br>
@@ -101,8 +105,7 @@
                   </span>
                 </div>
               </v-card-title>
-
-              <v-card-text class="d-flex flex-column justify-center fill-height">
+              <v-card-text>
                 <v-skeleton-loader
                   :loading="loading.trend"
                   type="card"
@@ -154,18 +157,15 @@ export default {
     sparkline () {
       return {
         value: this.trend?.values || [],
-        labels: this.trend?.labels || [],
-        padding: this.$vuetify.breakpoint.xlOnly ? 8 : 16,
-        radius: 10,
-        labelSize: this.$vuetify.breakpoint.xlOnly ? 3 : 9,
+        labels: this.trend?.values || [],
+        padding: 8,
+        labelSize: 3,
         lineCap: 'round',
-        smooth: true,
-        gradient: ['red', 'orange', 'lightGreen'],
-        gradientDirection: 'bottom',
-        lineWidth: this.$vuetify.breakpoint.xlOnly ? 1 : 3,
+        smooth: false,
+        lineWidth: 1,
         autoLineWidth: true,
-        height: this.$vuetify.breakpoint.xlOnly ? '50%' : '100%',
-        type: 'trend',
+        height: '40vh',
+        type: 'bars',
         autoDraw: true
       }
     },
