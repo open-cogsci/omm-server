@@ -31,17 +31,7 @@ Factory.blueprint('App/Models/JobResult', async (faker) => {
 
 class JobResultSeeder {
   async run () {
-    // Don't seed any job results if there already are some.
-    if (await JobResult.getCount() === 0) {
-      const jobResults1 = await Factory.model('App/Models/JobResult').makeMany(5)
-      const jobResults2 = await Factory.model('App/Models/JobResult').makeMany(7)
-
-      const study1 = await Study.findOrFail(1)
-      const study2 = await Study.findOrFail(2)
-
-      await study1.jobResults().saveMany(jobResults1)
-      await study2.jobResults().saveMany(jobResults2)
-    }
+    // Don't seed any job results
   }
 }
 

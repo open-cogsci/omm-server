@@ -340,15 +340,14 @@ class Study extends Model {
       })
     }
 
+    console.log(JSON.stringify(data))
     // A job result is stored as JSON in the database and consists of 1) the actual submitted data, 2) some info about the participant,
     // 3) some info about the job, 4) the variables data.
     return await this.jobResults().create({
+      study_id: this.Id,
+      participant_id: ptcpId,
+      job_id: jobId,
       data: JSON.stringify({
-        participant_name: ptcp.name,
-        participant_identifier: ptcp.identifier,
-        participant_meta: ptcp.meta,
-        job_id: job.id,
-        job_position: job.position,
         ...variableData,
         ...data
       })

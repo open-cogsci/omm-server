@@ -21,7 +21,7 @@ async function createCaptureJobs (study) {
   })
 
   for (const [key, value] of Object.entries([
-    'red', 'green', 'blue', 'yellow', 'purple', 'magenta'
+    'present', 'absent'
   ])) {
     const job = await study.jobs().create({
       position: parseInt(key) + 1
@@ -55,21 +55,6 @@ class StudySeeder {
     })
 
     await createCaptureJobs(captureStudy)
-
-    let studies = await Factory.model('App/Models/Study').makeMany(4)
-    await daniel.studies().saveMany(studies)
-    await daniel.studies().pivotQuery().update({
-      is_owner: true,
-      access_permission_id: 2
-    })
-
-    studies = await Factory.model('App/Models/Study').makeMany(4)
-    await sebastiaan.studies().saveMany(studies)
-    await sebastiaan.studies().pivotQuery().update({
-      is_owner: true,
-      access_permission_id: 2
-    })
-
     // Make Sebastiaan co-owner of the study
     await sebastiaan.studies().attach([captureStudy.id], (row) => {
       row.access_permission_id = 2
