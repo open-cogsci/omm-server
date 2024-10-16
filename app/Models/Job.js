@@ -87,6 +87,10 @@ class Job extends Model {
       .pivotModel('App/Models/JobState')
       .withPivot(['status_id'])
   }
+
+  jobResults () {
+    return this.hasMany('App/Models/JobResult')
+  }
 }
 
 module.exports = Job

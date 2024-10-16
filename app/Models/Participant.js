@@ -54,6 +54,10 @@ class Participant extends Model {
       .withPivot(['status_id'])
   }
 
+  jobResults () {
+    return this.hasMany('App/Models/JobResult')
+  }
+
   /**
    * Session data
    *
