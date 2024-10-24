@@ -694,13 +694,13 @@ class ParticipantController {
     for (const job of jobs.rows) {
       await job.$relations.pivot.load('status')
     }
-    return transform.collection(jobs, 'JobTransformer')
+    return transform.include('jobResults,study').collection(jobs, 'JobTransformer')
   }
 
   /**
   * @swagger
   * /participants/{identifier}/{job_id}/result:
-  *   post:
+  *   patch:
   *     tags:
   *       - Jobs
   *     summary: >
