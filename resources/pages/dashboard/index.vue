@@ -95,23 +95,57 @@
         </v-row>
 
         <v-row>
-          <v-col cols="12" :style="colStyle">
+          <v-col cols="12">
             <v-card>
-              <v-card-title class="pb-0 mb-0">
-                <div>
-                  {{ $t('dashboard.title.trend.main').replace('{days}', days) }}<br>
+              <v-card-title class="d-flex">
+                <div class="me-auto">
+                  Participation trend<br>
                   <span class="font-weight-light text-subtitle-1">
-                    {{ $t('dashboard.title.trend.sub') }}
+                    of all your current studies taken together
                   </span>
+                </div>
+                <div>
+                  <v-select
+                    v-model="trendType"
+                    dense
+                    outlined
+                    hide-details
+                    label="Select type"
+                    :items="trendSelectorItems"
+                    @input="fetchTrend"
+                  />
                 </div>
               </v-card-title>
               <v-card-text>
                 <v-skeleton-loader
                   :loading="loading.trend"
                   type="card"
-                  transition="fade-transition"
                 >
                   <v-sparkline v-bind="sparkline" />
+                  <v-simple-table class="trend-table">
+                    <thead>
+                      <tr>
+                        <th
+                          v-for="item in trendTable"
+                          :key="item.label"
+                          class="text-center"
+                        >
+                          {{ item.label }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td
+                          v-for="item in trendTable"
+                          :key="item.label"
+                          class="text-center"
+                        >
+                          {{ item.value }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-simple-table>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>
@@ -132,7 +166,9 @@ export default {
   name: 'DashboardIndex',
   data () {
     return {
+      trendType: 'week',
       trend: { values: [], labels: [] },
+      trendTable: [],
       mostRecentPtcp: [],
       mostActiveStudies: [],
       mostActiveParticipants: [],
@@ -157,16 +193,11 @@ export default {
     sparkline () {
       return {
         value: this.trend?.values || [],
-        labels: this.trend?.values || [],
-        padding: 8,
-        labelSize: 3,
-        lineCap: 'round',
-        smooth: false,
-        lineWidth: 1,
-        autoLineWidth: true,
-        height: '40vh',
-        type: 'bars',
-        autoDraw: true
+        padding: 0,
+        showLabels: false,
+        autoLineWidth: false,
+        height: '35vh',
+        type: 'bar'
       }
     },
     colStyle () {
@@ -175,6 +206,26 @@ export default {
             height: '50%'
           }
         : {}
+    },
+    trendSelectorItems () {
+      return [
+        {
+          value: 'day',
+          text: 'Past day'
+        },
+        {
+          value: 'week',
+          text: 'Past week'
+        },
+        {
+          value: 'month',
+          text: 'Past month'
+        },
+        {
+          value: 'year',
+          text: 'Past year'
+        }
+      ]
     }
   },
   created () {
@@ -184,7 +235,7 @@ export default {
     ...mapActions('notifications', ['notify']),
     fetchAll () {
       this.fetchMostRecentPtcp()
-      this.fetchDaysTrend()
+      this.fetchTrend()
       this.fetchMostActiveStudies()
       this.fetchmostActivePtcp()
     },
@@ -198,11 +249,14 @@ export default {
         this.loading.mostRecentPtcp = false
       }
     },
-    async fetchDaysTrend () {
+    async fetchTrend () {
       this.loading.trend = true
       try {
         this.trend = await this.Participation.trend(
-          { params: { days: this.days } })
+          { params: { type: this.trendType } })
+        this.trendTable = this.trend.labels.map((l, i) => {
+          return { label: l, value: this.trend.values[i] }
+        })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
