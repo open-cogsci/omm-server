@@ -607,7 +607,7 @@ class StudyController {
       return response.status(code).json({ message: e.toString() })
     }
 
-    // Set participants with status 'finished' back started (since new jobs have been added)
+    // Set participants with status 'finished' back to 'started' (since new jobs have been added)
     await study.participants()
       .pivotQuery()
       .where('status_id', 3) // participation status 'finished'

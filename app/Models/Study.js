@@ -410,35 +410,36 @@ class Study extends Model {
    */
   async getParticipantQueuePositions (ptcpID = null) {
     let query = `
-      select ranked.participant_id, ranked.queue_position
-        from (select
-            pp.id participant_id,
-            studies.id study_id,
-            row_number() over (
-              partition by
-                pp.id
-              order by
-                ptcp.priority asc,
-                ptcp.status_id desc,
-                studies.created_at asc
-              ) as queue_position
-          from participants as pp
-          left join
-            participations as ptcp on ptcp.participant_id = pp.id
-          left join
-            studies on studies.id = ptcp.study_id
-          order by
-            participant_id asc,
-            queue_position asc
-          ) ranked
-        where ranked.study_id = ?`
+      SELECT ranked.participant_id, ranked.queue_position
+      FROM (
+        SELECT
+          pp.id AS participant_id,
+          studies.id AS study_id,
+          ROW_NUMBER() OVER (
+            PARTITION BY
+              pp.id
+            ORDER BY
+              ptcp.priority ASC,
+              ptcp.status_id DESC,
+              studies.created_at ASC
+            ) AS queue_position
+        FROM participants AS pp
+        LEFT JOIN
+          participations AS ptcp ON ptcp.participant_id = pp.id
+        LEFT JOIN
+          studies ON studies.id = ptcp.study_id
+        ORDER BY
+          participant_id ASC,
+          queue_position ASC
+      ) AS ranked
+      WHERE ranked.study_id = ?`
 
     const args = [this.id]
     if (ptcpID !== null) {
       const id = parseFloat(ptcpID)
       if (!isNaN(id)) {
         args.push(id)
-        query += ' and ranked.participant_id = ?'
+        query += ' AND ranked.participant_id = ?'
       }
     }
     const results = await Database.raw(query, args)
