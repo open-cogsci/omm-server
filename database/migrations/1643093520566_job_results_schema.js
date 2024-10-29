@@ -12,10 +12,6 @@ class JobResultSchema extends Schema {
       table.integer('job_id').unsigned()
       table.json('data')
       table.timestamps()
-
-      table.foreign('study_id').references('id').inTable('studies')
-      table.foreign('participant_id').references('id').inTable('participants')
-      table.foreign('job_id').references('id').inTable('jobs')
     })
   }
 
