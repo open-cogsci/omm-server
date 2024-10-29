@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height">
     <v-row class="fill-height">
-      <v-col cols="12" class="d-flex flex-column fill-height">
+      <v-col cols="12">
         <v-row style="max-height: 64px">
           <v-col cols="12">
             <h1 class="display-1 font-weight-light">
@@ -9,41 +9,9 @@
             </h1>
           </v-col>
         </v-row>
-        <v-row class="fill-height">
-          <v-col cols="12" sm="6" xl="4" :style="colStyle">
-            <v-card class="fill-height" style="overflow: auto">
-              <v-card-title class="font-weight-normal">
-                {{ $t('dashboard.title.most_recent_ptcp') }}
-              </v-card-title>
-              <v-card-text class="px-0">
-                <v-skeleton-loader
-                  :loading="loading.mostRecentPtcp"
-                  type="list-item-two-line@5"
-                >
-                  <v-list v-if="mostRecentPtcp.length">
-                    <v-list-item v-for="item of mostRecentPtcp" :key="item.identifier">
-                      <v-list-item-content>
-                        <v-list-item-title>
-                          {{ item.participant }}
-                          <span class="caption grey--text text--darken-1">
-                            ({{ item.identifier }})
-                          </span>
-                          to <span class="font-weight-medium">{{ item.study }}</span>
-                        </v-list-item-title>
-                        <v-list-item-subtitle>
-                          {{ distanceFromNow(item.occurrence) }}
-                        </v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                  <div v-else class="px-4 text-subtitle-1 font-weight-light">
-                    {{ $t('dashboard.no_recent_ptcps') }}
-                  </div>
-                </v-skeleton-loader>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col cols="12" sm="6" xl="4" :style="colStyle">
+
+        <v-row>
+          <v-col cols="6" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title>
                 {{ $t('dashboard.title.most_active_studies') }}&nbsp;
@@ -56,7 +24,11 @@
                   :loading="loading.mostActiveStudies"
                   type="list-item-two-line@5"
                 >
-                  <v-list v-if="mostActiveStudies.length">
+                  <v-list
+                    v-if="mostActiveStudies.length"
+                    max-height="30vh"
+                    class="overflow-y-auto"
+                  >
                     <v-list-item
                       v-for="item of mostActiveStudies"
                       :key="item.identifier"
@@ -80,7 +52,7 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6" xl="4" :style="colStyle">
+          <v-col cols="6" :style="colStyle">
             <v-card class="fill-height">
               <v-card-title>
                 {{ $t('dashboard.title.most_active_ptcp') }}&nbsp;
@@ -93,7 +65,11 @@
                   :loading="loading.mostActiveParticipants"
                   type="list-item-two-line@5"
                 >
-                  <v-list v-if="mostActiveParticipants.length">
+                  <v-list
+                    v-if="mostActiveParticipants.length"
+                    max-height="30vh"
+                    class="overflow-y-auto"
+                  >
                     <v-list-item
                       v-for="item of mostActiveParticipants"
                       :key="item.identifier"
@@ -116,24 +92,60 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="12" sm="6" xl="12" :style="colStyle">
-            <v-card class="fill-height d-flex flex-column">
-              <v-card-title class="pb-0 mb-0">
-                <div>
-                  {{ $t('dashboard.title.trend.main').replace('{days}', days) }}<br>
+        </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <v-card>
+              <v-card-title class="d-flex">
+                <div class="me-auto">
+                  Participation trend<br>
                   <span class="font-weight-light text-subtitle-1">
-                    {{ $t('dashboard.title.trend.sub') }}
+                    of all your current studies taken together
                   </span>
                 </div>
+                <div>
+                  <v-select
+                    v-model="trendType"
+                    dense
+                    outlined
+                    hide-details
+                    label="Select type"
+                    :items="trendSelectorItems"
+                    @input="fetchTrend"
+                  />
+                </div>
               </v-card-title>
-
-              <v-card-text class="d-flex flex-column justify-center fill-height">
+              <v-card-text>
                 <v-skeleton-loader
                   :loading="loading.trend"
                   type="card"
-                  transition="fade-transition"
                 >
                   <v-sparkline v-bind="sparkline" />
+                  <v-simple-table class="trend-table">
+                    <thead>
+                      <tr>
+                        <th
+                          v-for="item in trendTable"
+                          :key="item.label"
+                          class="text-center"
+                        >
+                          {{ item.label }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td
+                          v-for="item in trendTable"
+                          :key="item.label"
+                          class="text-center"
+                        >
+                          {{ item.value }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </v-simple-table>
                 </v-skeleton-loader>
               </v-card-text>
             </v-card>
@@ -154,7 +166,9 @@ export default {
   name: 'DashboardIndex',
   data () {
     return {
+      trendType: 'week',
       trend: { values: [], labels: [] },
+      trendTable: [],
       mostRecentPtcp: [],
       mostActiveStudies: [],
       mostActiveParticipants: [],
@@ -179,19 +193,11 @@ export default {
     sparkline () {
       return {
         value: this.trend?.values || [],
-        labels: this.trend?.labels || [],
-        padding: this.$vuetify.breakpoint.xlOnly ? 8 : 16,
-        radius: 10,
-        labelSize: this.$vuetify.breakpoint.xlOnly ? 3 : 9,
-        lineCap: 'round',
-        smooth: true,
-        gradient: ['red', 'orange', 'lightGreen'],
-        gradientDirection: 'bottom',
-        lineWidth: this.$vuetify.breakpoint.xlOnly ? 1 : 3,
-        autoLineWidth: true,
-        height: this.$vuetify.breakpoint.xlOnly ? '50%' : '100%',
-        type: 'trend',
-        autoDraw: true
+        padding: 0,
+        showLabels: false,
+        autoLineWidth: false,
+        height: '35vh',
+        type: 'bar'
       }
     },
     colStyle () {
@@ -200,6 +206,26 @@ export default {
             height: '50%'
           }
         : {}
+    },
+    trendSelectorItems () {
+      return [
+        {
+          value: 'day',
+          text: 'Past day'
+        },
+        {
+          value: 'week',
+          text: 'Past week'
+        },
+        {
+          value: 'month',
+          text: 'Past month'
+        },
+        {
+          value: 'year',
+          text: 'Past year'
+        }
+      ]
     }
   },
   created () {
@@ -209,7 +235,7 @@ export default {
     ...mapActions('notifications', ['notify']),
     fetchAll () {
       this.fetchMostRecentPtcp()
-      this.fetchDaysTrend()
+      this.fetchTrend()
       this.fetchMostActiveStudies()
       this.fetchmostActivePtcp()
     },
@@ -223,11 +249,14 @@ export default {
         this.loading.mostRecentPtcp = false
       }
     },
-    async fetchDaysTrend () {
+    async fetchTrend () {
       this.loading.trend = true
       try {
         this.trend = await this.Participation.trend(
-          { params: { days: this.days } })
+          { params: { type: this.trendType } })
+        this.trendTable = this.trend.labels.map((l, i) => {
+          return { label: l, value: this.trend.values[i] }
+        })
       } catch (e) {
         processErrors(e, this.notify)
       } finally {

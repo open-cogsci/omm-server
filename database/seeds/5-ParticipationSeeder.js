@@ -26,6 +26,24 @@ class ParticipationSeeder {
     const ptcpIds = await Participant.ids()
     const study = await Study.find(1)
     await study.participants().sync(ptcpIds)
+
+
+    // Sync participants to jobs of the study
+    const jobs = await study.jobs().fetch()
+    for (const job of jobs.rows) {
+      await job.participants().sync(ptcpIds)
+    }
+
+    for (const job of jobs.rows) {
+      // const sampledPtcp = sampleSize(ptcpIds, 7)
+      for (const ptcpID of ptcpIds) {
+        await job.participants().pivotQuery()
+          .where('participant_id', ptcpID)
+          .update({
+            status_id: 3 // participation status 'finished'
+          })
+      }
+    }
   }
 }
 
