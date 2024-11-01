@@ -33,9 +33,9 @@
               @changed-priority="$emit('changed-priority', $event)"
             />
           </v-list-item-action>
-          <v-list-item-avatar>
-            <progress-circle v-bind="progress(item)" :size="40" />
-          </v-list-item-avatar>
+          <v-list-item-action class="pa-6">
+            <v-list-item-action-text class="text--primary body-1" v-text="item.pivot.job_results_count" />
+          </v-list-item-action>
         </v-list-item>
       </template>
     </v-virtual-scroll>
@@ -48,7 +48,6 @@ import QueueStatus from './QueueStatus/QueueStatus.vue'
 
 export default {
   components: {
-    ProgressCircle: () => import('@/components/common/ProgressCircle'),
     PriorityDial: () => import('@/components/Participants/ParticipantsPanel/PriorityDial'),
     QueueStatus
   },

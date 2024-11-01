@@ -31,7 +31,7 @@
               Priority
             </span>
             <span class="caption">
-              {{ $t('study_participants.participants.perc_complete') }}
+              # Results
             </span>
           </div>
         </v-card-title>

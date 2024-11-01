@@ -12,6 +12,7 @@ export default class Participation extends Model {
       priority: this.number(1),
       jobs_count: this.number(0),
       completed_jobs_count: this.number(0),
+      job_results_count: this.number(0),
       created_at: this.attr(null),
       updated_at: this.attr(null)
     }
