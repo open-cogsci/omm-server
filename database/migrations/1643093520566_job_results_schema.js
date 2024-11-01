@@ -3,6 +3,12 @@
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
 
+/**
+ * Schema for job results that most importantly store the job result data. 
+ * 
+ * Do not rely on the study_id, participant_id, or job_id - they are not enforced by a foreign key constraint.
+ * A study, participant, or job can be deleted but the related job result data is kept.
+ */
 class JobResultSchema extends Schema {
   up () {
     this.create('job_results', (table) => {
