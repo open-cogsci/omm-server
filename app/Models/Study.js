@@ -340,14 +340,31 @@ class Study extends Model {
       })
     }
 
+    // Get the variables for the job and convert them to key:value pairs so that the variable name is the
+    // key and the value is its value
+    const vars = job.getRelated('variables')
+    let varData = []
+    if (vars && vars.length) {
+      varData = vars.map(v => ({
+        [v.name]: [v.pivot?.value]
+      }))
+    }
+
     // A job result is stored as JSON in the database and consists of 1) the actual submitted data, 2) some info about the participant,
-    // 3) some info about the job, 4) the variables data.
+    // 3) some info about the job, 4) the variables data, 5) the study ID and name.
     return await this.jobResults().create({
       study_id: this.Id,
       participant_id: ptcpId,
       job_id: jobId,
       data: JSON.stringify({
-        ...variableData,
+        participant_name: ptcp.name,
+        participant_identifier: ptcp.identifier,
+        participant_meta: ptcp.meta,
+        job_id: job.id,
+        job_position: job.position,
+        study_id: this.id,
+        study_name: this.name,
+        ...varData,
         ...data
       })
     })
@@ -355,7 +372,7 @@ class Study extends Model {
 
   /**
    * Checks if a study is finished. If ptcpID is supplied, it will check if that
-   * particular participant has done all jobs for the study. If this parameter is ommitted
+   * particular participant has done all jobs for the study. If this parameter is omitted
    * it will check if there are open jobs for any participant.
    *
    * @param {Number} [ptcpID=null]
