@@ -1064,9 +1064,6 @@ class StudyController {
       .with('studies', (q) => {
         q.where('study_id', study.id).select('id')
       })
-      .withCount('jobs as completed_jobs', (query) => {
-        query.where('study_id', study.id).wherePivot('status_id', 3) // job state status 'finished'
-      })
       .withCount('jobResults as job_results_count', (query) => {
         query.where('study_id', study.id)
       })

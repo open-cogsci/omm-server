@@ -72,10 +72,6 @@ export default {
       type: Boolean,
       default: false
     },
-    totalJobs: {
-      type: Number,
-      default: 0
-    },
     editable: {
       type: Boolean,
       default: false
@@ -91,13 +87,6 @@ export default {
     this.setHeight()
   },
   methods: {
-    progress (ptcp) {
-      return {
-        value: this.totalJobs > 0
-          ? parseInt((ptcp.pivot?.completed_jobs_count ?? 0) / this.totalJobs * 100)
-          : 0
-      }
-    },
     setHeight () {
       this.maxHeight = this.$el.clientHeight - 40 || 400
     },
