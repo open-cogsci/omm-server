@@ -27,11 +27,11 @@
           {{ $t('study_participants.participants.title') }}
           <v-spacer />
           <div v-if="participants.length">
-            <span class="caption mr-6">
+            <span class="caption">
               Priority
             </span>
-            <span class="caption">
-              # Results
+            <span class="caption ms-8">
+              # Trails
             </span>
           </div>
         </v-card-title>
