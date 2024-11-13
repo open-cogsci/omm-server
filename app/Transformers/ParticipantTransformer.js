@@ -25,8 +25,8 @@ class ParticipantTransformer extends BumblebeeTransformer {
       ...this.transform(model),
       pivot: model.$relations?.studies?.rows[0].$relations.pivot.toObject()
     }
-    if (model.$sideLoaded.completed_jobs) {
-      data.pivot.completed_jobs_count = model.$sideLoaded.completed_jobs
+    if (model.$sideLoaded.job_results_count) {
+      data.pivot.job_results_count = model.$sideLoaded.job_results_count
     }
     return data
   }
