@@ -236,17 +236,19 @@ class Study extends Model {
    * @memberof Study
    */
   async processJobs (jsonData) {
+    const trx = await Database.beginTransaction()
+
     const variables = Object.keys(jsonData[0]).map(varName => ({
       name: varName,
       dtype_id: 1
     }))
 
     // Delete old jobs data
-    await this.jobs().delete()
-    await this.variables().delete()
+    await this.jobs().delete(trx)
+    await this.variables().delete(trx)
 
     // Create the variables in the database
-    const variableRecords = await this.variables().createMany(variables)
+    const variableRecords = await this.variables().createMany(variables, trx)
     // Compose an object in which the key is the varname and value is its ID
     const varTable = variableRecords.reduce((result, current) => {
       result[current.id] = current.name
@@ -256,12 +258,13 @@ class Study extends Model {
     for (const [i, row] of Object.entries(jsonData)) {
       const job = await this.jobs().create({
         position: parseInt(i) + 1
-      })
+      }, trx)
 
       await job.variables().attach(Object.keys(varTable), (record) => {
         record.value = row[varTable[record.variable_id]]
-      })
+      }, trx)
     }
+    await trx.commit()
   }
 
   /**
