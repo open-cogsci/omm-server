@@ -2,6 +2,7 @@
   <studies-list
     :studies="filteredStudies"
     :loading="loading"
+    :active="false"
   />
 </template>
 
