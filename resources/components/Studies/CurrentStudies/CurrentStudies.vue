@@ -10,9 +10,12 @@
     />
     <studies-list
       :studies="filteredStudies"
+      :filter="filter"
       :loading="loading"
       :add-study-button="true"
+      :active="true"
       @clicked-new-study="dialog = true"
+      @update:order="updateStudyOrder"
     />
   </div>
 </template>
@@ -50,15 +53,25 @@ export default {
     },
     filteredStudies () {
       if (!this.filter || this.filter.length < 2) {
-        return this.studies
+        return this.orderedStudies
       }
       return this.searchableStudies.search(this.filter)
         .map(result => result.item)
     },
     searchableStudies () {
-      return new Fuse(this.studies, {
+      return new Fuse(this.orderedStudies, {
         keys: ['name', 'description']
       })
+    },
+    orderedStudies () {
+      // Get study order for all users from browser's local storage
+      const allUsersStudyOrder = JSON.parse(localStorage.getItem('studyOrder'))
+      // If no study order is present for the current user return the raw study list
+      if (!allUsersStudyOrder || !allUsersStudyOrder[this.$auth.user.id]) { return this.studies }
+      // Get study order for the current user
+      const studyOrder = allUsersStudyOrder[this.$auth.user.id]
+      // Apply the order to this.studies. Studies that are not in the list (e.g. new studies) get into first position.
+      return [...this.studies].sort((a, b) => studyOrder.indexOf(a.id) - studyOrder.indexOf(b.id))
     },
     studies () {
       return this.Study.query()
@@ -109,6 +122,16 @@ export default {
       } finally {
         this.saving = false
       }
+    },
+    async updateStudyOrder (newOrder) {
+      // Get study order for all users from browser's local storage
+      let allUsersStudyOrder = JSON.parse(localStorage.getItem('studyOrder'))
+      if (!allUsersStudyOrder) { allUsersStudyOrder = {} }
+      const updatedOrder = newOrder.map((study, i) => study.id)
+      // Overwrite current user's study order
+      allUsersStudyOrder[this.$auth.user.id] = updatedOrder
+      localStorage.setItem('studyOrder', JSON.stringify(allUsersStudyOrder))
+      await this.Study.update(newOrder)
     },
     /**
      *  Clear possible validation errors sent by adonis after closing the dialog.
