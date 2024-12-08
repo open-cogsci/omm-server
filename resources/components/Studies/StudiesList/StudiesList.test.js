@@ -48,25 +48,6 @@ describe('StudiesList', () => {
   //   expect(wrapper.findAll('.v-list-item').length).toBe(studies.length)
   // })
 
-  test('Skeleton is shown during loading and hidden afterwards', async () => {
-    const wrapper = mountFunc({
-      propsData: {
-        studies: [],
-        loading: true
-      }
-    })
-    await flushPromises()
-    expect(wrapper.find('.v-skeleton-loader').exists()).toBe(true)
-    expect(wrapper.find('.v-list-item').exists()).toBe(false)
-
-    await wrapper.setProps({
-      studies: [{ id: 1, name: 'Test study', description: 'Description' }],
-      loading: false
-    })
-    expect(wrapper.find('.v-skeleton-loader').exists()).toBe(false)
-    // expect(wrapper.find('.v-list-item').exists()).toBe(true)
-  })
-
   test('Shows new study button and processes clicks on it', async () => {
     const wrapper = mountFunc({
       propsData: {

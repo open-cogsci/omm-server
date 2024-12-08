@@ -16,28 +16,40 @@
     </v-list>
 
     <transition name="fade" mode="out-in">
-      <v-list v-if="loading" key="loading" three-line class="py-0">
+      <v-list v-if="loading" key="loading" two-line class="py-0">
         <v-skeleton-loader
           :loading="loading"
-          type="list-item-three-line@8"
+          type="list-item-two-line@8"
         />
       </v-list>
-      <v-virtual-scroll
+      <v-list
         v-else
         key="loaded"
-        :items="studies"
-        :item-height="88"
-        height="calc(100vh - 268px)"
-        class="py-0"
+        max-height="66vh"
+        class="py-0 overflow-y-auto"
       >
-        <template #default="{ item }">
-          <v-list-item three-line :to="localePath(`/dashboard/studies/${item.id}`)" nuxt>
+        <draggable
+          v-model="rows"
+          tag="v-list"
+          handle=".sortHandle"
+          @start="drag = true"
+          @end="drag = false"
+        >
+          <v-list-item
+            v-for="(study, i) in rows"
+            :key="i"
+            :to="localePath(`/dashboard/studies/${study.id}`)"
+            nuxt
+          >
+            <v-btn v-if="showSortHandle" icon class="sortHandle">
+              <v-icon>mdi-drag-horizontal-variant</v-icon>
+            </v-btn>
             <v-list-item-content class="px-3">
-              <v-list-item-title v-text="item.name" />
-              <v-list-item-subtitle v-text="item.description" />
+              <v-list-item-title v-text="study.name" />
+              <v-list-item-subtitle v-text="study.description" />
             </v-list-item-content>
             <v-fab-transition>
-              <v-list-item-action v-show="!userIsOwner(item.id)" class="align-self-center">
+              <v-list-item-action v-show="!userIsOwner(study.id)" class="align-self-center">
                 <v-tooltip bottom>
                   <template #activator="{on, attrs}">
                     <v-icon color="primary" v-bind="attrs" v-on="on">
@@ -45,21 +57,26 @@
                     </v-icon>
                   </template>
                   {{ $t('studies.list.shared_by') }} {{
-                    studyOwners[item.id] && studyOwners[item.id].name
+                    studyOwners[study.id] && studyOwners[study.id].name
                   }}
                 </v-tooltip>
               </v-list-item-action>
             </v-fab-transition>
           </v-list-item>
           <v-divider />
-        </template>
-      </v-virtual-scroll>
+        </draggable>
+      </v-list>
     </transition>
   </div>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
+
 export default {
+  components: {
+    draggable
+  },
   props: {
     studies: {
       type: Array,
@@ -72,6 +89,19 @@ export default {
     addStudyButton: {
       type: Boolean,
       default: false
+    },
+    active: {
+      type: Boolean,
+      default: true
+    },
+    filter: {
+      type: String,
+      default: ''
+    }
+  },
+  data () {
+    return {
+      drag: false
     }
   },
   computed: {
@@ -80,6 +110,18 @@ export default {
         result[study.id] = study?.users.find(user => user.pivot.is_owner)
         return result
       }, {})
+    },
+    showSortHandle () {
+      return this.active && !this.filter
+    },
+    rows: {
+      get () {
+        if (this.loading || !this.studies) { return [] }
+        return this.studies
+      },
+      set (newOrder) {
+        this.$emit('update:order', newOrder)
+      }
     }
   },
   methods: {
