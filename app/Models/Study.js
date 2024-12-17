@@ -448,6 +448,7 @@ class Study extends Model {
           participations AS ptcp ON ptcp.participant_id = pp.id
         LEFT JOIN
           studies ON studies.id = ptcp.study_id
+        WHERE studies.active IS TRUE
         ORDER BY
           participant_id ASC,
           queue_position ASC
