@@ -31,7 +31,7 @@
               Priority
             </span>
             <span class="caption ms-8">
-              # Trails
+              # Trials
             </span>
           </div>
         </v-card-title>
