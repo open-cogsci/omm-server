@@ -1,6 +1,6 @@
-FROM node:14-slim AS builder
+FROM node:18-slim AS builder
 RUN apt-get update
-RUN apt-get install python make g++ git -y
+RUN apt-get install python3 make g++ git -y
 WORKDIR /img
 COPY . .
 RUN npm clean-install
@@ -10,7 +10,7 @@ ENV APP_KEY=2wsjLSopTjD6WQEztTYIZgCFou8wpLJn
 RUN npm run build
 RUN npm prune --production
 
-FROM node:14-alpine
+FROM node:18-alpine
 WORKDIR /img
 ENV ENV_SILENT=true
 ENV NODE_ENV=production
