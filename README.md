@@ -182,6 +182,35 @@ Finally, paste your copied `Bearer XXXXX` string into the `Value` field and clic
 
 You should now be able to access the protected endpoints.
 
+## Build Docker image
+
+1. `cd` to omm-server's root.
+
+1. First change the version in package.json, package-lock.json to the new one.
+
+    Build the image (change x.x.x to the version you used in package.json):
+
+    ```shell
+    docker build -t cogsci/omm-server:x.x.x .
+    ```
+
+1. Try running it with docker compose. Before, you should edit the docker-compose.yml and change the image tag to the version you just pushed (search for `cogsci/omm-server`).
+
+    ```shell
+    docker compose up
+    ```
+
+    Check for errors and fix them. Use Ctrl-C to stop.
+
+1. If you are satisfied push the image to our Docker registry dockerhub:
+
+    ```shell
+    docker push cogsci/omm-server:x.x.x
+    ```
+
+    Check the image arrived in dockerhub: https://hub.docker.com/r/cogsci/omm-server/tags
+
+
 ## Built on the shoulders of giants
 
 This project uses prominent open-source frameworks and libraries:
