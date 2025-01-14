@@ -9,9 +9,10 @@ OpenMonkeyMind (OMM) allows OpenSesame experiments to be managed on a central se
 
 ## Credits
 
-© 2020 - 2021:
+© 2020 - 2025:
 
 - Sebastiaan Mathôt (@smathot), University of Groningen, The Netherlands
+- Kristian Lange (@kristian-lange)
 - Daniel Schreij  (@dschreij)
 - Joel Fagot (@joelfagot), CNRS and Aix-Marseille University, France
 - Nicolas Claidère (@nclaidiere), CNRS and Aix-Marseille University, France
