@@ -54,7 +54,7 @@ export default {
       },
       delete: {
         title: 'You are about to <span class="error--text">delete</span> this study',
-        body: `<p><strong>Deleting this study will also erase all its participations and associated data entries.</strong></p>
+        body: `<p><strong>By deleting the study, the data will not be erased but the progression in the experiment will be lost, do you wish to continue?</strong></p>
               <p>
                 Are you sure you want <span class="error--text">delete</span> the experiment?
               </p>`,
