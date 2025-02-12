@@ -10,8 +10,8 @@
       @clicked-no="deselected = []; warningDialog = false"
       @clicked-yes="apply"
     >
-      You have deselected {{ deselected.length }} participants. For these participants,
-      any results will be erased. Are you sure you want to continue?
+      You have deselected {{ deselected.length }} participants. For these participants
+      the data will not be erased but the progression in the experiment will be lost. Are you sure you want to continue?
     </confirmation-dialog>
     <v-card>
       <v-card-title>{{ $t('study_participants.dialogs.manage.title') }}</v-card-title>
