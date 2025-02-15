@@ -13,7 +13,7 @@ class SessionSchema extends Schema {
       table.timestamps()
 
       table.foreign('study_id').references('id').inTable('studies').onDelete('cascade')
-      table.foreign('participant_id').references('identifier').inTable('participants').onDelete('cascade')
+      table.foreign('participant_id').references('identifier').inTable('participants').onDelete('cascade').onUpdate('cascade')
       table.unique(['study_id', 'participant_id'])
     })
   }
