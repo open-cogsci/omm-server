@@ -315,11 +315,12 @@ class Study extends Model {
    * @returns Array
    * @memberof Study
    */
-  async getCollectedJobResultData () {
+  async getCollectedJobResultData (studyId) {
     return await Database
       .select('name', 'data')
       .from('job_results')
       .leftJoin('studies', 'job_results.study_id', 'studies.id')
+      .where('studies.id', studyId)
   }
 
   async storeJobResultData (data, jobId, ptcpId) {
