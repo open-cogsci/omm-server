@@ -470,8 +470,8 @@ export default {
         processErrors(e, this.notify)
       }
     },
-    downloadResultData () {
-      this.generateDataFile('csv')
+    async downloadResultData () {
+      await this.generateDataFile('csv')
       const url = this.dataFiles['data-csv'].path
       window.location.assign(url)
     }
