@@ -27,6 +27,7 @@
 
     <v-item-group v-if="userIsOwner" class="v-btn-toggle" :class="{'pr-5': $vuetify.breakpoint.mdAndUp}">
       <v-btn
+        :loading="downloadingResultData"
         @click="$emit('clicked-download-result-data')"
       >
         <v-icon v-bind="shareIconAttrs">
@@ -134,6 +135,10 @@ export default {
       default: false
     },
     loading: {
+      type: Boolean,
+      default: false
+    },
+    downloadingResultData: {
       type: Boolean,
       default: false
     },
