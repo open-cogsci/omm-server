@@ -57,6 +57,7 @@
             <v-col class="flex-grow-1 flex-shrink-0 text-md-right">
               <study-actions
                 :loading="status.loading"
+                :downloading-result-data="status.downloadingResultData"
                 :study="study"
                 :jobs="jobs"
                 :user-can-edit="userCanEdit"
@@ -176,6 +177,7 @@ export default {
         savingStudyInfo: false,
         savingInfo: false,
         loading: false,
+        downloadingResultData: false,
         refreshingJobs: false
       },
       errors: {
@@ -470,10 +472,12 @@ export default {
         processErrors(e, this.notify)
       }
     },
-    downloadResultData () {
-      this.generateDataFile('csv')
+    async downloadResultData () {
+      this.status.downloadingResultData = true
+      await this.generateDataFile('csv')
       const url = this.dataFiles['data-csv'].path
       window.location.assign(url)
+      this.status.downloadingResultData = false
     }
   }
 }
