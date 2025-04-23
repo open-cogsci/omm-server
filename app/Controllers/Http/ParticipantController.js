@@ -1,6 +1,7 @@
 'use strict'
 
 const { keyBy } = require('lodash')
+const formatISO9075 = require('date-fns/formatISO9075')
 const { ModelNotFoundException } = require('@adonisjs/lucid/src/Exceptions')
 const { validate } = use('Validator')
 
@@ -752,6 +753,8 @@ class ParticipantController {
       .firstOrFail()
 
     const jobResultData = request.input('data')
+    // Add timestamp field to data so multiple iterations of the same job can be discriminated by time
+    jobResultData.timestamp = formatISO9075(new Date())
     const job = ptcp.getRelated('jobs').first()
     if (!job) {
       throw new ModelNotFoundException(`Cannot find job with ID ${jobID} for participant ${identifier}`)
