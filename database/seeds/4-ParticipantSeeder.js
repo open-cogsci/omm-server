@@ -1,25 +1,18 @@
 'use strict'
 
-/*
-|--------------------------------------------------------------------------
-| ParticipantSeeder
-|--------------------------------------------------------------------------
-|
-| Make use of the Factory instance to seed database with dummy data or
-| make use of Lucid models directly.
-|
-*/
-
-/** @type {import('@adonisjs/lucid/src/Factory')} */
-const Factory = use('Factory')
-/** @type {import('@adonisjs/lucid/src/Model')} */
 const Participant = use('App/Models/Participant')
 
 class ParticipantSeeder {
   async run () {
-    // Don't seed any studies if there already are some.
     if (await Participant.getCount() === 0) {
-      return Factory.model('App/Models/Participant').createMany(100)
+      for (let i = 0; i < 10; i++) {
+        const identifier = String.fromCharCode(97 + i) // 'a', 'b', ..., 'j'
+        await Participant.create({
+          name: `Participant ${identifier}`,
+          identifier: identifier,
+          active: true
+        })
+      }
     }
   }
 }

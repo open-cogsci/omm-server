@@ -1,57 +1,44 @@
 'use strict'
 
-/*
-|--------------------------------------------------------------------------
-| JobResultSeeder
-|--------------------------------------------------------------------------
-|
-| Make use of the Factory instance to seed database with dummy data or
-| make use of Lucid models directly.
-|
-*/
-
-const Factory = use('Factory')
-const JobResult = use('App/Models/JobResult')
-const Study = use('App/Models/Study')
-const Participant = use('App/Models/Participant')
-const Job = use('App/Models/Job')
-
-Factory.blueprint('App/Models/JobResult', async (faker) => {
-  const data = {
-    name: faker.name(),
-    email: faker.email(),
-    foo: faker.word({ syllables: 3 }),
-    description: faker.sentence({ words: 10 }),
-    active: faker.bool(),
-    timestamp: Date.now(),
-    ratio: Math.random()
-  }
-  return {
-    data: JSON.stringify(data)
-  }
-})
+const Database = use('Database')
 
 class JobResultSeeder {
   async run () {
-    // Don't seed any job results if there already are some.
-    if (await JobResult.getCount() === 0) {
-      const jobResults1 = await Factory.model('App/Models/JobResult').makeMany(2000)
-      const jobResults2 = await Factory.model('App/Models/JobResult').makeMany(3000)
+    const CHUNK_SIZE = 500
+    const now = new Date()
+    const studies = await Database.table('studies').select('id')
 
-      const study1 = await Study.findOrFail(1)
-      const study2 = await Study.findOrFail(2)
-      await study1.jobResults().saveMany(jobResults1)
-      await study2.jobResults().saveMany(jobResults2)
+    for (const study of studies) {
+      // Find finished job states for this study
+      const finishedStates = await Database
+        .table('job_states')
+        .where('job_states.status_id', 3)
+        .innerJoin('jobs', 'job_states.job_id', 'jobs.id')
+        .where('jobs.study_id', study.id)
+        .select('job_states.participant_id', 'job_states.job_id', 'jobs.study_id')
 
-      const participant1 = await Participant.findOrFail(1)
-      const participant2 = await Participant.findOrFail(2)
-      await participant1.jobResults().saveMany(jobResults1)
-      await participant2.jobResults().saveMany(jobResults2)
+      // Create a result with 26 variables (result_var_a through result_var_z)
+      const jobResults = finishedStates.map(state => {
+        const data = {}
+        for (let i = 0; i < 26; i++) {
+          data[`result_var_${String.fromCharCode(97 + i)}`] = Math.floor(Math.random() * 1000)
+        }
+        return {
+          study_id: state.study_id,
+          participant_id: state.participant_id,
+          job_id: state.job_id,
+          data: JSON.stringify(data),
+          created_at: now,
+          updated_at: now
+        }
+      })
 
-      const job1 = await Job.findOrFail(1)
-      const job2 = await Job.findOrFail(2)
-      await job1.jobResults().saveMany(jobResults1)
-      await job2.jobResults().saveMany(jobResults2)
+      for (let i = 0; i < jobResults.length; i += CHUNK_SIZE) {
+        await Database.table('job_results').insert(
+          jobResults.slice(i, i + CHUNK_SIZE)
+        )
+      }
+      console.log(`  Study ${study.id}: ${jobResults.length} job results`)
     }
   }
 }
