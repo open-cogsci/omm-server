@@ -671,32 +671,59 @@ class ParticipantController {
       return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
     }
 
-    // Fetch the participant, or throw an error if it isn't found.
-    const participant = await Participant.query()
-      .where('identifier', identifier)
-      .with('jobs', (query) => {
-        if (from) {
-          query.where('position', '>=', from)
-        }
-        if (to) {
-          query.where('position', '<', to)
-        }
-        query
-          .where('study_id', studyID)
-          .orderBy('position', 'asc')
-          .with('variables.dtype')
-      })
-      .firstOrFail()
+    // Fetch the participant first as a separate step so that we have their
+    // numeric ID available to filter jobResults below. If we tried to do this
+    // in a single chained query we wouldn't have the ID yet when we need it.
+    const participant = await Participant.findByOrFail('identifier', identifier)
 
+    // Eagerly load jobs for this participant, study, and position range.
+    // Lucid fires separate SQL queries for each nested relation (jobs,
+    // variables, dtype, jobResults) and stitches the results together in
+    // memory — there are no SQL JOINs involved.
+    await participant.load('jobs', (query) => {
+      if (from) {
+        query.where('position', '>=', from)
+      }
+      if (to) {
+        query.where('position', '<', to)
+      }
+      query
+        .where('study_id', studyID)
+        .orderBy('position', 'asc')
+        .with('variables.dtype')
+        .with('jobResults', (q) => {
+          q.where('participant_id', participant.id)  // ← filter to this participant only
+        })
+    })
+
+    // Retrieve the already-loaded jobs collection from the participant model's
+    // in-memory relations map. This does NOT hit the database — it simply
+    // reads what was stored there by the load() call above.
     const jobs = participant.getRelated('jobs')
     if (jobs.length === 0) {
       return response.notFound(`No jobs were found for study ID ${studyID}`)
     }
+
+    // Job statuses have an id and a name, which are both merged into the
+    // result. Since there are only a few job statuses (finished, pending,
+    // started), we don't join them from the database (which is slow) but
+    // rather create a map from a status id to the full status info object,
+    // and assign these to the jobs in a for loop.
+    const JobStatus = use('App/Models/JobStatus')
+    const statuses = await JobStatus.all()
+    const statusMap = statuses.rows.reduce((map, s) => {
+      map[s.id] = s
+      return map
+    }, {})
     for (const job of jobs.rows) {
-      await job.$relations.pivot.load('status')
+      job.$relations.pivot.$relations.status = statusMap[job.$relations.pivot.status_id]
     }
-    return transform.include('jobResults,study').collection(jobs, 'JobTransformer')
+
+    // Serialize the result into a JSON-ready object via the transformer and return it.
+    const result = await transform.include('jobResults,study').collection(jobs, 'JobTransformer')
+    return result
   }
+
 
   /**
   * @swagger
