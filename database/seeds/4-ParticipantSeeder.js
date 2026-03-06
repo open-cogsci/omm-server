@@ -10,6 +10,7 @@ class ParticipantSeeder {
         await Participant.create({
           name: `Participant ${identifier}`,
           identifier: identifier,
+          alternate_identifier: `alt_${identifier}`,
           active: true
         })
       }

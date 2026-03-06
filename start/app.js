@@ -41,7 +41,8 @@ const providers = [
 */
 const aceProviders = [
   'adonis-bumblebee/providers/CommandsProvider',
-  '@adonisjs/lucid/providers/MigrationsProvider'
+  '@adonisjs/lucid/providers/MigrationsProvider',
+  '@adonisjs/vow/providers/VowProvider'
 ]
 
 /*

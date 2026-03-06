@@ -9,7 +9,7 @@ class StudySeeder {
 
     const now = new Date()
     const NUM_STUDIES = 10
-    const NUM_JOBS = 10000
+    const NUM_JOBS = 100
     const NUM_VARS = 26
     const CHUNK_SIZE = 500
 
