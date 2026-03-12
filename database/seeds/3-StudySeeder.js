@@ -35,6 +35,19 @@ class StudySeeder {
     }))
     await Database.table('study_users').insert(studyUsers)
 
+    // Fetch the created Study model instances and create a file for each
+    const createdStudies = await Study.query()
+      .whereBetween('id', [firstStudyId, firstStudyId + NUM_STUDIES - 1])
+      .fetch()
+    for (const study of createdStudies.rows) {
+      await study.files().create({
+        path: `/files/${study.id}/experiment.osexp`,
+        filename: 'experiment.osexp',
+        type: 'experiment'
+      })
+    }
+    console.log(`  Created files for ${NUM_STUDIES} studies`)
+
     // Create 26 variables per study (job_var_a through job_var_z)
     const allVariables = []
     for (let s = 0; s < NUM_STUDIES; s++) {
