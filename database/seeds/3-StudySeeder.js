@@ -1,6 +1,8 @@
 'use strict'
 
+const fs = require('fs')
 const Database = use('Database')
+const Helpers = use('Helpers')
 const Study = use('App/Models/Study')
 
 class StudySeeder {
@@ -40,10 +42,13 @@ class StudySeeder {
       .whereBetween('id', [firstStudyId, firstStudyId + NUM_STUDIES - 1])
       .fetch()
     for (const study of createdStudies.rows) {
+      const filePath = Helpers.publicPath(`files/${study.id}/experiment.osexp`)
+      const size = fs.statSync(filePath).size
       await study.files().create({
         path: `/files/${study.id}/experiment.osexp`,
         filename: 'experiment.osexp',
-        type: 'experiment'
+        type: 'experiment',
+        size
       })
     }
     console.log(`  Created files for ${NUM_STUDIES} studies`)
