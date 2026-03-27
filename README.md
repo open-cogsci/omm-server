@@ -9,7 +9,7 @@ OpenMonkeyMind (OMM) allows OpenSesame experiments to be managed on a central se
 
 ## Credits
 
-© 2020 - 2025:
+© 2020 - 2026:
 
 - Sebastiaan Mathôt (@smathot), University of Groningen, The Netherlands
 - Kristian Lange (@kristian-lange)
@@ -148,7 +148,13 @@ command. This will insert the data specified in the seed files under `database/s
 > Note: the process may hang after this operation forcing you to quit it with ctrl-c, but it will
 > likely have succeeded.
 
-## Running tests
+## Running API endpoint tests
+
+```
+node ace test
+```
+
+## Running UI tests
 
 Tests are implemented on the frontend with [Jest](https://jestjs.io/) and for the backend using Adonis.
 Tests can be run with the command `npm test`.

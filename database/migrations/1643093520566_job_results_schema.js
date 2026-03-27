@@ -18,6 +18,7 @@ class JobResultSchema extends Schema {
       table.integer('job_id').unsigned()
       table.json('data')
       table.timestamps()
+      table.index(['job_id', 'participant_id'])
     })
   }
 

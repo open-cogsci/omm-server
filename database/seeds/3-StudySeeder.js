@@ -1,81 +1,113 @@
 'use strict'
 
-/*
-|--------------------------------------------------------------------------
-| UserSeeder
-|--------------------------------------------------------------------------
-|
-| Make use of the Factory instance to seed database with dummy data or
-| make use of Lucid models directly.
-|
-*/
-
-const Factory = use('Factory')
+const fs = require('fs')
+const Database = use('Database')
+const Helpers = use('Helpers')
 const Study = use('App/Models/Study')
-const User = use('App/Models/User')
-
-async function createCaptureJobs (study) {
-  const distractorVariable = await study.variables().create({
-    name: 'distractor',
-    dtype_id: 1
-  })
-
-  for (const [key, value] of Object.entries([
-    'present', 'absent'
-  ])) {
-    const job = await study.jobs().create({
-      position: parseInt(key) + 1
-    })
-
-    await job.variables().attach([distractorVariable.id], (row) => {
-      row.value = value
-    })
-  }
-}
 
 class StudySeeder {
   async run () {
-    // Don't seed any studies if there already are some.
-    if (await Study.getCount() > 0) { return }
+    if (await Study.getCount() > 0) return
 
-    const daniel = await User.findOrFail(1)
-    const sebastiaan = await User.findOrFail(2)
+    const now = new Date()
+    const NUM_STUDIES = 10
+    const NUM_JOBS = 100
+    const NUM_VARS = 26
+    const CHUNK_SIZE = 500
 
-    const captureStudy = await daniel.studies().create({
-      name: 'Attentional Capture',
-      description: 'Basic attentional capture experiment'
-    }, (row) => {
-      row.is_owner = true
-    })
+    // Create studies
+    const studies = Array.from({ length: NUM_STUDIES }, (_, i) => ({
+      name: `Study ${i + 1}`,
+      description: `Test study ${i + 1}`,
+      active: true,
+      created_at: now,
+      updated_at: now
+    }))
+    const [firstStudyId] = await Database.table('studies').insert(studies)
+    console.log(`  Created ${NUM_STUDIES} studies`)
 
-    captureStudy.files().create({
-      path: '/files/1/experiment.osexp',
-      filename: 'attentional-capture.osexp',
-      type: 'experiment'
-    })
-
-    await createCaptureJobs(captureStudy)
-
-
-    let studies = await Factory.model('App/Models/Study').makeMany(4)
-    await daniel.studies().saveMany(studies)
-    await daniel.studies().pivotQuery().update({
+    // Link all studies to user 1
+    const studyUsers = Array.from({ length: NUM_STUDIES }, (_, i) => ({
+      user_id: 1,
+      study_id: firstStudyId + i,
       is_owner: true,
-      access_permission_id: 2
-    })
+      access_permission_id: 2,
+      created_at: now,
+      updated_at: now
+    }))
+    await Database.table('study_users').insert(studyUsers)
 
-    studies = await Factory.model('App/Models/Study').makeMany(4)
-    await sebastiaan.studies().saveMany(studies)
-    await sebastiaan.studies().pivotQuery().update({
-      is_owner: true,
-      access_permission_id: 2
-    })
+    // Fetch the created Study model instances and create a file for each
+    const createdStudies = await Study.query()
+      .whereBetween('id', [firstStudyId, firstStudyId + NUM_STUDIES - 1])
+      .fetch()
+    for (const study of createdStudies.rows) {
+      const filePath = Helpers.publicPath(`files/${study.id}/experiment.osexp`)
+      const size = fs.statSync(filePath).size
+      await study.files().create({
+        path: `/files/${study.id}/experiment.osexp`,
+        filename: 'experiment.osexp',
+        type: 'experiment',
+        size
+      })
+    }
+    console.log(`  Created files for ${NUM_STUDIES} studies`)
 
-    // Make Sebastiaan co-owner of the study
-    await sebastiaan.studies().attach([captureStudy.id], (row) => {
-      row.access_permission_id = 2
-      row.is_owner = false
-    })
+    // Create 26 variables per study (job_var_a through job_var_z)
+    const allVariables = []
+    for (let s = 0; s < NUM_STUDIES; s++) {
+      for (let v = 0; v < NUM_VARS; v++) {
+        allVariables.push({
+          study_id: firstStudyId + s,
+          dtype_id: 1,
+          name: `job_var_${String.fromCharCode(97 + v)}`,
+          created_at: now,
+          updated_at: now
+        })
+      }
+    }
+    const [firstVarId] = await Database.table('variables').insert(allVariables)
+    console.log(`  Created ${allVariables.length} variables`)
+
+    // Create jobs and job_variable pivot per study
+    let firstJobId = null
+    for (let s = 0; s < NUM_STUDIES; s++) {
+      // Insert jobs for this study
+      const jobs = Array.from({ length: NUM_JOBS }, (_, j) => ({
+        study_id: firstStudyId + s,
+        position: j + 1,
+        created_at: now,
+        updated_at: now
+      }))
+      for (let i = 0; i < jobs.length; i += CHUNK_SIZE) {
+        const [insertedId] = await Database.table('jobs').insert(
+          jobs.slice(i, i + CHUNK_SIZE)
+        )
+        if (s === 0 && i === 0) firstJobId = insertedId
+      }
+
+      // Insert job_variable pivot records (26 per job)
+      const studyFirstJobId = firstJobId + s * NUM_JOBS
+      const studyFirstVarId = firstVarId + s * NUM_VARS
+      const jobVars = []
+      for (let j = 0; j < NUM_JOBS; j++) {
+        for (let v = 0; v < NUM_VARS; v++) {
+          jobVars.push({
+            job_id: studyFirstJobId + j,
+            variable_id: studyFirstVarId + v,
+            value: String(Math.floor(Math.random() * 100)),
+            created_at: now,
+            updated_at: now
+          })
+        }
+      }
+      for (let i = 0; i < jobVars.length; i += CHUNK_SIZE) {
+        await Database.table('job_variable').insert(
+          jobVars.slice(i, i + CHUNK_SIZE)
+        )
+      }
+      console.log(`  Study ${s + 1}: ${NUM_JOBS} jobs, ${jobVars.length} job_variable rows`)
+    }
   }
 }
 
