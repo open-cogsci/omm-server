@@ -195,9 +195,9 @@ export default {
     participants () {
       const query = this.Participant.query().where('active', true)
       if (this.statusFilter === 'assigned') {
-        query.whereIdIn(this.selected)
+        query.whereIdIn(this.originalSelection)
       } else if (this.statusFilter === 'not assigned') {
-        query.whereIdIn(difference(this.allIDs, this.selected))
+        query.whereIdIn(difference(this.allIDs, this.originalSelection))
       }
       if (this.searchterm && this.searchterm.length > 2) {
         query.where((ptcp) => {
@@ -311,7 +311,7 @@ export default {
         this.notify({ message: 'No changes to apply', color: 'info' })
         return this.$emit('input', false)
       }
-      this.applyng = true
+      this.applying = true
       try {
         if (newlySelected.length) {
           await this.study.assignParticipants(newlySelected, this.priority)
@@ -329,7 +329,7 @@ export default {
       } catch (e) {
         processErrors(e, this.notify)
       } finally {
-        this.applyng = false
+        this.applying = false
       }
     },
     fetchMore () {
