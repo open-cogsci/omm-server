@@ -22,6 +22,9 @@ class ExceptionHandler extends BaseExceptionHandler {
    */
   handle (error, { request, response }) {
     // response.status(error.status).send(error.message)
+    if (error.code === 'E_JWT_TOKEN_EXPIRED') {
+      error.message = 'Session expired — please reload the page.'
+    }
     return super.handle(error, { request, response })
   }
 
