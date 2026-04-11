@@ -10,6 +10,7 @@
       >
         <template #default="{ item }">
           <v-list-item
+            :key="item.id + '-' + item.selected"
             :value="item.id"
             :class="{'blue lighten-5': item.selected}"
             @click="selectionChange(item.id, !item.selected )"
