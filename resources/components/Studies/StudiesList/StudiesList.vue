@@ -38,7 +38,7 @@
           <v-list-item
             v-for="(study, i) in rows"
             :key="i"
-            :to="localePath(`/dashboard/studies/${study.id}`)"
+            :to="localePath({ name: 'dashboard-studies-id', params: { id: study.id } })"
             nuxt
           >
             <v-btn v-if="showSortHandle" icon class="sortHandle">

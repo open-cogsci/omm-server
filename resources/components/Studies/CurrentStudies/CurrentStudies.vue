@@ -106,17 +106,20 @@ export default {
     async saveNewStudy (newStudyData) {
       this.saving = true
       try {
-        await this.Study.persist({
+        const newStudyResponse = await this.Study.persist({
           name: newStudyData.name,
           description: newStudyData.description,
           information: newStudyData.information
         })
+        const newStudyId = newStudyResponse.response.data.data.id
         this.notify({
           message: this.$t('studies.notifications.created'),
           color: 'success'
         })
         this.dialog = false
         this.$refs.dialog.clear()
+        // Automatically navigate to the newly created study
+        this.$router.push(this.localePath({ name: 'dashboard-studies-id', params: { id: newStudyId } }))
       } catch (e) {
         this.errors = processErrors(e, this.notify)
       } finally {
