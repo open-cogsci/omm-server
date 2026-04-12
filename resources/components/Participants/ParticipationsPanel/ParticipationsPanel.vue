@@ -36,7 +36,7 @@
                   <v-tooltip bottom>
                     <template #activator="{on, attrs}">
                       <div class="d-inline-block" v-bind="attrs" v-on="on">
-                        <progress-circle :value="progress(item.id, participant.id)" />
+                        <progress-circle :value="progress(item)" />
                       </div>
                     </template>
                     {{ $t('stats.progress') }}
@@ -73,14 +73,12 @@ export default {
     }
   },
   methods: {
-    progress (studyID, ptcpID) {
-      // This is such an ugly hack, but inevitable with the belongsToMany bug that vuex-orm
-      // experiences. Once that is fixed, this hoop is no longer necessary
-      const edge = this.Participation.find([studyID, ptcpID])
-      if (!edge?.jobs_count) {
+    progress (item) {
+      const pivot = item.pivot
+      if (!pivot?.jobs_count || pivot?.completed_jobs_count == null) {
         return 0
       }
-      return parseInt(edge.completed_jobs_count / edge.jobs_count * 100)
+      return parseInt(pivot.completed_jobs_count / pivot.jobs_count * 100)
     },
     names (userList) {
       return userList.map(user => user.name).join(', ')
