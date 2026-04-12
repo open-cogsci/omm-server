@@ -7,6 +7,7 @@ export const STUDIES = `${API_PREFIX}/studies`
 export const PARTICIPANTS = `${API_PREFIX}/participants`
 export const PARTICIPATIONS = `${API_PREFIX}/participations`
 export const JOBS = `${API_PREFIX}/jobs`
+export const SESSIONS = `${API_PREFIX}/sessions`
 
 // Misc routes
 export const RECOVER_PASSWORD = `${AUTH_PREFIX}/password/recover`

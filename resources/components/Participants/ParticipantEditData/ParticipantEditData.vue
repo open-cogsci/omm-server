@@ -5,6 +5,13 @@
       @clicked-yes="stopEdit"
       @clicked-no="dialog = false"
     />
+    <confirmation-dialog
+      v-model="showClearDialog"
+      :title="$t('common.clear_confirm_title')"
+      :body="$t('common.clear_confirm_body')"
+      @confirm="clear"
+      @cancel="showClearDialog = false"
+    />
     <v-card-text class="fill-height">
       <v-form ref="form" v-model="validates" lazy-validation @submit.prevent="save">
         <v-text-field
@@ -40,6 +47,19 @@
           @input="checkYaml"
           @change="metaToJson"
         />
+        <v-row align="center" class="mt-0">
+          <v-btn
+            small
+            text
+            color="error"
+            @click="showClearDialog = true"
+          >
+            <v-icon left small>
+              mdi-delete
+            </v-icon>
+            {{ $t('common.clear') }}
+          </v-btn>
+        </v-row>
         <v-switch
           v-model="ptcp.active"
           hide-details

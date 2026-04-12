@@ -7,5 +7,6 @@ export default {
   close: 'Close',
   upload: 'Upload',
   cancel: 'Cancel',
-  apply: 'Apply'
+  apply: 'Apply',
+  clear: 'Clear session data'
 }

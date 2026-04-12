@@ -133,6 +133,7 @@ Route.group(() => {
   Route.get('/studies/:id/jobs/count', 'StudyController.countJobs').as('jobs.count')
 
   Route.get('/sessions', 'SessionController.show').as('sessions.show')
+  Route.get('/sessions/list', 'SessionController.listByStudy').as('sessions.listByStudy')
   Route.put('/sessions', 'SessionController.update').as('sessions.update')
   Route.delete('/sessions', 'SessionController.destroy').as('sessions.delete')
 

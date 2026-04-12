@@ -6,6 +6,7 @@ export default {
     title: 'Participants',
     perc_complete: '% complete',
     manage: 'Manage',
+    clear_session_data: 'Clear session data',
     none: 'No participants assigned'
   },
   dialogs: {
@@ -28,6 +29,11 @@ export default {
         assigned: 'Assigned',
         not_assigned: 'Not assigned'
       }
+    },
+    clear_session_data: {
+      title: 'Clear session data',
+      subtitle: 'Select participants with session data to delete',
+      confirm: 'Are you sure you want to delete the session data for the selected participants? This action cannot be undone.'
     },
     data: {
       title: 'Download data',

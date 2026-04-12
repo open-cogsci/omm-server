@@ -5,6 +5,11 @@
       :study="study"
       @new-assignments="refresh"
     />
+    <clear-session-data-dialog
+      v-model="dialog.clearSessionData"
+      :study="study"
+      @cleared="refresh"
+    />
     <v-col
       cols="12"
       class="pb-5"
@@ -12,6 +17,17 @@
       <v-card outlined class="fill-height d-flex flex-column">
         <v-card-actions>
           <v-spacer />
+          <v-btn
+            v-if="userCanEdit"
+            color="error"
+            class="mr-2"
+            @click="dialog.clearSessionData = true"
+          >
+            <v-icon left>
+              mdi-delete
+            </v-icon>
+            {{ $t('study_participants.participants.clear_session_data') }}
+          </v-btn>
           <v-btn
             v-if="userCanEdit"
             color="primary"
@@ -61,7 +77,8 @@ import { processErrors } from '@/assets/js/errorhandling'
 export default {
   components: {
     StudyParticipantsList: () => import('./StudyParticipantsList'),
-    ManageDialog: () => import('@/components/Participants/dialogs/ManageDialog')
+    ManageDialog: () => import('@/components/Participants/dialogs/ManageDialog'),
+    ClearSessionDataDialog: () => import('@/components/Participants/dialogs/ClearSessionDataDialog')
   },
   props: {
     study: {
@@ -79,7 +96,8 @@ export default {
     return {
       dialog: {
         download: false,
-        manage: false
+        manage: false,
+        clearSessionData: false
       },
       loading: {
         initial: false,

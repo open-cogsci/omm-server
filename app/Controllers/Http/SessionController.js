@@ -61,6 +61,14 @@ class SessionController {
     return response.json({ data: result })
   }
 
+  async listByStudy ({ request, response }) {
+    const studyID = request.input('study_id', null)
+    const results = await Session.query()
+      .where('study_id', studyID)
+      .fetch()
+    return response.json({ data: results })
+  }
+
   /**
   * @swagger
   * /sessions:
