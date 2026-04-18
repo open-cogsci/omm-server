@@ -108,6 +108,14 @@ class StudySeeder {
       }
       console.log(`  Study ${s + 1}: ${NUM_JOBS} jobs, ${jobVars.length} job_variable rows`)
     }
+    
+    // Backfill loop_count for all existing job_results
+    await Database.raw(`
+      UPDATE job_results 
+      SET data = JSON_SET(data, '$.loop_count', 0)
+      WHERE JSON_EXTRACT(data, '$.loop_count') IS NULL OR JSON_EXTRACT(data, '$.loop_count') = 0
+    `)
+    console.log('  Backfilled loop_count=0 for existing job_results')
   }
 }
 

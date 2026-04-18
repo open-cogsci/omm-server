@@ -96,5 +96,8 @@ export default {
       can_edit_short: 'Edit',
       search: 'Search user'
     }
-  }
+  },
+  loop_enabled: 'Loop tasks',
+  loop_enabled_hint: 'When enabled, participants will restart from the first task after completing all jobs',
+  loop_disabled: 'Tasks do not loop'
 }

@@ -30,6 +30,7 @@ export default class Study extends Model {
       description: this.string(''),
       information: this.string(''),
       active: this.boolean(true),
+      loop_enabled: this.boolean(false),
       created_at: this.attr(''),
       updated_at: this.attr(''),
       deleted_at: this.attr(''),

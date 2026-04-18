@@ -23,6 +23,12 @@
             auto-grow
             label="Information"
           />
+          <v-switch
+            v-model="loopEnabled"
+            :label="$t('studies.loop_enabled')"
+            :hint="$t('studies.loop_enabled_hint')"
+            persistent-hint
+          />
         </div>
         <div v-else key="view">
           <div class="d-flex justify-end">
@@ -41,6 +47,15 @@
           </div>
           <!--  eslint-disable-next-line vue/no-v-html -->
           <div class="black--text study-info-content" v-html="$md.render(study.information)" />
+          <v-divider class="my-4" />
+          <div class="d-flex align-center">
+            <v-icon :color="study.loop_enabled ? 'primary' : 'grey'" class="mr-2">
+              {{ study.loop_enabled ? 'mdi-repeat' : 'mdi-repeat-off' }}
+            </v-icon>
+            <span :class="study.loop_enabled ? 'black--text' : 'grey--text'">
+              {{ study.loop_enabled ? $t('studies.loop_enabled') : $t('studies.loop_disabled') }}
+            </span>
+          </div>
         </div>
       </v-fade-transition>
     </div>
@@ -66,22 +81,28 @@ export default {
   data () {
     return {
       editMode: false,
-      buffer: this.study?.information ?? ''
+      buffer: this.study?.information ?? '',
+      loopEnabled: this.study?.loop_enabled ?? false
     }
   },
   watch: {
     study (newData, oldData) {
       if (newData?.information === oldData?.information) { return }
       this.buffer = newData.information
+      this.loopEnabled = newData?.loop_enabled ?? false
     }
   },
   methods: {
     cancel () {
       this.buffer = this.study?.information ?? ''
+      this.loopEnabled = this.study?.loop_enabled ?? false
       this.editMode = false
     },
     save () {
-      this.$emit('editted', { information: this.buffer })
+      this.$emit('editted', {
+        information: this.buffer,
+        loop_enabled: this.loopEnabled
+      })
       this.editMode = false
     }
   }

@@ -512,9 +512,30 @@ class ParticipantController {
         .orderBy('position', 'asc')
         .firstOrFail()
     } catch (e) {
-      return response.requestedRangeNotSatisfiable({
-        message: `No job could be fetched for participant with identifier ${identifier}.`
-      })
+      // Check if study has looping enabled
+      if (study.loop_enabled) {
+        // Reset all job states for this participant in this study
+        await study.resetJobStates(ptcp.id)
+        
+        // Increment loop count for this participation
+        await ptcp.studies().pivotQuery()
+          .where('study_id', study.id)
+          .increment('loop_count', 1)
+        
+        // Try to fetch job again
+        job = await ptcp.jobs()
+          .where('study_id', study.id)
+          .whereInPivot('status_id', [1, 2])
+          .withPivot(['status_id'])
+          .with('variables.dtype')
+          .orderBy('pivot_status_id', 'desc')
+          .orderBy('position', 'asc')
+          .firstOrFail()
+      } else {
+        return response.requestedRangeNotSatisfiable({
+          message: `No job could be fetched for participant with identifier ${identifier}.`
+        })
+      }
     }
 
     // Change the status of the job from pending to started
@@ -597,6 +618,40 @@ class ParticipantController {
       .first()
 
     if (job === null) {
+      // Check if study has looping enabled
+      if (study.loop_enabled) {
+        // Reset all job states for this participant in this study
+        await study.resetJobStates(ptcp.id)
+        
+        // Increment loop count for this participation
+        await ptcp.studies().pivotQuery()
+          .where('study_id', study.id)
+          .increment('loop_count', 1)
+        
+        // Try to fetch job again
+        const newJob = await ptcp.jobs()
+          .where('study_id', study.id)
+          .whereInPivot('status_id', [1, 2])
+          .withPivot(['status_id'])
+          .with('variables.dtype')
+          .orderBy('pivot_status_id', 'desc')
+          .orderBy('position', 'asc')
+          .first()
+        
+        if (newJob === null) {
+          return response.notFound({
+            message: `There are no jobs available for participant with identifier ${identifier}.`
+          })
+        }
+        
+        return {
+          data: {
+            study_id: newJob.study_id,
+            current_job_index: newJob.position
+          }
+        }
+      }
+      
       return response.notFound({
         message: `There are no jobs available for participant with identifier ${identifier}.`
       })
