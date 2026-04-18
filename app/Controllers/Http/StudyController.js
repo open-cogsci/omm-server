@@ -297,7 +297,7 @@ class StudyController {
       })
     }
 
-    study.merge(request.only(['name', 'description', 'information', 'active']))
+    study.merge(request.only(['name', 'description', 'information', 'active', 'loop_enabled']))
     study.save()
 
     return transform.item(study, 'StudyTransformer')
