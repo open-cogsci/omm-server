@@ -1,7 +1,7 @@
 import { Model } from '@vuex-orm/core'
 import { cloneDeep, keyBy } from 'lodash'
-import { JOBS } from '@/assets/js/endpoints'
 import Study from './Study'
+import { JOBS } from '@/assets/js/endpoints'
 
 export const jobTransformer = (job) => {
   if (job.variables?.length) {

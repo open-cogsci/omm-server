@@ -27,6 +27,24 @@
               :position="queue[item.id]"
             />
           </v-list-item-content>
+          <v-list-item-action v-if="editable" style="max-width: 40px">
+            <v-tooltip left>
+              <template #activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                  @click.stop="$emit('reset-jobs', { participant: item, studyId })"
+                >
+                  <v-icon small>
+                    mdi-refresh
+                  </v-icon>
+                </v-btn>
+              </template>
+              {{ $t('participants.jobs.reset.tooltip') }}
+            </v-tooltip>
+          </v-list-item-action>
           <v-list-item-action v-if="editable" style="max-width: 100px">
             <priority-dial
               :participation="item.pivot"
@@ -52,6 +70,10 @@ export default {
     QueueStatus
   },
   props: {
+    studyId: {
+      type: [Number, null],
+      default: null
+    },
     participants: {
       type: Array,
       default: () => []

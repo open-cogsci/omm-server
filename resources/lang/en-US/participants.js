@@ -47,5 +47,19 @@ export default {
   priority: {
     queued: 'Queued at position',
     first: 'First to run'
+  },
+  jobs: {
+    reset: {
+      title: 'Reset Jobs to Pending',
+      description: 'Reset finished jobs to pending for participant {participant}.',
+      button: 'Reset to Pending',
+      no_finished: 'No finished jobs found for this participant.',
+      select_all: 'Select All',
+      success: '{count} job(s) reset to pending',
+      tooltip: 'Reset finished jobs to pending',
+      confirm_message: 'Are you sure you want to reset {count} job(s) to pending?',
+      warning: 'This will allow the participant to redo these jobs.',
+      confirm_button: 'Yes, Reset Jobs'
+    }
   }
 }

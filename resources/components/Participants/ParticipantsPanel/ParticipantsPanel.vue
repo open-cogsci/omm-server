@@ -5,6 +5,13 @@
       :study="study"
       @new-assignments="refresh"
     />
+    <reset-jobs-dialog
+      v-if="dialog.selectedParticipant"
+      v-model="dialog.resetJobs"
+      :study-id="study?.id"
+      :participant="dialog.selectedParticipant"
+      @jobs-reset="refresh"
+    />
     <v-col
       cols="12"
       class="pb-5"
@@ -38,14 +45,15 @@
         <v-card-text class="pa-0 fill-height">
           <study-participants-list
             :editable="userCanEdit"
-            :total-jobs="study.jobs_count"
             :participants="participants"
             :queue="queue"
             :loading-queue="loading.queue"
             :loading="loading.initial"
             :fetching-more="loading.participants"
+            :study-id="study?.id"
             @changed-priority="fetchQueue"
             @scroll-end="loadMore"
+            @reset-jobs="openResetJobsDialog"
           />
         </v-card-text>
       </v-card>
@@ -61,7 +69,8 @@ import { processErrors } from '@/assets/js/errorhandling'
 export default {
   components: {
     StudyParticipantsList: () => import('./StudyParticipantsList'),
-    ManageDialog: () => import('@/components/Participants/dialogs/ManageDialog')
+    ManageDialog: () => import('@/components/Participants/dialogs/ManageDialog'),
+    ResetJobsDialog: () => import('@/components/Participants/dialogs/ResetJobsDialog')
   },
   props: {
     study: {
@@ -79,7 +88,9 @@ export default {
     return {
       dialog: {
         download: false,
-        manage: false
+        manage: false,
+        resetJobs: false,
+        selectedParticipant: null
       },
       loading: {
         initial: false,
@@ -193,6 +204,12 @@ export default {
     },
     setStartpage () {
       this.pagination.page = Math.max(1, Math.ceil(this.participants.length / this.pagination.perPage))
+    },
+    openResetJobsDialog ({ participant, studyId }) {
+      if (participant) {
+        this.dialog.selectedParticipant = participant
+        this.dialog.resetJobs = true
+      }
     }
   }
 }
