@@ -5,7 +5,7 @@
         v-if="ptcps.length"
         :items="ptcps"
         :item-height="65"
-        max-height="calc(100vh - 575px)"
+        :height="scrollHeight"
         @scroll.native="scrolling"
       >
         <template #default="{ item }">
@@ -13,7 +13,7 @@
             :key="item.id + '-' + item.selected"
             :value="item.id"
             :class="{'blue lighten-5': item.selected}"
-            @click="selectionChange(item.id, !item.selected )"
+            @click="selectionChange(item.id, !item.selected)"
           >
             <v-list-item-action>
               <v-checkbox
@@ -41,12 +41,18 @@
 
 <script>
 import { debounce } from 'lodash'
+
 export default {
   sync: ['selected'],
   props: {
     participants: {
       type: Array,
       required: true
+    }
+  },
+  data () {
+    return {
+      scrollHeight: 400
     }
   },
   computed: {
@@ -60,19 +66,29 @@ export default {
       })
     }
   },
+  mounted () {
+    this.$nextTick(() => {
+      this.updateHeight()
+    })
+    window.addEventListener('resize', this.updateHeight)
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateHeight)
+  },
   created () {
     this.scrolling = debounce(this.scrolling, 200)
   },
   methods: {
+    updateHeight () {
+      this.scrollHeight = Math.max(200, window.innerHeight - 575)
+    },
     selectionChange (id, checked) {
       let next
-
       if (checked) {
         next = [...this.selected, id]
       } else {
         next = this.selected.filter(i => i !== id)
       }
-
       this.$emit('update:selected', next)
     },
     scrolling (event) {
@@ -82,6 +98,5 @@ export default {
       }
     }
   }
-
 }
 </script>

@@ -53,7 +53,7 @@
                     solo
                     min="1"
                     :max="participants.length || 1"
-                    :rules="[v => v >= 1 || $t('study_participants.dialogs.manage.provide') ]"
+                    :rules="[v => v >= 1 || $t('study_participants.dialogs.manage.provide')]"
                     single-line
                     type="number"
                   />
@@ -100,7 +100,7 @@
                 <v-progress-linear v-show="fetchingMore" height="2" indeterminate />
               </div>
               <participant-selector
-                v-if="value"
+                v-if="value && selectorReady"
                 :participants="participants"
                 :selected.sync="selected"
                 @scroll-end="fetchMore"
@@ -178,6 +178,7 @@ export default {
       loading: false,
       fetchingMore: false,
       applying: false,
+      selectorReady: false,
       statusFilter: 'all',
       priority: 1,
       searchterm: null,
@@ -202,7 +203,7 @@ export default {
       if (this.searchterm && this.searchterm.length > 2) {
         query.where((ptcp) => {
           return ptcp.name.toLowerCase().includes(this.searchterm.toLowerCase()) ||
-          ptcp.identifier.toLowerCase().includes(this.searchterm.toLowerCase())
+            ptcp.identifier.toLowerCase().includes(this.searchterm.toLowerCase())
         })
       }
       return query.get()
@@ -231,10 +232,15 @@ export default {
     async value (opened) {
       if (opened) {
         this.searchterm = null
+        this.selectorReady = false
         this.loading = true
         try {
-          this.fetchParticipants()
-          const { assigned, all, total } = await this.fetchParticipantIDs()
+          // Await both fetches together so the selector mounts
+          // only once participants AND selections are fully loaded
+          const [, { assigned, all, total }] = await Promise.all([
+            this.fetchParticipants(),
+            this.fetchParticipantIDs()
+          ])
           this.originalSelection = [...assigned]
           this.selected = [...assigned]
           this.allIDs = all
@@ -243,6 +249,8 @@ export default {
           processErrors(e, this.notify, true)
         } finally {
           this.loading = false
+          await this.$nextTick()
+          this.selectorReady = true
         }
       }
     }
@@ -306,7 +314,6 @@ export default {
     async apply () {
       this.warningDialog = false
       const newlySelected = difference(this.selected, this.originalSelection)
-      // If there are no new selections or deselections, there is nothing to do
       if (!newlySelected.length && !this.deselected.length) {
         this.notify({ message: 'No changes to apply', color: 'info' })
         return this.$emit('input', false)
@@ -343,8 +350,6 @@ export default {
       }
     },
     async fetchAfterFilter () {
-      // Wait a bit for the participants collection to be filtered, so its length can be used
-      // in the execution of setStartpage
       await this.$nextTick()
       this.setStartpage()
       this.fetchParticipants()
