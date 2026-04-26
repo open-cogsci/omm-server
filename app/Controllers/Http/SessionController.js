@@ -57,7 +57,10 @@ class SessionController {
     const result = await Session.query()
       .where('study_id', studyID)
       .where('participant_id', participantID)
-      .firstOrFail()
+      .first()
+    if (!result) {
+      return response.status(404).json({ message: 'Cannot find database row for Session model' })
+    }
     return response.json({ data: result })
   }
 
@@ -110,16 +113,23 @@ class SessionController {
    * @param {Response} ctx.response
    */
   async update ({ request, response }) {
-    const validation = await validate(request.all(), {
-      study_id: 'integer',
-      participant_id: 'string',
+    const rules = {
       data: 'required|json'
-    })
-    if (validation.fails()) {
-      return response.status(422).json(validation.messages())
     }
     const studyID = request.input('study_id', null)
     const participantID = request.input('participant_id', null)
+
+    if (studyID !== null) {
+      rules.study_id = 'integer'
+    }
+    if (participantID !== null) {
+      rules.participant_id = 'string'
+    }
+
+    const validation = await validate(request.all(), rules)
+    if (validation.fails()) {
+      return response.status(422).json(validation.messages())
+    }
     const data = request.input('data', {})
     const record = await Session.query()
       .where('study_id', studyID)

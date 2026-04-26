@@ -26,6 +26,12 @@
         </div>
         <div v-else key="view">
           <div class="d-flex justify-end">
+            <v-btn v-if="userCanEdit" @click="$emit('edit-study-data')">
+              <v-icon left>
+                mdi-database
+              </v-icon>
+              Edit Study Data
+            </v-btn>
             <v-btn v-if="userCanEdit" color="primary" @click="editMode=true">
               <v-icon left>
                 mdi-pencil

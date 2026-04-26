@@ -97,6 +97,7 @@
                   style="width: 100%"
                   @clicked-edit="(id) => editing = id"
                   @clicked-delete="$emit('delete-participant', $event)"
+                  @edit-participant-data="$emit('edit-participant-data', ptcp.identifier)"
                 />
               </v-fade-transition>
             </v-card>

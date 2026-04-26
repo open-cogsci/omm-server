@@ -45,6 +45,7 @@
                 @update-participant="saveParticipant"
                 @delete-participant="deleteParticipant"
                 @load-participant="loadParticipant"
+                @edit-participant-data="openJsonEditor('participant', $event)"
               />
             </v-skeleton-loader>
           </v-col>
@@ -77,6 +78,13 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-fab-transition>
+    <json-editor-dialog
+      v-model="jsonEditor.dialog"
+      :type="jsonEditor.type"
+      :participant-id="jsonEditor.participantId"
+      @saved="onJsonSaved"
+      @cleared="onJsonCleared"
+    />
   </v-container>
 </template>
 
@@ -89,7 +97,8 @@ export default {
   // inject: ['theme'],
   components: {
     ParticipantsList: () => import('@/components/Participants/ParticipantsList'),
-    newParticipantDialog: () => import('@/components/Participants/dialogs/NewParticipantDialog')
+    newParticipantDialog: () => import('@/components/Participants/dialogs/NewParticipantDialog'),
+    JsonEditorDialog: () => import('@/components/common/JsonEditorDialog/JsonEditorDialog.vue')
   },
   data () {
     return {
@@ -106,6 +115,11 @@ export default {
         ids: [],
         page: 1,
         perPage: 12
+      },
+      jsonEditor: {
+        dialog: false,
+        type: null,
+        participantId: null
       }
     }
   },
@@ -226,6 +240,17 @@ export default {
         this.pagination.page = page
         this.fetchParticipants()
       }
+    },
+    openJsonEditor (type, participantId) {
+      this.jsonEditor.type = type
+      this.jsonEditor.participantId = participantId
+      this.jsonEditor.dialog = true
+    },
+    onJsonSaved () {
+      this.notify({ message: 'Data saved successfully', color: 'success' })
+    },
+    onJsonCleared () {
+      this.notify({ message: 'Data cleared successfully', color: 'success' })
     }
   }
 }
