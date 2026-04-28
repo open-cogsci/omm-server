@@ -5,19 +5,20 @@
         v-if="ptcps.length"
         :items="ptcps"
         :item-height="65"
-        max-height="calc(100vh - 575px)"
+        :height="scrollHeight"
         @scroll.native="scrolling"
       >
         <template #default="{ item }">
           <v-list-item
+            :key="item.id + '-' + item.selected"
             :value="item.id"
             :class="{'blue lighten-5': item.selected}"
-            @click="selectionChange(item.id, !item.selected )"
+            @click="selectionChange(item.id, !item.selected)"
           >
             <v-list-item-action>
               <v-checkbox
                 :input-value="item.selected"
-                color="primary"
+                @click.stop="selectionChange(item.id, !item.selected)"
               />
             </v-list-item-action>
             <v-list-item-content>
@@ -40,6 +41,7 @@
 
 <script>
 import { debounce } from 'lodash'
+
 export default {
   sync: ['selected'],
   props: {
@@ -48,24 +50,46 @@ export default {
       required: true
     }
   },
+  data () {
+    return {
+      scrollHeight: 400
+    }
+  },
   computed: {
     ptcps () {
+      const selected = this.selected
       return this.participants.map((ptcp) => {
-        ptcp.selected = this.selected.includes(ptcp.id)
-        return ptcp
+        return {
+          ...ptcp,
+          selected: selected.includes(ptcp.id)
+        }
       })
     }
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.updateHeight()
+    })
+    window.addEventListener('resize', this.updateHeight)
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateHeight)
   },
   created () {
     this.scrolling = debounce(this.scrolling, 200)
   },
   methods: {
+    updateHeight () {
+      this.scrollHeight = Math.max(200, window.innerHeight - 575)
+    },
     selectionChange (id, checked) {
+      let next
       if (checked) {
-        this.selected.push(id)
+        next = [...this.selected, id]
       } else {
-        this.selected.splice(this.selected.indexOf(id), 1)
+        next = this.selected.filter(i => i !== id)
       }
+      this.$emit('update:selected', next)
     },
     scrolling (event) {
       const element = event.currentTarget || event.target
@@ -74,6 +98,5 @@ export default {
       }
     }
   }
-
 }
 </script>
