@@ -29,6 +29,14 @@
       @remove-user="removeCollaborator"
       @set-access-level="setAccessLevel"
     />
+    <json-editor-dialog
+      v-model="jsonEditor.dialog"
+      :type="jsonEditor.type"
+      :study-id="jsonEditor.studyId"
+      :participant-id="jsonEditor.participantId"
+      @saved="onJsonSaved"
+      @cleared="onJsonCleared"
+    />
     <v-row class="fill-height" no-gutters>
       <v-col cols="12" class="d-flex flex-column py-0">
         <v-row dense>
@@ -84,6 +92,7 @@
                             :user-can-edit="userCanEdit"
                             :study="study"
                             @editted="saveStudyInfo"
+                            @edit-study-data="openJsonEditor('study')"
                           />
                         </v-card-text>
                       </v-card>
@@ -110,6 +119,7 @@
                     ref="ptcpPanel"
                     :visible="ptcpPanelVisible"
                     :study="study"
+                    @edit-session-data="openJsonEditor('session', $event)"
                   />
                 </v-tab-item>
                 <v-tab-item>
@@ -156,7 +166,8 @@ export default {
     CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog'),
     ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel'),
     ParticipationStats: () => import('@/components/Participants/ParticipationStats'),
-    StudyInfo
+    StudyInfo,
+    JsonEditorDialog: () => import('@/components/common/JsonEditorDialog/JsonEditorDialog.vue')
   },
   beforeRouteUpdate (to, from, next) {
     // The component is reused if the id simply changed, so mounted is not called in this case.
@@ -211,6 +222,12 @@ export default {
           cancel: null,
           file: null
         }
+      },
+      jsonEditor: {
+        dialog: false,
+        type: null,
+        studyId: null,
+        participantId: null
       }
     }
   },
@@ -478,6 +495,18 @@ export default {
       const url = this.dataFiles['data-csv'].path
       window.location.assign(url)
       this.status.downloadingResultData = false
+    },
+    openJsonEditor (type, participantId = null) {
+      this.jsonEditor.type = type
+      this.jsonEditor.studyId = this.study.id
+      this.jsonEditor.participantId = participantId
+      this.jsonEditor.dialog = true
+    },
+    onJsonSaved () {
+      this.notify({ message: 'Data saved successfully', color: 'success' })
+    },
+    onJsonCleared () {
+      this.notify({ message: 'Data cleared successfully', color: 'success' })
     }
   }
 }

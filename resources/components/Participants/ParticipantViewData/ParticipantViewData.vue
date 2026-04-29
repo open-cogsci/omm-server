@@ -33,6 +33,12 @@
       </template>
     </v-card-text>
     <v-card-actions v-if="$auth.user.user_type_id === 1">
+      <v-btn @click="$emit('edit-participant-data')">
+        <v-icon left>
+          mdi-database
+        </v-icon>
+        Edit Participant Data
+      </v-btn>
       <v-spacer />
       <v-tooltip v-if="participant.studies_count > 0" bottom>
         <template #activator="{ on, attrs }">

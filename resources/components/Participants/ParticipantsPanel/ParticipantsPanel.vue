@@ -54,6 +54,7 @@
             @changed-priority="fetchQueue"
             @scroll-end="loadMore"
             @reset-jobs="openResetJobsDialog"
+            @edit-session-data="$emit('edit-session-data', $event)"
           />
         </v-card-text>
       </v-card>

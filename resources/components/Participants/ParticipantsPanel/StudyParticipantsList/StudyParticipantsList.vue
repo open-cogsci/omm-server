@@ -35,6 +35,24 @@
                   small
                   v-bind="attrs"
                   v-on="on"
+                  @click.stop="$emit('edit-session-data', item.identifier)"
+                >
+                  <v-icon small>
+                    mdi-database
+                  </v-icon>
+                </v-btn>
+              </template>
+              Edit session data
+            </v-tooltip>
+          </v-list-item-action>
+          <v-list-item-action v-if="editable" style="max-width: 40px">
+            <v-tooltip left>
+              <template #activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
                   @click.stop="$emit('reset-jobs', { participant: item, studyId })"
                 >
                   <v-icon small>
