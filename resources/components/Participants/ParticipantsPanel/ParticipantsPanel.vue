@@ -10,6 +10,7 @@
       v-model="dialog.resetJobs"
       :study-id="study?.id"
       :participant="dialog.selectedParticipant"
+      :finished-jobs="dialog.finishedJobs"
       @jobs-reset="refresh"
     />
     <v-col
@@ -51,6 +52,7 @@
             :loading="loading.initial"
             :fetching-more="loading.participants"
             :study-id="study?.id"
+            :loading-resets="loadingResets"
             @changed-priority="fetchQueue"
             @scroll-end="loadMore"
             @reset-jobs="openResetJobsDialog"
@@ -66,6 +68,7 @@
 import { mapActions } from 'vuex'
 import { keyBy } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
+import { API_PREFIX } from '@/assets/js/endpoints'
 
 export default {
   components: {
@@ -91,7 +94,8 @@ export default {
         download: false,
         manage: false,
         resetJobs: false,
-        selectedParticipant: null
+        selectedParticipant: null,
+        finishedJobs: null
       },
       loading: {
         initial: false,
@@ -106,7 +110,8 @@ export default {
         total: 0
       },
       ptcpListCtrHeight: 0,
-      queue: {}
+      queue: {},
+      loadingResets: {}
     }
   },
   computed: {
@@ -206,10 +211,25 @@ export default {
     setStartpage () {
       this.pagination.page = Math.max(1, Math.ceil(this.participants.length / this.pagination.perPage))
     },
-    openResetJobsDialog ({ participant, studyId }) {
-      if (participant) {
+    async openResetJobsDialog ({ participant, studyId }) {
+      if (!participant) {
+        return
+      }
+      this.$set(this.loadingResets, participant.id, true)
+      try {
+        const response = await this.$axios.get(
+          `${API_PREFIX}/participants/${participant.identifier}/${studyId}/jobs`
+        )
+        const finishedJobs = response.data.data.filter(
+          job => job.pivot && job.pivot.status_id === 3
+        )
         this.dialog.selectedParticipant = participant
+        this.dialog.finishedJobs = finishedJobs
         this.dialog.resetJobs = true
+      } catch (e) {
+        processErrors(e, this.notify)
+      } finally {
+        this.$set(this.loadingResets, participant.id, false)
       }
     }
   }

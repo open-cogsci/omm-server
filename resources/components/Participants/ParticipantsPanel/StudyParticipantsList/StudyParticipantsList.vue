@@ -51,6 +51,8 @@
                 <v-btn
                   icon
                   small
+                  :loading="loadingResets[item.id]"
+                  :disabled="loadingResets[item.id]"
                   v-bind="attrs"
                   v-on="on"
                   @click.stop="$emit('reset-jobs', { participant: item, studyId })"
@@ -115,6 +117,10 @@ export default {
     editable: {
       type: Boolean,
       default: false
+    },
+    loadingResets: {
+      type: Object,
+      default: () => ({})
     }
   },
   data: () => ({

@@ -25,7 +25,7 @@
 
           <v-progress-linear v-if="loading" indeterminate class="mb-4" />
 
-          <div v-else-if="finishedJobs.length === 0">
+          <div v-else-if="dialogFinishedJobs.length === 0">
             {{ $t('participants.jobs.reset.no_finished') }}
           </div>
 
@@ -43,7 +43,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item v-for="job in finishedJobs" :key="job.id">
+            <v-list-item v-for="job in dialogFinishedJobs" :key="job.id">
               <v-list-item-action>
                 <v-checkbox
                   v-model="selectedJobs"
@@ -106,12 +106,16 @@ export default {
     participant: {
       type: [Object, null],
       default: null
+    },
+    finishedJobs: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
     return {
       loading: false,
-      finishedJobs: [],
+      dialogFinishedJobs: [],
       selectedJobs: [],
       selectAll: false,
       showConfirmation: false
@@ -124,13 +128,20 @@ export default {
   },
   watch: {
     value (val) {
-      if (val && this.participant) {
-        this.fetchFinishedJobs()
+      if (val) {
         this.showConfirmation = false
       }
     },
+    finishedJobs: {
+      handler (newVal) {
+        this.dialogFinishedJobs = newVal || []
+        this.selectedJobs = []
+        this.selectAll = false
+      },
+      immediate: true
+    },
     selectedJobs (val) {
-      this.selectAll = val.length === this.finishedJobs.length && this.finishedJobs.length > 0
+      this.selectAll = val.length === this.dialogFinishedJobs.length && this.dialogFinishedJobs.length > 0
     }
   },
   methods: {
@@ -145,7 +156,7 @@ export default {
         const response = await this.$axios.get(
           `${API_PREFIX}/participants/${this.participant.identifier}/${this.studyId}/jobs`
         )
-        this.finishedJobs = response.data.data.filter(
+        this.dialogFinishedJobs = response.data.data.filter(
           job => job.pivot && job.pivot.status_id === 3
         )
         this.selectedJobs = []
@@ -160,7 +171,7 @@ export default {
 
     toggleAll () {
       if (this.selectAll) {
-        this.selectedJobs = this.finishedJobs.map(j => j.id)
+        this.selectedJobs = this.dialogFinishedJobs.map(j => j.id)
       } else {
         this.selectedJobs = []
       }
@@ -173,7 +184,7 @@ export default {
 
       this.loading = true
       try {
-        const positions = this.finishedJobs
+        const positions = this.dialogFinishedJobs
           .filter(j => this.selectedJobs.includes(j.id))
           .map(j => j.position)
 
