@@ -174,6 +174,40 @@ class Study extends Model {
   }
 
   /**
+   * Check if study has looping enabled
+   * @method hasLoopEnabled
+   * @return {Boolean}
+   */
+  async hasLoopEnabled () {
+    return this.loop_enabled === true
+  }
+
+  /**
+   * Reset all job states for participants in this study (for looping)
+   * @method resetJobStates
+   * @param {Number} participantId
+   * @return {Number} Number of reset job states
+   */
+  async resetJobStates (participantId) {
+    const studyJobs = await this.jobs().ids()
+    if (studyJobs.length === 0) {
+      return 0
+    }
+    
+    const result = await Database
+      .table('job_states')
+      .where('participant_id', participantId)
+      .whereIn('job_id', studyJobs)
+      .where('status_id', 3) // Only reset completed jobs
+      .update({ 
+        status_id: 1, // Reset to pending
+        updated_at: new Date()
+      })
+    
+    return result
+  }
+
+  /**
    * Checks if the passed user has sufficient privileges to edit this study
    *
    * @param {User} user
@@ -354,8 +388,20 @@ class Study extends Model {
       }))
     }
 
-    // A job result is stored as JSON in the database and consists of 1) the actual submitted data, 2) some info about the participant,
-    // 3) some info about the job, 4) the variables data, 5) the study ID and name.
+    // Get loop_count for this participant in this study
+    const participation = await Database
+      .table('participations')
+      .where('study_id', this.id)
+      .where('participant_id', ptcpId)
+      .first()
+    const loopCount = participation?.loop_count || 0
+
+    // A job result is stored as JSON in the database and consists of 
+    // 1) the actual submitted data + loop count,
+    // 2) some info about the participant,
+    // 3) some info about the job, 
+    // 4) the variables data, 
+    // 5) the study ID and name.
     return await this.jobResults().create({
       study_id: this.Id,
       participant_id: ptcpId,
@@ -367,7 +413,8 @@ class Study extends Model {
         job_id: job.id,
         job_position: job.position,
         study_id: this.id,
-        study_name: this.name,
+        study_name: this.name,  
+        loop_count: loopCount,
         ...varData,
         ...data
       })
@@ -407,8 +454,13 @@ class Study extends Model {
     if (ptcpID && updateStatus) {
       let statusID
 
-      if (finished) {
+      if (finished && !this.loop_enabled) {
         statusID = 3 // Finished
+      } else if (finished && this.loop_enabled) {
+        // Reset jobs for next loop
+        await this.resetJobStates(ptcpID)
+        await this.participants().pivotQuery().where('participant_id', ptcpID).increment('loop_count', 1)
+        statusID = 2 // Keep as in progress
       } else {
         statusID = 2 // In progress
       }

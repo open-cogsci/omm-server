@@ -501,17 +501,16 @@ class ParticipantController {
       return response.notFound({ message: `The study with ${studyID} could not be found.` })
     }
 
-    let job
-    try {
-      job = await ptcp.jobs()
-        .where('study_id', study.id)
-        .whereInPivot('status_id', [1, 2]) // job state status 'pending' or 'started'
-        .withPivot(['status_id'])
-        .with('variables.dtype')
-        .orderBy('pivot_status_id', 'desc')
-        .orderBy('position', 'asc')
-        .firstOrFail()
-    } catch (e) {
+    const job = await ptcp.jobs()
+      .where('study_id', study.id)
+      .whereInPivot('status_id', [1, 2]) // job state status 'pending' or 'started'
+      .withPivot(['status_id'])
+      .with('variables.dtype')
+      .orderBy('pivot_status_id', 'desc')
+      .orderBy('position', 'asc')
+      .first()
+
+    if (job === null) {
       return response.requestedRangeNotSatisfiable({
         message: `No job could be fetched for participant with identifier ${identifier}.`
       })
