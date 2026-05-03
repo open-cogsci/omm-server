@@ -454,8 +454,13 @@ class Study extends Model {
     if (ptcpID && updateStatus) {
       let statusID
 
-      if (finished) {
+      if (finished && !this.loop_enabled) {
         statusID = 3 // Finished
+      } else if (finished && this.loop_enabled) {
+        // Reset jobs for next loop
+        await this.resetJobStates(ptcpID)
+        await this.participants().pivotQuery().where('participant_id', ptcpID).increment('loop_count', 1)
+        statusID = 2 // Keep as in progress
       } else {
         statusID = 2 // In progress
       }
