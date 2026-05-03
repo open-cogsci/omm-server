@@ -81,7 +81,7 @@ export default {
     },
     type: {
       type: String,
-      required: true,
+      default: 'study',
       validator: val =>
         ['study', 'session', 'participant'].includes(val)
     },
@@ -153,8 +153,13 @@ export default {
         const response = await this.$axios.get('/sessions', { params })
         const session = response.data.data || {}
         this.originalData = session.data || {}
-        this.recordExists = true
-        this.jsonText = JSON.stringify(this.originalData, null, 2)
+        if (Object.keys(this.originalData).length === 0) {
+          this.recordExists = false
+          this.jsonText = ''
+        } else {
+          this.recordExists = true
+          this.jsonText = JSON.stringify(this.originalData, null, 2)
+        }
         this.originalJsonText = this.jsonText
       } catch (e) {
         if (e.response && e.response.status === 404) {
