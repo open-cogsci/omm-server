@@ -59,7 +59,7 @@ class SessionController {
       .where('participant_id', participantID)
       .first()
     if (!result) {
-      return response.status(404).json({ message: 'Cannot find database row for Session model' })
+      return response.json({ data: {} })
     }
     return response.json({ data: result })
   }
