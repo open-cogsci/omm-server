@@ -6,6 +6,8 @@ const Participant = use('App/Models/Participant')
 const Database = use('Database')
 
 trait('Test/ApiClient')
+trait('DatabaseTransactions')
+
 
 function genIdentifier () {
   return 'loop_' + Date.now() + '_' + Math.floor(Math.random() * 1000)
