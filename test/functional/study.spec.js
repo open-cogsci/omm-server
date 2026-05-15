@@ -5,6 +5,7 @@ const { test, trait, before } = use('Test/Suite')('Participant Jobs')
 trait('Test/ApiClient')
 
 const PARTICIPANT = 'a'
+const PARTICIPANT_ALT = 'alt_a'
 const STUDY_ID = 1
 
 // Shared state across tests
@@ -160,4 +161,31 @@ test('current job index is back to incremented value', async ({ client, assert }
   assert.isNumber(data.study_id)
   assert.isNumber(data.current_job_index)
   assert.equal(data.current_job_index, currentJobIndex + 1)
+})
+
+test('can announce participant using alternate identifier', async ({ client, assert }) => {
+ 
+  const response = await client
+    .get(`/api/v1/participants/${PARTICIPANT_ALT}/announce`)
+    .end()
+  
+  response.assertStatus(200)
+  const { data } = response.body
+  
+  // Same assertions as the regular announce test
+  assert.isNumber(data.id)
+  assert.isString(data.name)
+  assert.isString(data.description)
+  assert.isNumber(data.jobs_count)
+  assert.isArray(data.files)
+  assert.isArray(data.participants)
+  assert.isAbove(data.participants.length, 0)
+  
+  const participant = data.participants[0]
+  assert.isNumber(participant.id)
+  assert.isString(participant.name)
+  assert.isObject(participant.pivot)
+  assert.isNumber(participant.pivot.participant_id)
+  assert.isNumber(participant.pivot.study_id)
+  assert.isNumber(participant.pivot.status_id)
 })

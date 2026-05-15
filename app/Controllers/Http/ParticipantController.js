@@ -381,7 +381,7 @@ class ParticipantController {
   *         name: identifier
   *         required: true
   *         type: string
-  *         description: The identifier code of the participant.
+  *         description: The identifier (canonical or alternate) of the participant.
   *     responses:
   *       200:
   *         description: Sends the study to perform, including a download link for the osexp file.
@@ -412,7 +412,10 @@ class ParticipantController {
   */
   async announce ({ params, transform, response }) {
     const { identifier } = params
-    const ptcp = await Participant.findByOrFail('identifier', identifier)
+    const ptcp = await Participant.query()
+      .where('identifier', identifier)
+      .orWhere('alternate_identifier', identifier)
+      .firstOrFail()
     if (!ptcp.active) {
       return response.badRequest({ message: 'Participant is not active' })
     }
@@ -845,7 +848,7 @@ class ParticipantController {
   *         name: identifier
   *         required: true
   *         type: string
-  *         description: The identifier of the participant to retrieve
+  *         description: The identifier (canonical or alternate) of the participant to retrieve
   *     responses:
   *       200:
   *         description: The participant's canonical identifier.
