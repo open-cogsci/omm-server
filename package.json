@@ -1,11 +1,12 @@
 {
   "name": "omm-server",
-  "version": "0.9.3",
+  "version": "0.10.0",
   "description": "OpenMonkeyMind",
   "author": "Daniel Schreij",
   "contributors": [
     "Sebastiaan Mathôt",
-    "Kristian Lange"
+    "Kristian Lange",
+    "Blazej Baczkowski"
   ],
   "private": true,
   "main": "electron.js",
