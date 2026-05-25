@@ -428,7 +428,7 @@ class ParticipantController {
       .with('participants', (query) => {
         query
           .where('participants.id', ptcp.id)
-          .select(['id', 'name', 'meta'])
+          .select(['id', 'name', 'meta', 'identifier', 'alternate_identifier'])
       })
       .withPivot(['status_id', 'priority'])
       .whereInPivot('status_id', [1, 2]) // participation status 'pending' or 'started'
