@@ -22,7 +22,7 @@
     "release": "scripts/release.sh"
   },
   "dependencies": {
-    "@adonisjs/ace": "^5.1.0",
+    "@adonisjs/ace": "^14.1.0",
     "@adonisjs/auth": "^3.2.0",
     "@adonisjs/bodyparser": "^2.3.0",
     "@adonisjs/cors": "^1.0.2",
