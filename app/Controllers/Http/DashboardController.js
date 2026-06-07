@@ -54,7 +54,7 @@ class DashboardController {
               return d
             })
             .reverse()
-        bins = dates.map(d => d.getDate()) 
+        bins = dates.map(d => d.getFullDay()) 
         labels = dates.map(d => d.toLocaleDateString('en-gb', {  weekday: 'long' }))
         break
       case 'month':
