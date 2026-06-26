@@ -27,16 +27,15 @@ module.exports = function (bins, dbData) {
     const dayFormat = 'd MMM'
     const timeFormat = 'HH:mm'
 
-    // If all participations are on the same day, show the time at the ends of the axis
-    // with the day in the center. Otherwise, just show the first and last day at the ends
-    // of the axis
-    if (differenceInCalendarDays(last.updated_at, first.updated_at) === 0) {
-      labels[0] = format(first.updated_at, timeFormat)
-      labels[Math.floor(bins / 2)] = format(first.updated_at, dayFormat)
-      labels[bins] = format(last.updated_at, timeFormat)
+    const dateKey = first.updated_at ? 'updated_at' : 'created_at'
+    
+    if (differenceInCalendarDays(last[dateKey], first[dateKey]) === 0) {
+      labels[0] = format(first[dateKey], timeFormat)
+      labels[Math.floor(bins / 2)] = format(first[dateKey], dayFormat)
+      labels[bins] = format(last[dateKey], timeFormat)
     } else {
-      labels[0] = format(first.updated_at, dayFormat)
-      labels[bins] = format(last.updated_at, dayFormat)
+      labels[0] = format(first[dateKey], dayFormat)
+      labels[bins] = format(last[dateKey], dayFormat)
     }
   }
   return {

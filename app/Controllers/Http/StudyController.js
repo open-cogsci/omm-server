@@ -1205,21 +1205,21 @@ class StudyController {
       .firstOrFail()
 
     const ptcpTrend = (await Database.raw(`
-      SELECT SUM(c) AS amount, bin, updated_at
+      SELECT SUM(c) AS amount, bin, created_at
       FROM (
         SELECT
-          job_states.updated_at,
+          job_results.created_at,
           count(*) AS c,
           FLOOR(
             PERCENT_RANK() OVER (
-                ORDER BY job_states.updated_at ASC
+                ORDER BY job_results.created_at ASC
             ) * ?) as bin
-        FROM job_states
-        LEFT JOIN jobs ON job_states.job_id = jobs.id
-        WHERE status_id = 3 AND jobs.study_id = ?
-        GROUP BY job_states.updated_at
+        FROM job_results
+        LEFT JOIN jobs ON job_results.job_id = jobs.id
+        WHERE jobs.study_id = ?
+        GROUP BY job_results.created_at
       ) as bins
-      GROUP BY bin, updated_at
+      GROUP BY bin, created_at
       `, [bins, study.id]))[0]
 
     const trend = processTrend(bins, ptcpTrend)

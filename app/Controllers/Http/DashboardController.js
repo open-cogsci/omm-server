@@ -157,19 +157,20 @@ class DashboardController {
   async mostActiveStudies ({ request, auth }) {
     const limit = request.input('limit', 1000)
     const days = request.input('days', 7)
-    const data = await JobState.query()
+    
+    const JobResult = use('App/Models/JobResult')
+    
+    const data = await JobResult.query()
       .select(
-        Database.raw('COUNT(*) as participations'),
+        Database.raw('COUNT(*) as participations'),  // Now counts job_results
         'studies.id',
         'studies.name'
       )
-      .leftJoin('jobs', 'job_states.job_id', 'jobs.id')
-      .leftJoin('studies', 'jobs.study_id', 'studies.id')
+      .leftJoin('studies', 'job_results.study_id', 'studies.id')
       .leftJoin('study_users', 'studies.id', 'study_users.study_id')
       .where('study_users.user_id', auth.user.id)
       .where('studies.active', 1)
-      .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
-      .whereNot('job_states.status_id', 1) // job state status 'pending'
+      .whereRaw('job_results.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
       .groupByRaw('studies.name, studies.id')
       .orderBy('participations', 'desc')
       .limit(limit)
@@ -187,14 +188,16 @@ class DashboardController {
   async mostActiveParticipants ({ request }) {
     const limit = request.input('limit', 1000)
     const days = request.input('days', 7)
-    const data = await JobState.query()
+    
+    const JobResult = use('App/Models/JobResult')
+    
+    const data = await JobResult.query()
       .select('participants.name',
         'participants.identifier',
-        Database.raw('COUNT(*) as participations')
+        Database.raw('COUNT(*) as participations')  // ← Now counts job_results
       )
-      .leftJoin('participants', 'job_states.participant_id', 'participants.id')
-      .whereRaw('job_states.updated_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
-      .whereNot('job_states.status_id', 1) // job state status 'pending'
+      .leftJoin('participants', 'job_results.participant_id', 'participants.id')
+      .whereRaw('job_results.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)', [days])
       .groupByRaw('name, identifier')
       .orderBy('participations', 'desc')
       .limit(limit)
