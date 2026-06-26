@@ -27,6 +27,10 @@ export default {
       type: Number,
       required: true
     },
+    status: {
+      type: Number,
+      default: null
+    },
     loading: {
       type: [String, Number, Boolean],
       default: false
@@ -34,6 +38,9 @@ export default {
   },
   computed: {
     message () {
+      if (this.status === 3) {
+        return this.$t('participants.priority.finished')
+      }
       if (this.position.queue_position > 1) {
         return this.$t('participants.priority.queued') + ` ${this.position.queue_position - 1}`
       } else {
@@ -41,6 +48,9 @@ export default {
       }
     },
     decorations () {
+      if (this.status === 3) {
+        return { class: 'grey--text text--disabled' }
+      }
       return {
         class: this.position.queue_position > 1
           ? 'primary--text'

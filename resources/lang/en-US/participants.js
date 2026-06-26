@@ -46,7 +46,8 @@ export default {
   },
   priority: {
     queued: 'Queued at position',
-    first: 'First to run'
+    first: 'First to run',
+    finished: 'Finished'
   },
   jobs: {
     reset: {

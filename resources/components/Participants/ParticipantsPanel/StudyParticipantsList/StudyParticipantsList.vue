@@ -25,6 +25,7 @@
               :participant="item.id"
               :loading="loadingQueue"
               :position="queue[item.id]"
+              :status="item.pivot.status_id"
             />
           </v-list-item-content>
           <v-list-item-action v-if="editable" style="max-width: 40px">
