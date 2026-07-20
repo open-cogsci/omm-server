@@ -3,26 +3,18 @@
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
 
-class AddLoopFieldsSchema extends Schema {
+class AddRepeatFieldSchema extends Schema {
   up () {
     this.table('studies', (table) => {
-      table.boolean('loop_enabled').default(false)
-    })
-    
-    this.table('participations', (table) => {
-      table.integer('loop_count').unsigned().notNullable().defaultTo(0)
+      table.boolean('repeat').default(false)
     })
   }
 
   down () {
     this.table('studies', (table) => {
-      table.dropColumn('loop_enabled')
-    })
-    
-    this.table('participations', (table) => {
-      table.dropColumn('loop_count')
+      table.dropColumn('repeat')
     })
   }
 }
 
-module.exports = AddLoopFieldsSchema
+module.exports = AddRepeatFieldSchema

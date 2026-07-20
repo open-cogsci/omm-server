@@ -97,7 +97,7 @@ export default {
       search: 'Search user'
     }
   },
-  loop_enabled: 'Loop tasks',
-  loop_enabled_hint: 'When enabled, participants will restart from the first task after completing all jobs',
-  loop_disabled: 'Tasks do not loop'
+  repeat: 'Repeat',
+  repeat_hint: 'When enabled, participants will restart from the first task after completing all jobs',
+  repeat_off: 'Repeat off'
 }
