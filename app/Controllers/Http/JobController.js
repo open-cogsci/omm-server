@@ -70,6 +70,7 @@ class JobController {
    */
   async index ({ params, request, auth, transform }) {
     const { study_id: studyID } = params
+
     // Check if user has permission to view this study
     const study = await auth.user.studies()
       .where('study_id', studyID)
@@ -79,6 +80,9 @@ class JobController {
     const page = request.input('page', 1)
 
     const jobs = await study.jobs()
+      .with('variables', (query) => {
+        query.with('dtype')
+      })
       .orderBy('position', 'asc')
       .paginate(page, perPage)
 

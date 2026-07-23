@@ -1273,13 +1273,259 @@ class StudyController {
   *       default:
   *         description: Unexpected error
   */
-  async participantQueue ({ params, auth }) {
+  async participantQueue ({ params, request, auth, response }) {
     const { id, ptcpid = null } = params
-    const study = await auth.user.studies()
+
+    const study = await auth.user
+      .studies()
       .where('id', id)
-      .first()
-    const data = await study.getParticipantQueuePositions(ptcpid)
+      .firstOrFail()
+
+    let participantIDs = null
+
+    // Preserve support for:
+    // /studies/:id/queue/:ptcpid
+    if (ptcpid !== null) {
+      const participantID = Number(ptcpid)
+
+      if (
+        !Number.isInteger(participantID) ||
+        participantID <= 0
+      ) {
+        return response.badRequest({
+          message: 'Invalid participant ID'
+        })
+      }
+
+      participantIDs = [participantID]
+    } else {
+      // New:
+      // /studies/:id/queue?participant_ids=1,2,3
+      const rawIDs = request.input('participant_ids')
+
+      if (rawIDs !== undefined && rawIDs !== null) {
+        participantIDs = String(rawIDs)
+          .split(',')
+          .map(id => Number(id.trim()))
+
+        const hasInvalidIDs = participantIDs.some(
+          id =>
+            !Number.isInteger(id) ||
+            id <= 0
+        )
+
+        if (
+          participantIDs.length === 0 ||
+          hasInvalidIDs
+        ) {
+          return response.badRequest({
+            message: 'Invalid participant_ids'
+          })
+        }
+
+        participantIDs = [
+          ...new Set(participantIDs)
+        ]
+      }
+    }
+
+    const data = await study.getParticipantQueuePositions(participantIDs)
+
     return { data }
+  }
+
+  async finishedParticipantJobs ({ params, auth, response }) {
+    const { id, participantID } = params
+
+    const parsedParticipantID = Number(participantID)
+
+    if (
+      !Number.isInteger(parsedParticipantID) ||
+      parsedParticipantID <= 0
+    ) {
+      return response.badRequest({
+        message: 'Invalid participant ID'
+      })
+    }
+
+    const study = await auth.user
+      .studies()
+      .where('studies.id', id)
+      .firstOrFail()
+
+    const participant = await study
+      .participants()
+      .where(
+        'participants.id',
+        parsedParticipantID
+      )
+      .first()
+
+    if (!participant) {
+      return response.notFound({
+        message: 'Participant is not assigned to this study'
+      })
+    }
+
+    const jobs = await Database
+      .table('jobs')
+      .innerJoin(
+        'job_states',
+        'jobs.id',
+        'job_states.job_id'
+      )
+      .where('jobs.study_id', study.id)
+      .where(
+        'job_states.participant_id',
+        participant.id
+      )
+      .where(
+        'job_states.status_id',
+        3
+      )
+      .select(
+        'jobs.id',
+        'jobs.position'
+      )
+      .orderBy(
+        'jobs.position',
+        'asc'
+      )
+
+    return {
+      data: jobs
+    }
+  }
+
+
+  async resetParticipantJobs ({ params, request, auth, response }) {
+    const { id, participantID } = params
+    
+    const parsedParticipantID = Number(participantID)
+
+    if (
+      !Number.isInteger(parsedParticipantID) ||
+      parsedParticipantID <= 0
+    ) {
+      return response.badRequest({
+        message: 'Invalid participant ID'
+      })
+    }
+
+    const requestedJobIDs = request.input('job_ids')
+
+    if (
+      !Array.isArray(requestedJobIDs) ||
+      requestedJobIDs.length === 0
+    ) {
+      return response.badRequest({
+        message: 'job_ids must be a non-empty array'
+      })
+    }
+
+    const jobIDs = [
+      ...new Set(
+        requestedJobIDs.map(jobID => Number(jobID))
+      )
+    ]
+
+    if (
+      jobIDs.some(
+        jobID =>
+          !Number.isInteger(jobID) ||
+          jobID <= 0
+      )
+    ) {
+      return response.badRequest({
+        message: 'All job IDs must be positive integers'
+      })
+    }
+
+    // Ensure the logged-in user has access to the study.
+    const study = await auth.user
+      .studies()
+      .where('studies.id', id)
+      .firstOrFail()
+
+    if (!await study.isEditableBy(auth.user)) {
+      return response.unauthorized({
+        message:
+          'You have insufficient privileges to edit this study'
+      })
+    }
+
+    // Ensure participant belongs to the study.
+    const participant = await study
+      .participants()
+      .where(
+        'participants.id',
+        participantID
+      )
+      .first()
+
+    if (!participant) {
+      return response.notFound({
+        message:
+          'Participant is not assigned to this study'
+      })
+    }
+
+    /*
+    * Validate that all requested jobs actually belong
+    * to this study.
+    */
+    const validJobs = await Database
+      .table('jobs')
+      .where('study_id', study.id)
+      .whereIn('id', jobIDs)
+      .select('id')
+
+    const validJobIDs =
+      validJobs.map(job => Number(job.id))
+
+    if (validJobIDs.length !== jobIDs.length) {
+      return response.badRequest({
+        message:
+          'One or more selected jobs do not belong to this study'
+      })
+    }
+
+    /*
+    * Reset exactly the requested jobs.
+    *
+    * status_id:
+    * 1 = pending
+    * 2 = started
+    * 3 = finished
+    */
+    const rowsUpdated = await Database
+      .table('job_states')
+      .where(
+        'participant_id',
+        participant.id
+      )
+      .whereIn(
+        'job_id',
+        validJobIDs
+      )
+      .where(
+        'status_id',
+        3
+      )
+      .update({
+        status_id: 1
+      })
+
+    await study.checkIfFinished(
+      participant.id
+    )
+
+    return {
+      data: {
+        jobs_requested: jobIDs.length,
+        jobs_updated: rowsUpdated
+      }
+    }
   }
 }
 module.exports = StudyController

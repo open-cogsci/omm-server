@@ -82,6 +82,7 @@
           <v-row class="fill-height">
             <v-col cols="12" class="pt-6 pb-0 mb-0">
               <v-tabs-items v-model="tab" class="fill-height">
+                <!-- Information -->
                 <v-tab-item class="fill-height">
                   <v-row justify="center" class="fill-height">
                     <v-col xl="10">
@@ -99,12 +100,13 @@
                     </v-col>
                   </v-row>
                 </v-tab-item>
+                <!-- Jobs -->
                 <v-tab-item>
                   <jobs-table
                     :editable="userCanEdit"
                     :variables="variables"
                     :jobs="jobs"
-                    :loading="status.loading"
+                    :loading="status.loading || !jobsLoaded"
                     :refreshing="status.refreshingJobs"
                     :total-records="pagination.total"
                     :page="pagination.page"
@@ -114,6 +116,7 @@
                     @update:order="updateJobsOrder"
                   />
                 </v-tab-item>
+                <!-- Participants -->
                 <v-tab-item class="fill-height">
                   <participants-panel
                     ref="ptcpPanel"
@@ -122,6 +125,7 @@
                     @edit-session-data="openJsonEditor('session', $event)"
                   />
                 </v-tab-item>
+                <!-- Statistics -->
                 <v-tab-item>
                   <participation-stats
                     ref="participationStats"
@@ -159,29 +163,52 @@ export default {
   name: 'StudyPage',
   components: {
     StudyActions,
-    StudyTitle: () => import('@/components/Studies/page/StudyTitle'),
-    JobsTable: () => import('@/components/Studies/page/JobsTable'),
-    UploadExperimentDialog: () => import('@/components/Studies/dialogs/UploadExperimentDialog'),
-    UploadJobsDialog: () => import('@/components/Studies/dialogs/UploadJobsDialog'),
-    CollaboratorsDialog: () => import('@/components/Studies/dialogs/CollaboratorsDialog'),
-    ParticipantsPanel: () => import('@/components/Participants/ParticipantsPanel'),
-    ParticipationStats: () => import('@/components/Participants/ParticipationStats'),
+    StudyTitle: () =>
+      import('@/components/Studies/page/StudyTitle'),
+
+    JobsTable: () =>
+      import('@/components/Studies/page/JobsTable'),
+
+    UploadExperimentDialog: () =>
+      import('@/components/Studies/dialogs/UploadExperimentDialog'),
+
+    UploadJobsDialog: () =>
+      import('@/components/Studies/dialogs/UploadJobsDialog'),
+
+    CollaboratorsDialog: () =>
+      import('@/components/Studies/dialogs/CollaboratorsDialog'),
+
+    ParticipantsPanel: () =>
+      import('@/components/Participants/ParticipantsPanel'),
+
+    ParticipationStats: () =>
+      import('@/components/Participants/ParticipationStats'),
+
     StudyInfo,
-    JsonEditorDialog: () => import('@/components/common/JsonEditorDialog/JsonEditorDialog.vue')
+
+    JsonEditorDialog: () =>
+      import('@/components/common/JsonEditorDialog/JsonEditorDialog.vue')
   },
+
   beforeRouteUpdate (to, from, next) {
-    // The component is reused if the id simply changed, so mounted is not called in this case.
-    // Force a refetch if the id has changed.
+    // The component is reused when only the study ID changes,
+    // so mounted/created is not called again.
     if (to.params.id !== from.params.id) {
+      this.resetPagination()
+      this.jobsLoaded = false
+
+      // Fetch the newly selected study.
       this.fetchAll(to.params.id)
     }
-    this.resetPagination()
+
     next()
   },
+
   validate ({ params }) {
-    // Must be a number
+    // Study ID must be numeric.
     return /^\d+$/.test(params.id)
   },
+
   data () {
     return {
       status: {
@@ -191,13 +218,20 @@ export default {
         downloadingResultData: false,
         refreshingJobs: false
       },
+
+      jobsLoaded: false,
+
       errors: {
         title: {
           name: '',
           description: ''
         }
       },
-      pagination: { ...defaultPagination },
+
+      pagination: {
+        ...defaultPagination
+      },
+
       collaborators: {
         dialog: false,
         searchField: false,
@@ -207,6 +241,7 @@ export default {
         searchTerm: '',
         searchResults: []
       },
+
       uploading: {
         experiment: {
           dialog: false,
@@ -215,6 +250,7 @@ export default {
           cancel: null,
           file: null
         },
+
         jobs: {
           dialog: false,
           inProgress: false,
@@ -223,6 +259,7 @@ export default {
           file: null
         }
       },
+
       jsonEditor: {
         dialog: false,
         type: null,
@@ -231,173 +268,398 @@ export default {
       }
     }
   },
+
   head () {
     return {
       title: 'Study -- ' + this.study?.name || 404
     }
   },
+
   computed: {
     tab: sync('studyTab'),
+
+    // Tabs:
+    // 0 = Information
+    // 1 = Jobs
+    // 2 = Participants
+    // 3 = Statistics
+
     participationStatsVisible () {
-      return this.tab === 1
+      return this.tab === 3
     },
+
     ptcpPanelVisible () {
-      return this.tab === 1
+      return this.tab === 2
     },
+
     Study () {
       return this.$store.$db().model('studies')
     },
+
     Job () {
       return this.$store.$db().model('jobs')
     },
+
     User () {
       return this.$store.$db().model('users')
     },
+
     study () {
       return this.Study.query()
         .where('id', parseInt(this.$route.params.id))
-        .with(['variables.dtype', 'users', 'participants', 'files'])
+        .with([
+          'variables.dtype',
+          'users',
+          'participants',
+          'files'
+        ])
         .first()
     },
+
     jobs () {
       if (!this.study?.id) {
         return []
       }
+
       return this.Job.query()
         .where('study_id', this.study.id)
         .orderBy('position', 'asc')
-        .where('position',
-          value => value > this.pagination.pageStart && value <= this.pagination.pageStop)
+        .where(
+          'position',
+          value =>
+            value > this.pagination.pageStart &&
+            value <= this.pagination.pageStop
+        )
         .with('variables.dtype')
         .get()
     },
+
     variables () {
-      return (!this.status.loading && this.study?.variables) || []
+      return (
+        !this.status.loading &&
+        this.study?.variables
+      ) || []
     },
+
     osexpFile () {
-      return this.study?.files.filter(fl => fl.type === 'experiment')[0]
+      return this.study?.files
+        .filter(file => file.type === 'experiment')[0]
     },
+
     jobsFile () {
-      return this.study?.files.filter(fl => fl.type === 'jobs')[0]
+      return this.study?.files
+        .filter(file => file.type === 'jobs')[0]
     },
+
     userIsOwner () {
-      return !!this.study?.users.find(user => user.id === this.$auth.user.id && user.pivot.is_owner)
+      return !!this.study?.users.find(
+        user =>
+          user.id === this.$auth.user.id &&
+          user.pivot.is_owner
+      )
     },
+
     userCanEdit () {
-      return !!this.study?.users.find(user => user.id === this.$auth.user.id &&
-        user.pivot.access_permission_id === 2)
+      return !!this.study?.users.find(
+        user =>
+          user.id === this.$auth.user.id &&
+          user.pivot.access_permission_id === 2
+      )
     },
+
     dataFiles () {
-      return keyBy(this.study.files.filter(file => file.type.includes('data-')), 'type')
+      if (!this.study?.files) {
+        return {}
+      }
+
+      return keyBy(
+        this.study.files.filter(
+          file => file.type.includes('data-')
+        ),
+        'type'
+      )
     }
   },
-  async created () {
-    this.searchUsers = debounce(this.searchUsers, 250)
-    await this.fetchAll(this.$route.params.id)
+
+  watch: {
+    /**
+     * Lazy-load jobs only when the user actually opens
+     * the Jobs tab.
+     */
+    tab (newTab) {
+      if (newTab === 1) {
+        this.fetchJobsIfNeeded()
+      }
+    }
   },
+
+  async created () {
+    this.searchUsers = debounce(
+      this.searchUsers,
+      250
+    )
+
+    await this.fetchAll(
+      this.$route.params.id
+    )
+  },
+
   methods: {
-    ...mapActions('notifications', ['notify']),
+    ...mapActions(
+      'notifications',
+      ['notify']
+    ),
+
     async fetchStudy (studyID, options) {
       try {
-        await this.Study.fetchById(studyID, {
-          persistOptions: {
-            create: ['users']
-          },
-          ...options
-        })
-      } catch (e) {
-        processErrors(e, this.notify, true)
-      }
-    },
-    async fetchJobs (studyID, options) {
-      this.refreshingJobs = true
-      try {
-        const response = await this.Job.fetchByStudyId(
+        await this.Study.fetchById(
           studyID,
           {
-            params: pick(this.pagination, ['page', 'perPage']),
+            persistOptions: {
+              create: ['users']
+            },
             ...options
           }
         )
-        const serverPagination = response.response.data.pagination
-        const pageStart = (serverPagination.page - 1) * serverPagination.perPage
-        const pageStop = serverPagination.page * serverPagination.perPage
+
+        return true
+      } catch (e) {
+        processErrors(
+          e,
+          this.notify,
+          true
+        )
+
+        return false
+      }
+    },
+
+    /**
+     * Fetch one page of jobs.
+     *
+     * Returns true when successful so jobsLoaded is only
+     * set after a successful request.
+     */
+    async fetchJobs (studyID, options) {
+      this.status.refreshingJobs = true
+
+      try {
+        const response =
+          await this.Job.fetchByStudyId(
+            studyID,
+            {
+              params: pick(
+                this.pagination,
+                ['page', 'perPage']
+              ),
+              ...options
+            }
+          )
+
+        const serverPagination =
+          response.response.data.pagination
+
+        const pageStart =
+          (
+            serverPagination.page - 1
+          ) * serverPagination.perPage
+
+        const pageStop =
+          serverPagination.page *
+          serverPagination.perPage
+
         this.pagination = {
           ...this.pagination,
           ...serverPagination,
           pageStart,
           pageStop
         }
+
+        return true
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
+
+        return false
       } finally {
-        this.refreshingJobs = false
+        this.status.refreshingJobs = false
       }
     },
-    async fetchAll (studyID) {
-      this.status.loading = true
-      await this.fetchStudy(studyID)
-      await this.fetchJobs(studyID)
-      this.status.loading = false
+
+    /**
+     * Lazy-load jobs.
+     *
+     * This prevents the jobs request from being
+     * executed when the user only wants to view Participants.
+     */
+    async fetchJobsIfNeeded (studyID = null) {
+      if (this.jobsLoaded) {
+        return
+      }
+
+      const id =
+        studyID ||
+        this.study?.id
+
+      if (!id) {
+        return
+      }
+
+      const success =
+        await this.fetchJobs(id)
+
+      if (success) {
+        this.jobsLoaded = true
+      }
     },
+
+    /**
+     * Initial study load.
+     *
+     * Only the study request blocks initial rendering.
+     * Jobs are fetched only if the current tab is Jobs.
+     */
+    async fetchAll (studyID) {
+      this.jobsLoaded = false
+      this.status.loading = true
+
+      try {
+        await this.fetchStudy(studyID)
+      } finally {
+        this.status.loading = false
+      }
+
+      // Do not fetch jobs when opening Participants,
+      // Statistics, or Information.
+      if (this.tab === 1) {
+        await this.fetchJobsIfNeeded(studyID)
+      }
+    },
+
     async saveStudyInfo (data) {
       const payload = {
-        ...pick(this.study, ['id', 'name', 'description', 'information']),
+        ...pick(
+          this.study,
+          [
+            'id',
+            'name',
+            'description',
+            'information'
+          ]
+        ),
         ...data
       }
+
       this.status.savingStudyInfo = true
+
       try {
         await this.Study.persist(payload)
         this.errors.title = {}
       } catch (e) {
-        this.errors.title = processErrors(e, this.notify)
+        this.errors.title =
+          processErrors(
+            e,
+            this.notify
+          )
       } finally {
         this.status.savingStudyInfo = false
       }
     },
+
     async deleteStudy () {
       try {
         await this.study.destroy()
-        this.notify({ message: this.$t('studies.notifications.deleted'), color: 'success' })
-        this.$router.replace(this.localePath({ name: 'dashboard-studies' }))
+
+        this.notify({
+          message:
+            this.$t(
+              'studies.notifications.deleted'
+            ),
+          color: 'success'
+        })
+
+        this.$router.replace(
+          this.localePath({
+            name: 'dashboard-studies'
+          })
+        )
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       }
     },
+
     async updateJobsOrder (newOrder) {
       try {
         await this.Job.update(newOrder)
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       }
     },
+
     async archiveStudy () {
       try {
         await this.study.toggleArchived()
-        this.notify({ message: this.$t('studies.notifications.archived'), color: 'success' })
+
+        this.notify({
+          message:
+            this.$t(
+              'studies.notifications.archived'
+            ),
+          color: 'success'
+        })
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       }
     },
+
     async upload (type, file) {
       this.uploading[type].inProgress = true
-      const CancelToken = this.$axios.CancelToken
+
+      const CancelToken =
+        this.$axios.CancelToken
 
       try {
         this.uploading[type].progress = 0
-        await this.study.upload(type, file, {
-          cancelToken: new CancelToken((c) => {
-            this.uploading[type].cancel = c
-          }),
-          onUploadProgress: (event) => {
-            this.uploading[type].progress = event.loaded / event.total * 100
+
+        await this.study.upload(
+          type,
+          file,
+          {
+            cancelToken:
+              new CancelToken((cancel) => {
+                this.uploading[type].cancel =
+                  cancel
+              }),
+
+            onUploadProgress: (event) => {
+              this.uploading[type].progress =
+                event.loaded /
+                event.total *
+                100
+            }
           }
-        })
+        )
+
         this.uploading[type].progress = 100
       } catch (e) {
         if (!e.__CANCEL__) {
-          processErrors(e, this.notify)
+          processErrors(
+            e,
+            this.notify
+          )
         }
+
         this.uploading[type].progress = -1
       } finally {
         this.uploading[type].inProgress = false
@@ -406,107 +668,229 @@ export default {
 
       if (type === 'jobs') {
         this.notify({
-          message: this.$t('studies.notifications.refreshing_jobs'),
+          message:
+            this.$t(
+              'studies.notifications.refreshing_jobs'
+            ),
           color: 'info'
         })
+
         this.resetPagination()
-        await this.fetchStudy(this.study.id, {
-          persistOptions: {
-            create: ['users', 'variables']
+
+        await this.fetchStudy(
+          this.study.id,
+          {
+            persistOptions: {
+              create: [
+                'users',
+                'variables'
+              ]
+            }
           }
-        })
-        this.fetchJobs(this.study.id, { refresh: true })
+        )
+
+        // We explicitly need fresh jobs after uploading them.
+        const success =
+          await this.fetchJobs(
+            this.study.id,
+            {
+              refresh: true
+            }
+          )
+
+        this.jobsLoaded = success
+
         if (this.$refs.ptcpPanel) {
           this.$refs.ptcpPanel.refresh()
         }
       }
     },
+
     async searchUsers (val) {
-      if (this.collaborators.searching) { return }
+      if (this.collaborators.searching) {
+        return
+      }
+
       this.collaborators.searching = true
-      this.collaborators.searchResults = await this.User.search(val)
+
+      this.collaborators.searchResults =
+        await this.User.search(val)
+
       this.collaborators.searching = false
     },
+
     async addCollaborator (userID) {
       this.collaborators.saving = true
+
       try {
         await this.study.addUser(userID)
-        this.collaborators.searchField = false
+
+        this.collaborators.searchField =
+          false
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       } finally {
         this.collaborators.saving = false
       }
     },
+
     async setAccessLevel (payload) {
       try {
-        this.collaborators.savingAccess = payload.userID
-        await this.study.setAccessLevel(payload)
+        this.collaborators.savingAccess =
+          payload.userID
+
+        await this.study.setAccessLevel(
+          payload
+        )
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       } finally {
-        this.collaborators.savingAccess = null
+        this.collaborators.savingAccess =
+          null
       }
     },
+
     async removeCollaborator (userID) {
-      this.collaborators.deleting = userID
+      this.collaborators.deleting =
+        userID
+
       try {
-        await this.study.deleteUser(userID)
+        await this.study.deleteUser(
+          userID
+        )
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       } finally {
-        this.collaborators.deleting = null
+        this.collaborators.deleting =
+          null
       }
     },
+
     cancelUpload (item) {
-      if (isFunction(this.uploading[item].cancel)) {
-        this.uploading[item].cancel(this.$t('studies.notifications.upload_canceled'))
+      if (
+        isFunction(
+          this.uploading[item].cancel
+        )
+      ) {
+        this.uploading[item].cancel(
+          this.$t(
+            'studies.notifications.upload_canceled'
+          )
+        )
       }
     },
+
     openUploadExpDialog () {
-      this.uploading.experiment.progress = null
-      this.uploading.experiment.dialog = true
+      this.uploading.experiment.progress =
+        null
+
+      this.uploading.experiment.dialog =
+        true
     },
+
     openUploadJobsDialog () {
-      this.uploading.jobs.progress = null
-      this.uploading.jobs.dialog = true
+      this.uploading.jobs.progress =
+        null
+
+      this.uploading.jobs.dialog =
+        true
     },
-    updatePage (val) {
+
+    async updatePage (val) {
       this.pagination.page = val
-      this.fetchJobs(this.study.id)
+
+      await this.fetchJobs(
+        this.study.id
+      )
     },
-    updatePerPage (val) {
+
+    async updatePerPage (val) {
+      // Return to page 1 when changing page size.
+      this.pagination.page = 1
       this.pagination.perPage = val
-      this.fetchJobs(this.study.id)
+
+      await this.fetchJobs(
+        this.study.id
+      )
     },
+
     resetPagination () {
-      this.pagination = { ...defaultPagination }
+      this.pagination = {
+        ...defaultPagination
+      }
     },
+
     async generateDataFile (format) {
       try {
-        await this.study.generateDataFile({ params: { format } })
+        await this.study.generateDataFile({
+          params: {
+            format
+          }
+        })
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       }
     },
+
     async downloadResultData () {
-      this.status.downloadingResultData = true
-      await this.generateDataFile('csv')
-      const url = this.dataFiles['data-csv'].path
-      window.location.assign(url)
-      this.status.downloadingResultData = false
+      this.status.downloadingResultData =
+        true
+
+      try {
+        await this.generateDataFile('csv')
+
+        const url =
+          this.dataFiles['data-csv']?.path
+
+        if (url) {
+          window.location.assign(url)
+        }
+      } finally {
+        this.status.downloadingResultData =
+          false
+      }
     },
-    openJsonEditor (type, participantId = null) {
+
+    openJsonEditor (
+      type,
+      participantId = null
+    ) {
       this.jsonEditor.type = type
-      this.jsonEditor.studyId = this.study.id
-      this.jsonEditor.participantId = participantId
+      this.jsonEditor.studyId =
+        this.study.id
+
+      this.jsonEditor.participantId =
+        participantId
+
       this.jsonEditor.dialog = true
     },
+
     onJsonSaved () {
-      this.notify({ message: 'Data saved successfully', color: 'success' })
+      this.notify({
+        message:
+          'Data saved successfully',
+        color: 'success'
+      })
     },
+
     onJsonCleared () {
-      this.notify({ message: 'Data cleared successfully', color: 'success' })
+      this.notify({
+        message:
+          'Data cleared successfully',
+        color: 'success'
+      })
     }
   }
 }

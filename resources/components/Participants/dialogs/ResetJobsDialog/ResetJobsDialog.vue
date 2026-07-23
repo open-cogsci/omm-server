@@ -99,17 +99,15 @@ export default {
       type: Boolean,
       default: false
     },
+
     studyId: {
       type: Number,
       required: true
     },
+
     participant: {
       type: [Object, null],
       default: null
-    },
-    finishedJobs: {
-      type: Array,
-      default: () => []
     }
   },
   data () {
@@ -127,42 +125,51 @@ export default {
     }
   },
   watch: {
-    value (val) {
-      if (val) {
-        this.showConfirmation = false
+    value (isOpen) {
+      if (isOpen) {
+        this.onOpen()
+      } else {
+        this.onClose()
       }
     },
-    finishedJobs: {
-      handler (newVal) {
-        this.dialogFinishedJobs = newVal || []
-        this.selectedJobs = []
-        this.selectAll = false
-      },
-      immediate: true
-    },
+
     selectedJobs (val) {
-      this.selectAll = val.length === this.dialogFinishedJobs.length && this.dialogFinishedJobs.length > 0
+      this.selectAll =
+        this.dialogFinishedJobs.length > 0 &&
+        val.length === this.dialogFinishedJobs.length
     }
   },
   methods: {
     ...mapActions('notifications', ['notify']),
 
     async fetchFinishedJobs () {
-      if (!this.participant) {
+      if (
+        !this.studyId ||
+        !this.participant?.id
+      ) {
         return
       }
+
       this.loading = true
+
       try {
         const response = await this.$axios.get(
-          `${API_PREFIX}/participants/${this.participant.identifier}/${this.studyId}/jobs`
+          `${API_PREFIX}/studies/${this.studyId}` +
+          `/participants/${this.participant.id}` +
+          '/finished-jobs'
         )
-        this.dialogFinishedJobs = response.data.data.filter(
-          job => job.pivot && job.pivot.status_id === 3
-        )
+
+        this.dialogFinishedJobs =
+          response.data.data || []
+
         this.selectedJobs = []
         this.selectAll = false
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
+
         this.close()
       } finally {
         this.loading = false
@@ -183,33 +190,39 @@ export default {
       }
 
       this.loading = true
+
       try {
-        const positions = this.dialogFinishedJobs
-          .filter(j => this.selectedJobs.includes(j.id))
-          .map(j => j.position)
-
-        const minPos = Math.min(...positions)
-        const maxPos = Math.max(...positions)
-
-        await this.$axios.put(
-          `${API_PREFIX}/studies/${this.studyId}/jobs/state`,
+        const response = await this.$axios.put(
+          `${API_PREFIX}/studies/${this.studyId}` +
+          `/participants/${this.participant.id}` +
+          '/jobs/reset',
           {
-            from: minPos,
-            to: maxPos + 1,
-            state: 1,
-            participant: this.participant.identifier
+            job_ids: this.selectedJobs
           }
         )
 
+        const jobsUpdated =
+          response.data?.data?.jobs_updated ??
+          this.selectedJobs.length
+
         this.notify({
-          message: this.$t('participants.jobs.reset.success', { count: this.selectedJobs.length }),
+          message: this.$t(
+            'participants.jobs.reset.success',
+            {
+              count: jobsUpdated
+            }
+          ),
           color: 'success'
         })
 
         this.$emit('jobs-reset')
+
         this.close()
       } catch (e) {
-        processErrors(e, this.notify)
+        processErrors(
+          e,
+          this.notify
+        )
       } finally {
         this.loading = false
       }
@@ -217,6 +230,22 @@ export default {
 
     close () {
       this.$emit('input', false)
+    },
+
+    async onOpen () {
+      this.showConfirmation = false
+      this.selectedJobs = []
+      this.selectAll = false
+      this.dialogFinishedJobs = []
+
+      await this.fetchFinishedJobs()
+    },
+
+    onClose () {
+      this.showConfirmation = false
+      this.selectedJobs = []
+      this.selectAll = false
+      this.dialogFinishedJobs = []
     }
   }
 }

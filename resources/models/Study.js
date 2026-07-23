@@ -280,15 +280,27 @@ export default class Study extends Model {
     return reply.response.data.data
   }
 
-  async fetchParticipantQueuePositions (ptcpID = null, config) {
+  async fetchParticipantQueuePositions (ptcpIDs = null, config = {}) {
     let endpoint = `${STUDIES}/${this.id}/queue`
-    if (isNumber(ptcpID)) {
-      endpoint += `/${ptcpID}`
+
+    const params = {
+      ...(config.params || {})
     }
+
+    // Keep existing single-participant behavior.
+    if (isNumber(ptcpIDs)) {
+      endpoint += `/${ptcpIDs}`
+    } else if (Array.isArray(ptcpIDs) && ptcpIDs.length) {
+      // Batch behavior.
+      params.participant_ids = ptcpIDs.join(',')
+    }
+
     const reply = await this.constructor.api().get(endpoint, {
       save: false,
-      ...config
+      ...config,
+      params
     })
+
     return reply.response.data.data
   }
 }

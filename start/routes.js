@@ -58,14 +58,32 @@ Route.group(() => {
 
   Route.get('/studies/:id/participants', 'StudyController.fetchParticipants')
     .as('studies.fetch_participants')
+
   Route.get('/studies/:id/participants/ids', 'StudyController.fetchParticipantIDs')
     .as('studies.fetch_participant_ids')
+
   Route.post('/studies/:id/participants', 'StudyController.assignParticipants')
     .as('studies.assign_participants')
+
   Route.delete('/studies/:id/participants', 'StudyController.revokeParticipants')
     .as('studies.revoke_participants')
-  Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs').as('studies.refresh_jobs')
-  Route.get('/studies/:id/queue/:ptcpid?', 'StudyController.participantQueue').as('studies.queue')
+
+  Route.get(
+    '/studies/:id/participants/:participantID/finished-jobs',
+    'StudyController.finishedParticipantJobs'
+  ).as('studies.participant_finished_jobs')
+
+  Route.put(
+    '/studies/:id/participants/:participantID/jobs/reset',
+    'StudyController.resetParticipantJobs'
+  ).as('studies.reset_participant_jobs')
+
+  Route.get('/studies/:id/jobs/refresh', 'StudyController.refreshJobs')
+    .as('studies.refresh_jobs')
+
+  Route.get('/studies/:id/queue/:ptcpid?', 'StudyController.participantQueue')
+    .as('studies.queue')
+
   Route.resource('studies', 'StudyController').apiOnly()
     .validator(new Map([
       [['studies.store'], ['SaveStudy']],

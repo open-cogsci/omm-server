@@ -6,11 +6,10 @@
       @new-assignments="refresh"
     />
     <reset-jobs-dialog
-      v-if="dialog.selectedParticipant"
+      v-if="study?.id && dialog.selectedParticipant"
       v-model="dialog.resetJobs"
-      :study-id="study?.id"
+      :study-id="study.id"
       :participant="dialog.selectedParticipant"
-      :finished-jobs="dialog.finishedJobs"
       @jobs-reset="refresh"
     />
     <v-col
@@ -51,8 +50,6 @@
             :loading-queue="loading.queue"
             :loading="loading.initial"
             :fetching-more="loading.participants"
-            :study-id="study?.id"
-            :loading-resets="loadingResets"
             @changed-priority="fetchQueue"
             @scroll-end="loadMore"
             @reset-jobs="openResetJobsDialog"
@@ -68,7 +65,6 @@
 import { mapActions } from 'vuex'
 import { keyBy } from 'lodash'
 import { processErrors } from '@/assets/js/errorhandling'
-import { API_PREFIX } from '@/assets/js/endpoints'
 
 export default {
   components: {
@@ -94,8 +90,7 @@ export default {
         download: false,
         manage: false,
         resetJobs: false,
-        selectedParticipant: null,
-        finishedJobs: null
+        selectedParticipant: null
       },
       loading: {
         initial: false,
@@ -110,8 +105,7 @@ export default {
         total: 0
       },
       ptcpListCtrHeight: 0,
-      queue: {},
-      loadingResets: {}
+      queue: {}
     }
   },
   computed: {
@@ -127,12 +121,15 @@ export default {
     }
   },
   watch: {
-    study (val, oldVal) {
+    async study (val, oldVal) {
       if (!val || val.id === oldVal?.id) {
         return
       }
-      this.fetchParticipants()
-      this.fetchQueue()
+
+      this.queue = {}
+
+      await this.fetchParticipants()
+      await this.fetchQueue()
     }
   },
   async mounted () {
@@ -161,11 +158,27 @@ export default {
         this.loading.participants = false
       }
     },
-    async fetchQueue (ptcpID = null) {
-      if (!this.study?.id) { return }
-      this.loading.queue = ptcpID ?? 'all'
+    async fetchQueue (ptcpIDs = null) {
+      if (!this.study?.id) {
+        return
+      }
+
+      // No explicit IDs means: only participants currently loaded
+      // in the participant list.
+      const ids = ptcpIDs === null
+        ? this.participants.map(participant => participant.id)
+        : ptcpIDs
+
+      if (Array.isArray(ids) && ids.length === 0) {
+        return
+      }
+
+      this.loading.queue = ptcpIDs ?? 'all'
+
       try {
-        const results = await this.study.fetchParticipantQueuePositions(ptcpID)
+        const results =
+          await this.study.fetchParticipantQueuePositions(ids)
+
         this.queue = {
           ...this.queue,
           ...keyBy(results, 'participant_id')
@@ -186,51 +199,55 @@ export default {
         this.loading.data = null
       }
     },
-    refresh () {
-      this.fetchParticipants({
+    async refresh () {
+      this.queue = {}
+
+      await this.fetchParticipants({
         params: {
           page: 1,
           perPage: this.pagination.perPage
         }
       })
-      this.fetchQueue()
+
+      await this.fetchQueue()
     },
     setPtcpListCtrHeight () {
       this.ptcpListCtrHeight = this.$refs.ptcpListContainer?.clientHeight || 0
     },
-    loadMore () {
-      if (this.participants.length < this.pagination.total) {
-        this.fetchParticipants({
-          params: {
-            page: this.pagination.page + 1,
-            perPage: this.pagination.perPage
-          }
-        })
+    async loadMore () {
+      if (this.participants.length >= this.pagination.total) {
+        return
+      }
+
+      const existingIDs = new Set(
+        this.participants.map(participant => participant.id)
+      )
+
+      await this.fetchParticipants({
+        params: {
+          page: this.pagination.page + 1,
+          perPage: this.pagination.perPage
+        }
+      })
+
+      const newParticipantIDs = this.participants
+        .map(participant => participant.id)
+        .filter(id => !existingIDs.has(id))
+
+      if (newParticipantIDs.length) {
+        await this.fetchQueue(newParticipantIDs)
       }
     },
     setStartpage () {
       this.pagination.page = Math.max(1, Math.ceil(this.participants.length / this.pagination.perPage))
     },
-    async openResetJobsDialog ({ participant, studyId }) {
+    openResetJobsDialog ({ participant }) {
       if (!participant) {
         return
       }
-      this.$set(this.loadingResets, participant.id, true)
-      try {
-        const response = await this.$axios.get(
-          `${API_PREFIX}/participants/${participant.identifier}/${studyId}/jobs`
-        )
-        const finishedJobs = response.data.data.filter(
-          job => job.pivot && job.pivot.status_id === 3
-        )
-        this.dialog.selectedParticipant = participant
-        this.dialog.finishedJobs = finishedJobs
-        this.dialog.resetJobs = true
-      } catch (e) {
-        processErrors(e, this.notify)
-      } finally {
-        this.$set(this.loadingResets, participant.id, false)
-      }
+
+      this.dialog.selectedParticipant = participant
+      this.dialog.resetJobs = true
     }
   }
 }

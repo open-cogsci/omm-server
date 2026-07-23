@@ -52,11 +52,9 @@
                 <v-btn
                   icon
                   small
-                  :loading="loadingResets[item.id]"
-                  :disabled="loadingResets[item.id]"
                   v-bind="attrs"
                   v-on="on"
-                  @click.stop="$emit('reset-jobs', { participant: item, studyId })"
+                  @click.stop="$emit('reset-jobs', { participant: item })"
                 >
                   <v-icon small>
                     mdi-refresh
@@ -91,10 +89,6 @@ export default {
     QueueStatus
   },
   props: {
-    studyId: {
-      type: [Number, null],
-      default: null
-    },
     participants: {
       type: Array,
       default: () => []
@@ -118,10 +112,6 @@ export default {
     editable: {
       type: Boolean,
       default: false
-    },
-    loadingResets: {
-      type: Object,
-      default: () => ({})
     }
   },
   data: () => ({

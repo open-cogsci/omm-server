@@ -417,39 +417,58 @@ class ParticipantController {
       .orWhere('alternate_identifier', identifier)
       .firstOrFail()
     if (!ptcp.active) {
-      return response.badRequest({ message: 'Participant is not active' })
+      return response.badRequest({
+        message: 'Participant is not active'
+      })
     }
 
-    // Not very efficient to retrieve the participant from the DB twice (again in query below), but
-    // currently the simplest solution...
     const study = await ptcp.studies()
       .where('active', true)
       .with('files')
       .with('participants', (query) => {
         query
           .where('participants.id', ptcp.id)
-          .select(['id', 'name', 'meta', 'identifier', 'alternate_identifier'])
+          .select([
+            'id',
+            'name',
+            'meta',
+            'identifier',
+            'alternate_identifier'
+          ])
       })
       .withPivot(['status_id', 'priority'])
-      .whereInPivot('status_id', [1, 2]) // participation status 'pending' or 'started'
+      .whereInPivot('status_id', [1, 2])
       .orderBy('priority', 'asc')
       .orderBy('status_id', 'desc')
       .orderBy('studies.created_at', 'asc')
       .withCount('jobs')
-      .firstOrFail()
+      .first()
 
-    // Set studies status from pending to in progress
+    if (!study) {
+      return response.notFound({
+        message: 'No active studies with pending or started participation found'
+      })
+    }
+
+    // Set study status from pending to in progress
     if (study.pivot_status_id === 1) {
       try {
-        await ptcp.studies().pivotQuery()
+        await ptcp.studies()
+          .pivotQuery()
           .where('study_id', study.id)
-          .update({ status_id: 2 }) // participation status 'started'
+          .update({
+            status_id: 2
+          })
       } catch (e) {
-        return response.internalServerError({ message: 'Could not update study status' })
+        return response.internalServerError({
+          message: 'Could not update study status'
+        })
       }
     }
 
-    return transform.include('files,jobs_count,participants').item(study, 'StudyTransformer')
+    return transform
+      .include('files,jobs_count,participants')
+      .item(study, 'StudyTransformer')
   }
 
   /**

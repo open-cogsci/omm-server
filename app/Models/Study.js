@@ -481,42 +481,79 @@ class Study extends Model {
    * @return {*}
    * @memberof Study
    */
-  async getParticipantQueuePositions (ptcpID = null) {
-    let query = `
-      SELECT ranked.participant_id, ranked.queue_position
+  async getParticipantQueuePositions (ptcpIDs = null) {
+    if (
+      Array.isArray(ptcpIDs) &&
+      ptcpIDs.length === 0
+    ) {
+      return []
+    }
+
+    let participantIDs = []
+
+    if (Array.isArray(ptcpIDs)) {
+      participantIDs = ptcpIDs
+        .map(id => Number(id))
+        .filter(
+          id =>
+            Number.isInteger(id) &&
+            id > 0
+        )
+    } else if (ptcpIDs !== null) {
+      const id = Number(ptcpIDs)
+
+      if (
+        Number.isInteger(id) &&
+        id > 0
+      ) {
+        participantIDs = [id]
+      }
+    }
+
+    let participantFilter = ''
+    const args = []
+
+    if (participantIDs.length) {
+      const placeholders = participantIDs.map(() => '?').join(', ')
+
+      participantFilter = `
+        AND ptcp.participant_id IN (${placeholders})
+      `
+
+      args.push(...participantIDs)
+    }
+
+    const query = `
+      SELECT
+        ranked.participant_id,
+        ranked.queue_position
       FROM (
         SELECT
-          pp.id AS participant_id,
-          studies.id AS study_id,
+          ptcp.participant_id,
+          ptcp.study_id,
           ROW_NUMBER() OVER (
-            PARTITION BY
-              pp.id
+            PARTITION BY ptcp.participant_id
             ORDER BY
               ptcp.priority ASC,
               ptcp.status_id DESC,
               studies.created_at ASC
-            ) AS queue_position
-        FROM participants AS pp
-        LEFT JOIN
-          participations AS ptcp ON ptcp.participant_id = pp.id
-        LEFT JOIN
-          studies ON studies.id = ptcp.study_id
-        WHERE studies.active IS TRUE AND ptcp.status_id != 3
-        ORDER BY
-          participant_id ASC,
-          queue_position ASC
+          ) AS queue_position
+        FROM participations AS ptcp
+        INNER JOIN studies
+          ON studies.id = ptcp.study_id
+        WHERE
+          studies.active IS TRUE
+          AND ptcp.status_id != 3
+          ${participantFilter}
       ) AS ranked
-      WHERE ranked.study_id = ?`
+      WHERE ranked.study_id = ?
+      ORDER BY ranked.participant_id ASC
+    `
 
-    const args = [this.id]
-    if (ptcpID !== null) {
-      const id = parseFloat(ptcpID)
-      if (!isNaN(id)) {
-        args.push(id)
-        query += ' AND ranked.participant_id = ?'
-      }
-    }
+    args.push(this.id)
+
     const results = await Database.raw(query, args)
+
     return results.length ? results[0] : results
   }
 
