@@ -6,6 +6,7 @@ const { ModelNotFoundException } = require('@adonisjs/lucid/src/Exceptions')
 const { validate } = use('Validator')
 
 const Participant = use('App/Models/Participant')
+const Study = use('App/Models/Study')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -797,6 +798,7 @@ class ParticipantController {
 
     await study.storeJobResultData(jobResultData, jobID, ptcp.id)
     await study.checkIfFinished(ptcp.id)
+    await Study.resetLoopingStudiesForParticipant(ptcp.id)
 
     return response.noContent()
   }
