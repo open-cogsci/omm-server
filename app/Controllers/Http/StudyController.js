@@ -297,7 +297,7 @@ class StudyController {
       })
     }
 
-    study.merge(request.only(['name', 'description', 'information', 'active', 'loop_enabled']))
+    study.merge(request.only(['name', 'description', 'information', 'active', 'repeat']))
     study.save()
 
     return transform.item(study, 'StudyTransformer')
@@ -849,6 +849,7 @@ class StudyController {
     // Check if the study if finished for this participant (i.e. there are not open jobs),
     // and set this status accordingly
     await study.checkIfFinished(participant.id)
+    await Study.resetLoopingStudiesForParticipant(participant.id)
 
     return response.json({
       data: { jobs_updated: rowsUpdated }

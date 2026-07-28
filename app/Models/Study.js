@@ -174,16 +174,16 @@ class Study extends Model {
   }
 
   /**
-   * Check if study has looping enabled
-   * @method hasLoopEnabled
+   * Check if study has repeat enabled
+   * @method hasRepeatEnabled
    * @return {Boolean}
    */
-  async hasLoopEnabled () {
-    return this.loop_enabled === true
+  async hasRepeatEnabled () {
+    return this.repeat === true
   }
 
   /**
-   * Reset all job states for participants in this study (for looping)
+    * Reset all job states for participants in this study (for repeating)
    * @method resetJobStates
    * @param {Number} participantId
    * @return {Number} Number of reset job states
@@ -204,7 +204,44 @@ class Study extends Model {
         updated_at: new Date()
       })
     
+    await this.checkIfFinished(participantId)
+    await Study.resetLoopingStudiesForParticipant(participantId)
+
     return result
+  }
+
+  /**
+    * Reset repeat studies for a participant when all their studies are finished.
+   * This is called after a job result is submitted and checkIfFinished returns true.
+   * @method resetLoopingStudiesForParticipant
+   * @param {Number} participantId
+   * @return {Promise<void>}
+   */
+  static async resetLoopingStudiesForParticipant (participantId) {
+    const openJobsCount = await Database.table('job_states')
+      .where('participant_id', participantId)
+      .whereIn('status_id', [1, 2])
+      .getCount()
+
+    if (openJobsCount > 0) {
+      return
+    }
+
+    const repeatStudies = await Database.table('studies')
+      .join('participations', 'studies.id', 'participations.study_id')
+      .where('participations.participant_id', participantId)
+      .where('participations.status_id', 3)
+      .where('studies.repeat', true)
+      .select('studies.id')
+
+    for (const studyRow of repeatStudies) {
+      const study = await Study.find(studyRow.id)
+      await study.resetJobStates(participantId)
+      await study.participants()
+        .pivotQuery()
+        .where('participant_id', participantId)
+        .update({ status_id: 1 })
+    }
   }
 
   /**
@@ -388,16 +425,8 @@ class Study extends Model {
       }))
     }
 
-    // Get loop_count for this participant in this study
-    const participation = await Database
-      .table('participations')
-      .where('study_id', this.id)
-      .where('participant_id', ptcpId)
-      .first()
-    const loopCount = participation?.loop_count || 0
-
     // A job result is stored as JSON in the database and consists of 
-    // 1) the actual submitted data + loop count,
+    // 1) the actual submitted data,
     // 2) some info about the participant,
     // 3) some info about the job, 
     // 4) the variables data, 
@@ -414,7 +443,6 @@ class Study extends Model {
         job_position: job.position,
         study_id: this.id,
         study_name: this.name,  
-        loop_count: loopCount,
         ...varData,
         ...data
       })
@@ -447,26 +475,24 @@ class Study extends Model {
     if (ptcpID) {
       query.where('job_states.participant_id', ptcpID)
     }
-    // If the number of open jobs is 0, the study is finished
-    const finished = !await query.getCount()
+    const totalOpen = await query.clone().getCount()
+    const hasStartedJob = totalOpen > 0 && await query.clone().where('job_states.status_id', 2).getCount() > 0
+    const finished = totalOpen === 0
 
     // If the study is finished, update the participant's status
     if (ptcpID && updateStatus) {
       let statusID
 
-      if (finished && !this.loop_enabled) {
+      if (finished && !this.repeat) {
         statusID = 3 // Finished
-      } else if (finished && this.loop_enabled) {
-        // Reset jobs for next loop
-        await this.resetJobStates(ptcpID)
-        await this.participants().pivotQuery().where('participant_id', ptcpID).increment('loop_count', 1)
-        statusID = 2 // Keep as in progress
+      } else if (finished && this.repeat) {
+        statusID = 3 // Finished - will be reset when all studies are finished
       } else {
-        statusID = 2 // In progress
+        statusID = hasStartedJob ? 2 : 1
       }
 
-      await this.participants()
-        .pivotQuery()
+      await Database.table('participations')
+        .where('study_id', this.id)
         .where('participant_id', ptcpID)
         .whereNot('status_id', statusID)
         .update({ status_id: statusID })
