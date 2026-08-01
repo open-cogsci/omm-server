@@ -79,7 +79,7 @@
     "electron": "^11.4.2",
     "eslint": "^7.24.0",
     "eslint-plugin-nuxt": "^2.0.0",
-    "faker": "^5.5.3",
+    "faker": "^6.6.6",
     "flush-promises": "^1.0.2",
     "jest": "^26.6.3",
     "jest-serializer-vue-tjw": "^3.18.0",
