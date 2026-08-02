@@ -184,21 +184,21 @@ export default {
 
       this.loading = true
       try {
-        const positions = this.dialogFinishedJobs
-          .filter(j => this.selectedJobs.includes(j.id))
-          .map(j => j.position)
+        const selectedJobs = this.dialogFinishedJobs
+          .filter(job => this.selectedJobs.includes(job.id))
 
-        const minPos = Math.min(...positions)
-        const maxPos = Math.max(...positions)
-
-        await this.$axios.put(
-          `${API_PREFIX}/studies/${this.studyId}/jobs/state`,
-          {
-            from: minPos,
-            to: maxPos + 1,
-            state: 1,
-            participant: this.participant.identifier
-          }
+        await Promise.all(
+          selectedJobs.map(job =>
+            this.$axios.put(
+              `${API_PREFIX}/studies/${this.studyId}/jobs/state`,
+              {
+                from: job.position,
+                to: job.position + 1,
+                state: 1,
+                participant: this.participant.identifier
+              }
+            )
+          )
         )
 
         this.notify({
