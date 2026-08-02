@@ -1,6 +1,7 @@
 <template>
   <v-dialog
     persistent
+    scrollable
     :value="value"
     max-width="650px"
     @input="$emit('input', $event)"

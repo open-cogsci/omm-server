@@ -1,42 +1,43 @@
 <template>
-  <smooth-reflow>
-    <v-card outlined>
-      <v-virtual-scroll
-        v-if="ptcps.length"
-        :items="ptcps"
-        :item-height="65"
-        :height="scrollHeight"
-        @scroll.native="scrolling"
-      >
-        <template #default="{ item }">
-          <v-list-item
-            :key="item.id + '-' + item.selected"
-            :value="item.id"
-            :class="{'blue lighten-5': item.selected}"
-            @click="selectionChange(item.id, !item.selected)"
-          >
-            <v-list-item-action>
-              <v-checkbox
-                :input-value="item.selected"
-                @click.stop="selectionChange(item.id, !item.selected)"
-              />
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>
-                {{ item.name }}
-              </v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.identifier }}
-              </v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-virtual-scroll>
-      <v-card-text v-else>
-        No participants to show
-      </v-card-text>
-    </v-card>
-  </smooth-reflow>
+  <v-card outlined>
+    <v-virtual-scroll
+      v-if="ptcps.length"
+      :items="ptcps"
+      :item-height="65"
+      :height="scrollHeight"
+      @scroll.native="scrolling"
+    >
+      <template #default="{ item }">
+        <v-list-item
+          :key="item.id + '-' + item.selected"
+          :value="item.id"
+          :class="{ 'blue lighten-5': item.selected }"
+          @click="selectionChange(item.id, !item.selected)"
+        >
+          <v-list-item-action>
+            <v-checkbox
+              :input-value="item.selected"
+              @click.stop="selectionChange(item.id, !item.selected)"
+            />
+          </v-list-item-action>
+
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ item.name }}
+            </v-list-item-title>
+
+            <v-list-item-subtitle>
+              {{ item.identifier }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </template>
+    </v-virtual-scroll>
+
+    <v-card-text v-else>
+      No participants to show
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -51,8 +52,16 @@ export default {
     }
   },
   data () {
+    const viewportHeight =
+      typeof window !== 'undefined'
+        ? window.innerHeight
+        : 975
+
     return {
-      scrollHeight: 400
+      scrollHeight: Math.min(
+        400,
+        Math.max(200, viewportHeight - 575)
+      )
     }
   },
   computed: {
@@ -66,21 +75,35 @@ export default {
       })
     }
   },
+
+  created () {
+    this.scrolling = debounce(this.scrolling, 200)
+    this.updateHeight = debounce(this.updateHeight, 100)
+  },
+
   mounted () {
-    this.$nextTick(() => {
-      this.updateHeight()
-    })
     window.addEventListener('resize', this.updateHeight)
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.updateHeight)
+
+    if (this.scrolling.cancel) {
+      this.scrolling.cancel()
+    }
+
+    if (this.updateHeight.cancel) {
+      this.updateHeight.cancel()
+    }
   },
-  created () {
-    this.scrolling = debounce(this.scrolling, 200)
-  },
+
   methods: {
     updateHeight () {
-      this.scrollHeight = Math.max(200, window.innerHeight - 575)
+      const availableHeight = window.innerHeight - 575
+
+      this.scrollHeight = Math.min(
+        400,
+        Math.max(200, availableHeight)
+      )
     },
     selectionChange (id, checked) {
       let next
@@ -93,7 +116,17 @@ export default {
     },
     scrolling (event) {
       const element = event.currentTarget || event.target
-      if (element && element.scrollHeight - element.scrollTop === element.clientHeight) {
+
+      if (!element) {
+        return
+      }
+
+      const remainingScroll =
+        element.scrollHeight -
+        element.scrollTop -
+        element.clientHeight
+
+      if (remainingScroll <= 4) {
         this.$emit('scroll-end')
       }
     }
