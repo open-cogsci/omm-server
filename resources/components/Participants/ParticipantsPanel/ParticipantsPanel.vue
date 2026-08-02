@@ -218,13 +218,16 @@ export default {
       this.$set(this.loadingResets, participant.id, true)
       try {
         const response = await this.$axios.get(
-          `${API_PREFIX}/participants/${participant.identifier}/${studyId}/jobs`
+          `${API_PREFIX}/participants/${participant.identifier}/${studyId}/jobs`,
+          {
+            params: {
+              status_id: 3
+            }
+          }
         )
-        const finishedJobs = response.data.data.filter(
-          job => job.pivot && job.pivot.status_id === 3
-        )
+
         this.dialog.selectedParticipant = participant
-        this.dialog.finishedJobs = finishedJobs
+        this.dialog.finishedJobs = response.data.data
         this.dialog.resetJobs = true
       } catch (e) {
         processErrors(e, this.notify)

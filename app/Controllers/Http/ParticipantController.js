@@ -668,10 +668,19 @@ class ParticipantController {
    */
   async fetchJobs ({ params, request, response, transform }) {
     const { identifier, studyID } = params
-    const { from, to } = request.all()
+    const { from, to, status_id: statusId } = request.all()
 
     if (to && from && to <= from) {
       return response.badRequest({ message: 'To cannot be smaller than or equal to From' })
+    }
+
+    if (
+      statusId !== undefined &&
+      ![1, 2, 3].includes(Number(statusId))
+    ) {
+      return response.badRequest({
+        message: 'Invalid job status ID'
+      })
     }
 
     // Fetch the participant first as a separate step so that we have their
@@ -690,6 +699,11 @@ class ParticipantController {
       if (to) {
         query.where('position', '<', to)
       }
+
+      if (statusId !== undefined) {
+        query.whereInPivot('status_id', [Number(statusId)])
+      }
+
       query
         .where('study_id', studyID)
         .orderBy('position', 'asc')
@@ -703,7 +717,7 @@ class ParticipantController {
     // in-memory relations map. This does NOT hit the database — it simply
     // reads what was stored there by the load() call above.
     const jobs = participant.getRelated('jobs')
-    if (jobs.length === 0) {
+    if (jobs.length === 0 && statusId === undefined) {
       return response.notFound(`No jobs were found for study ID ${studyID}`)
     }
 
