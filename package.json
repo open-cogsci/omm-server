@@ -45,7 +45,7 @@
     "adonis-swagger": "^1.2.9",
     "cross-env": "^7.0.3",
     "date-fns": "^2.20.1",
-    "flat": "^5.0.2",
+    "flat": "^6.0.1",
     "fuse.js": "^6.6.2",
     "js-yaml": "^3.14.1",
     "mysql2": "^2.2.5",
